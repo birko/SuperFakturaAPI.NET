@@ -28,7 +28,7 @@ namespace Birko.SuperFaktura.Entities
         public string DeliveryCountryISOID { get; set; }
         public string DeliveryCountry { get; set; }
         public string DeliveryName { get; set; }
-        public bool match_address { get; set; } = true;
+        public bool MatchAddress { get; set; } = true;
         public string Comment { get; set; }
     }
 }
