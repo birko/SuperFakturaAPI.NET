@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Raven.Imports.Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -20,6 +21,7 @@ namespace Birko.SuperFaktura
 
     public class SearchParams : Params
     {
+        [JsonProperty(PropertyName = "search")]
         public string Search { get; set; }
         public override string ToParams(bool listInfo = true)
         {
@@ -32,7 +34,9 @@ namespace Birko.SuperFaktura
 
     public class PagedSearchParams : SearchParams
     {
+        [JsonProperty(PropertyName = "page")]
         public int Page { get; set; } = 1;
+        [JsonProperty(PropertyName = "per_page")]
         public int PerPage { get; set; } = 10;
 
         public override string ToParams(bool listInfo = true)

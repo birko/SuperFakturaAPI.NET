@@ -12,9 +12,8 @@ namespace Birko.SuperFaktura
     {
         public string Email { get; internal set; }
         public string APIKey { get; internal set; }
-
         public Data Data { get; internal set; } = new Data();
-
+        // constants
         public const string APIAUTHKEYWORD = "SFAPI";
         public const string APIURL = "https://moja.superfaktura.sk/";
 
@@ -30,7 +29,7 @@ namespace Birko.SuperFaktura
             client.BaseAddress = new Uri(Client.APIURL);
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(string.Format("{0} email={1}&apiKey={2}", Client.APIAUTHKEYWORD, this.Email, this.APIKey));
+            client.DefaultRequestHeaders.Add("Authorization", string.Format("{0} email={1}&apiKey={2}", Client.APIAUTHKEYWORD, this.Email, this.APIKey));
 
             return client;
         }
@@ -152,8 +151,11 @@ namespace Birko.SuperFaktura
         {
             using (var client = this.CreateClient())
             {
-                string uri = string.Format("contries");
-                HttpResponseMessage response = await client.GetAsync(uri);
+                string uri = string.Format("countries");
+                //HttpResponseMessage response = await client.GetAsync(uri);
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri) {};
+                request.Headers.Add("Authorization", string.Format("{0} email={1}&apiKey={2}", Client.APIAUTHKEYWORD, this.Email, this.APIKey));
+                HttpResponseMessage response = await client.SendAsync(request);
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsAsync<dynamic>();
