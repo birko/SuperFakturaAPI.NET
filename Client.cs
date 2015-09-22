@@ -29,7 +29,7 @@ namespace Birko.SuperFaktura
             client.BaseAddress = new Uri(Client.APIURL);
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.Add("Authorization", string.Format("{0} email={1}&apiKey={2}", Client.APIAUTHKEYWORD, this.Email, this.APIKey));
+            client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", string.Format("{0} email={1}&apiKey={2}", Client.APIAUTHKEYWORD, this.Email, this.APIKey));
 
             return client;
         }
@@ -53,9 +53,10 @@ namespace Birko.SuperFaktura
             {
                 string uri = string.Format("invoice_items/delete/{0}/invoice_id:{1}", invoiceID, itemID);
                 HttpResponseMessage response = await client.GetAsync(uri);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadAsAsync<dynamic>();
+                    return await response.Content.ReadAsAsync<dynamic>().ConfigureAwait(false);
                 }
             }
             return null;
@@ -151,11 +152,8 @@ namespace Birko.SuperFaktura
         {
             using (var client = this.CreateClient())
             {
-                string uri = string.Format("countries");
-                //HttpResponseMessage response = await client.GetAsync(uri);
-                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri) {};
-                request.Headers.Add("Authorization", string.Format("{0} email={1}&apiKey={2}", Client.APIAUTHKEYWORD, this.Email, this.APIKey));
-                HttpResponseMessage response = await client.SendAsync(request);
+                string uri = string.Format("{0}countries", Client.APIURL);
+                HttpResponseMessage response = await client.GetAsync(uri);
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsAsync<dynamic>();
