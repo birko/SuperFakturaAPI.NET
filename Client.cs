@@ -28,8 +28,8 @@ namespace Birko.SuperFaktura
             var client = new HttpClient();
             client.BaseAddress = new Uri(Client.APIURL);
             client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", string.Format("{0} email={1}&apiKey={2}", Client.APIAUTHKEYWORD, this.Email, this.APIKey));
+            //client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", string.Format("{0} email={1}&apikey={2}", Client.APIAUTHKEYWORD, this.Email, this.APIKey));
 
             return client;
         }
@@ -68,6 +68,7 @@ namespace Birko.SuperFaktura
             {
                 string uri = string.Format("expenses/delete/{0}", ID);
                 HttpResponseMessage response = await client.GetAsync(uri);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsAsync<dynamic>();
@@ -90,16 +91,17 @@ namespace Birko.SuperFaktura
             }
         }
 
-        public async Task<dynamic> Clients(Entities.Client.Filter filter, bool listInfo = true)
+        public async Task<PageResponse<ClientItem>> Clients(Entities.Client.Filter filter, bool listInfo = true)
         {
             using (var client = this.CreateClient())
             {
                 filter = (filter != null) ? filter : new Entities.Client.Filter();
                 string uri = string.Format("clients/index.json{0}", filter.ToParams(listInfo));
                 HttpResponseMessage response = await client.GetAsync(uri);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadAsAsync<dynamic>();
+                    return await response.Content.ReadAsAsync<PageResponse<ClientItem>>();
                 }
             }
             return null;
@@ -111,6 +113,7 @@ namespace Birko.SuperFaktura
             {
                 string uri = string.Format("invoices/delete/{0}", ID);
                 HttpResponseMessage response = await client.GetAsync(uri);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsAsync<dynamic>();
@@ -125,6 +128,7 @@ namespace Birko.SuperFaktura
             {
                 string uri = string.Format("stock_items/delete/{0}", ID);
                 HttpResponseMessage response = await client.GetAsync(uri);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsAsync<dynamic>();
@@ -140,6 +144,7 @@ namespace Birko.SuperFaktura
                 filter = (filter != null) ? filter : new Expense.Filter();
                 string uri = string.Format("expenses/index.json{0}", filter.ToParams(listInfo));
                 HttpResponseMessage response = await client.GetAsync(uri);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsAsync<dynamic>();
@@ -148,43 +153,46 @@ namespace Birko.SuperFaktura
             return null;
         }
 
-        public async Task<dynamic> GetCountries()
+        public async Task<Dictionary<int, string>> GetCountries()
         {
             using (var client = this.CreateClient())
             {
                 string uri = string.Format("{0}countries", Client.APIURL);
                 HttpResponseMessage response = await client.GetAsync(uri);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadAsAsync<dynamic>();
+                    return await response.Content.ReadAsAsync<Dictionary<int, string>>();
                 }
             }
             return null;
         }
 
-        public async Task<dynamic> GetSequences()
+        public async Task<IEnumerable<dynamic>> GetSequences()
         {
             using (var client = this.CreateClient())
             {
                 string uri = string.Format("sequences/index.json");
                 HttpResponseMessage response = await client.GetAsync(uri);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadAsAsync<dynamic>();
+                    return await response.Content.ReadAsAsync<IEnumerable<dynamic>>();
                 }
             }
             return null;
         }
 
-        public async Task<dynamic> GetTags()
+        public async Task<Dictionary<int, string>> GetTags()
         {
             using (var client = this.CreateClient())
             {
                 string uri = string.Format("tags/index.json");
                 HttpResponseMessage response = await client.GetAsync(uri);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadAsAsync<dynamic>();
+                    return await response.Content.ReadAsAsync<Dictionary<int, string>>();
                 }
             }
             return null;
@@ -197,6 +205,7 @@ namespace Birko.SuperFaktura
             {
                 string uri = string.Format("{0}/invoices/pdf/{1}/token:{2}", language, invoiceId, token );
                 HttpResponseMessage response = await client.GetAsync(uri);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsAsync<dynamic>();
@@ -205,15 +214,16 @@ namespace Birko.SuperFaktura
             return null;
         }
 
-        public async Task<dynamic> Invoice(int ID)
+        public async Task<PageResponse<InvoiceItem>> Invoice(int ID)
         {
             using (var client = this.CreateClient())
             {
                 string uri = string.Format("invoices/view/{0}.json", ID);
                 HttpResponseMessage response = await client.GetAsync(uri);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadAsAsync<dynamic>();
+                    return await response.Content.ReadAsAsync<PageResponse<InvoiceItem>>();
                 }
             }
             return null;
@@ -226,9 +236,10 @@ namespace Birko.SuperFaktura
                 filter = (filter != null) ? filter : new Invoice.Filter();
                 string uri = string.Format("invoices/index.json{0}", filter.ToParams(listInfo));
                 HttpResponseMessage response = await client.GetAsync(uri);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadAsAsync<dynamic>();
+                    return await response.Content.ReadAsAsync<List<dynamic>>();
                 }
             }
             return null;
@@ -240,6 +251,7 @@ namespace Birko.SuperFaktura
             {
                 string uri = string.Format("expense/edit/{0}.json", ID);
                 HttpResponseMessage response = await client.GetAsync(uri);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsAsync<dynamic>();
@@ -254,6 +266,7 @@ namespace Birko.SuperFaktura
             {
                 string uri = string.Format("stock_items/edit/{0}.json", ID);
                 HttpResponseMessage response = await client.GetAsync(uri);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsAsync<dynamic>();
@@ -275,6 +288,7 @@ namespace Birko.SuperFaktura
 
                     string uri = string.Format("stock_items/addstockmovement");
                     HttpResponseMessage response = await client.PostAsJsonAsync(uri, this.Data);
+                    response.EnsureSuccessStatusCode();
                     if (response.IsSuccessStatusCode)
                     {
                         return await response.Content.ReadAsAsync<dynamic>();
@@ -295,6 +309,7 @@ namespace Birko.SuperFaktura
             {
                 string uri = string.Format("stock_items/add");
                 HttpResponseMessage response = await client.PostAsJsonAsync(uri, item);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsAsync<dynamic>();
@@ -309,6 +324,7 @@ namespace Birko.SuperFaktura
             {
                 string uri = string.Format("stock_items/edit");
                 HttpResponseMessage response = await client.PostAsJsonAsync(uri, item);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsAsync<dynamic>();
@@ -325,6 +341,7 @@ namespace Birko.SuperFaktura
                 filter = (filter != null) ? filter : new Stock.Filter();
                 string uri = string.Format("stock_items/index.json{0}", filter.ToParams(listInfo));
                 HttpResponseMessage response = await client.GetAsync(uri);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsAsync<dynamic>();
@@ -339,6 +356,7 @@ namespace Birko.SuperFaktura
             {
                 string uri = string.Format("invoices/setinvoicelanguage/{0}/lang:{1}", ID, lang);
                 HttpResponseMessage response = await client.GetAsync(uri);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsAsync<dynamic>();
@@ -353,6 +371,7 @@ namespace Birko.SuperFaktura
             {
                 string uri = string.Format("invoices/mark_as_sent");
                 HttpResponseMessage response = await client.PostAsJsonAsync(uri, email);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsAsync<dynamic>();
@@ -368,6 +387,7 @@ namespace Birko.SuperFaktura
             {
                 string uri = string.Format("invoices/send");
                 HttpResponseMessage response = await client.PostAsJsonAsync(uri, email);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsAsync<dynamic>();
@@ -382,6 +402,7 @@ namespace Birko.SuperFaktura
             {
                 string uri = string.Format("invoices/post");
                 HttpResponseMessage response = await client.PostAsJsonAsync(uri, post);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsAsync<dynamic>();
@@ -396,6 +417,7 @@ namespace Birko.SuperFaktura
             {
                 string uri = string.Format("invoice_payments/add/ajax:1/api:1");
                 HttpResponseMessage response = await client.PostAsJsonAsync(uri, payment);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsAsync<dynamic>();
@@ -409,6 +431,7 @@ namespace Birko.SuperFaktura
             {
                 string uri = string.Format("expense_payments/add");
                 HttpResponseMessage response = await client.PostAsJsonAsync(uri, payment);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsAsync<dynamic>();
@@ -423,6 +446,7 @@ namespace Birko.SuperFaktura
             {
                 string uri = string.Format((Data.Expense == null) ? "/invoices/create": "/expenses/add");
                 HttpResponseMessage response = await client.PostAsJsonAsync(uri, this.Data);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsAsync<dynamic>();
@@ -437,6 +461,7 @@ namespace Birko.SuperFaktura
             {
                 string uri = string.Format((Data.Expense == null) ? "/invoices/edit": "/expenses/edit");
                 HttpResponseMessage response = await client.PostAsJsonAsync(uri, this.Data);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsAsync<dynamic>();
@@ -451,6 +476,7 @@ namespace Birko.SuperFaktura
             {
                 string uri = string.Format("clients/create");
                 HttpResponseMessage response = await client.PostAsJsonAsync(uri, this.Data);
+                response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsAsync<dynamic>();

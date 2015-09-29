@@ -42,6 +42,8 @@ namespace Birko.SuperFaktura.Entities
             public const string ProForma = "proforma";
             public const string Estimate = "estimate";
             public const string Cancel = "cancel";
+
+            public static string[] Types = new[] { Regular, ProForma, Estimate, Cancel };
         }
         public class Delivery
         {

@@ -17,8 +17,14 @@ namespace Birko.SuperFaktura.Entities
             public override string ToParams(bool listInfo = true)
             {
                 string paramString = base.ToParams(listInfo);
-                paramString += "/price_from:" + this.PriceFrom;
-                paramString += "/price_to:" + this.PriceTo;
+                if (this.PriceFrom > 0)
+                {
+                    paramString += "/price_from:" + this.PriceFrom;
+                }
+                if (this.PriceTo > 0)
+                {
+                    paramString += "/price_to:" + this.PriceTo;
+                }
 
                 return paramString;
             }

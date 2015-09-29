@@ -9,9 +9,13 @@ namespace Birko.SuperFaktura.Entities
     {
         [JsonProperty(PropertyName = "id")]
         public int? ID { get; set; }
+        [JsonProperty(PropertyName = "user_id")]
+        public int? UserID { get; set; }
+        [JsonProperty(PropertyName = "user_profile_id")]
+        public int? UserProfileID { get; set; }
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
-        [JsonProperty(PropertyName = "ici")]
+        [JsonProperty(PropertyName = "ico")]
         public string ICO { get; set; }
         [JsonProperty(PropertyName = "dic")]
         public string DIC { get; set; }
@@ -33,7 +37,7 @@ namespace Birko.SuperFaktura.Entities
         public string BankAccount { get; set; }
         [JsonProperty(PropertyName = "country_id")]
         public int CountryID { get; set; }
-        [JsonProperty(PropertyName = "country_ido_id")]
+        [JsonProperty(PropertyName = "country_iso_id")]
         public string CountryISOID { get; set; }
         [JsonProperty(PropertyName = "country")]
         public string Country { get; set; }
@@ -55,5 +59,19 @@ namespace Birko.SuperFaktura.Entities
         public bool MatchAddress { get; set; } = true;
         [JsonProperty(PropertyName = "comment")]
         public string Comment { get; set; }
+        [JsonProperty(PropertyName = "default_variable")]
+        public string DefaultVariable { get; set; }
+        [JsonProperty(PropertyName = "dicount")]
+        public decimal Discount { get; set; }
+        [JsonProperty(PropertyName = "currency")]
+        public string Currency { get; set; } = Invoice.Currency.Euro;
+        [JsonProperty(PropertyName = "created")]
+        public DateTime Created { get; set; }
+        [JsonProperty(PropertyName = "modified")]
+        public DateTime Modified { get; set; }
+        [JsonProperty(PropertyName = "demo")]
+        public bool Demo { get; set; } = false;
+        [JsonProperty(PropertyName = "tags")]
+        public dynamic[] Tags { get; set; }
     }
 }

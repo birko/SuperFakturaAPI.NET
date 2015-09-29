@@ -22,11 +22,14 @@ namespace Birko.SuperFaktura
     public class SearchParams : Params
     {
         [JsonProperty(PropertyName = "search")]
-        public string Search { get; set; }
+        public string Search { get; set; } = string.Empty;
         public override string ToParams(bool listInfo = true)
         {
             string paramString = base.ToParams(listInfo);
-            paramString += "/search:" + Convert.ToBase64String(Encoding.UTF8.GetBytes(this.Search));
+            if (!string.IsNullOrEmpty(this.Search))
+            {
+                paramString += "/search:" + Convert.ToBase64String(Encoding.UTF8.GetBytes(this.Search));
+            }
 
             return paramString;
         }
@@ -42,8 +45,14 @@ namespace Birko.SuperFaktura
         public override string ToParams(bool listInfo = true)
         {
             string paramString = base.ToParams(listInfo);
-            paramString += "/page:" + this.Page;
-            paramString += "/per_page:" + this.PerPage;
+            if (this.Page > 0)
+            {
+                paramString += "/page:" + this.Page;
+            }
+            if (this.PerPage > 0)
+            {
+                paramString += "/per_page:" + this.PerPage;
+            }
 
             return paramString;
         }

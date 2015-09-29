@@ -45,16 +45,43 @@ namespace Birko.SuperFaktura.Entities
                 string paramString = base.ToParams(listInfo);
                 paramString += "/created:" + this.Created;
                 paramString += "/delivery:" + this.Delivery;
-                paramString += "/type:" + this.Type;
-                paramString += "/delivery_type:" + this.DeliveryType;
-                paramString += "/payment_type:" + this.PaymentType;
+                if (!string.IsNullOrEmpty(this.Type))
+                {
+                    paramString += "/type:" + this.Type;
+                }
+                if (!string.IsNullOrEmpty(this.DeliveryType))
+                {
+                    paramString += "/delivery_type:" + this.DeliveryType;
+                }
+                if (!string.IsNullOrEmpty(this.PaymentType))
+                {
+                    paramString += "/payment_type:" + this.PaymentType;
+                }
                 paramString += "/status:" + this.Status;
-                paramString += "/client_id:" + this.ClientId;
-                paramString += "/amount_from:" + this.AmountFrom;
-                paramString += "/amount_to:" + this.AmountTo;
-                paramString += "/paid_since:" + this.PaidSince;
-                paramString += "/paid_to:" + this.PaidTo;
-                paramString += "/ignore:" + this.Ignore;
+                if (this.ClientId.HasValue)
+                {
+                    paramString += "/client_id:" + this.ClientId;
+                }
+                if (this.AmountFrom > 0)
+                {
+                    paramString += "/amount_from:" + this.AmountFrom;
+                }
+                if (this.AmountTo > 0)
+                {
+                    paramString += "/amount_to:" + this.AmountTo;
+                }
+                if (this.PaidSince.HasValue)
+                {
+                    paramString += "/paid_since:" + this.PaidSince;
+                }
+                if (this.PaidTo.HasValue)
+                {
+                    paramString += "/paid_to:" + this.PaidTo;
+                }
+                if (!string.IsNullOrEmpty(this.Ignore))
+                {
+                    paramString += "/ignore:" + this.Ignore;
+                }
 
                 return paramString;
             }
