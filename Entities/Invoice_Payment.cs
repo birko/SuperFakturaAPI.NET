@@ -5,15 +5,17 @@ using System.Text;
 
 namespace Birko.SuperFaktura.Entities
 {
-    public partial class Expense 
+    public partial class Invoice
     {
-        public class Payment
+        public partial class Payment
         {
-            [JsonProperty(PropertyName = "expense_id", NullValueHandling = NullValueHandling.Ignore)]
-            public int ExpenseID { get; set; }
+            [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
+            public int? ID { get; set; }
+            [JsonProperty(PropertyName = "invoice_id", NullValueHandling = NullValueHandling.Ignore)]
+            public int InvoiceID { get; set; }
             // payment consts
             [JsonProperty(PropertyName = "type", NullValueHandling = NullValueHandling.Ignore)]
-            public string Type { get; set; } = Invoice.Payment.BankTransfer;
+            public string Type { get; set; } = Payment.BankTransfer;
             [JsonProperty(PropertyName = "amount", NullValueHandling = NullValueHandling.Ignore)]
             public decimal Amount { get; set; } = 0;
             [JsonProperty(PropertyName = "currency", NullValueHandling = NullValueHandling.Ignore)]

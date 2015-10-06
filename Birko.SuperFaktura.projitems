@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Client.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Entities\Client.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Entities\Client_Filter.cs" />
@@ -23,6 +24,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Entities\Invoice_Email.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Entities\Invoice_Filter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Entities\Invoice_Item.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\Invoice_Payment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Entities\Invoice_Post.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Entities\Stock_Filter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Entities\Stock_Item.cs" />

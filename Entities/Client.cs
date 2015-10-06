@@ -1,4 +1,4 @@
-﻿using Raven.Imports.Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,71 +7,72 @@ namespace Birko.SuperFaktura.Entities
 {
     public partial class Client
     {
-        [JsonProperty(PropertyName = "id")]
+        [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
         public int? ID { get; set; }
-        [JsonProperty(PropertyName = "user_id")]
+        [JsonProperty(PropertyName = "user_id", NullValueHandling = NullValueHandling.Ignore)]
         public int? UserID { get; set; }
-        [JsonProperty(PropertyName = "user_profile_id")]
+        [JsonProperty(PropertyName = "user_profile_id", NullValueHandling = NullValueHandling.Ignore)]
         public int? UserProfileID { get; set; }
-        [JsonProperty(PropertyName = "name")]
+        [JsonProperty(PropertyName = "name", NullValueHandling = NullValueHandling.Ignore)]
         public string Name { get; set; }
-        [JsonProperty(PropertyName = "ico")]
+        [JsonProperty(PropertyName = "ico", NullValueHandling = NullValueHandling.Ignore)]
         public string ICO { get; set; }
-        [JsonProperty(PropertyName = "dic")]
+        [JsonProperty(PropertyName = "dic", NullValueHandling = NullValueHandling.Ignore)]
         public string DIC { get; set; }
-        [JsonProperty(PropertyName = "ic_dph")]
+        [JsonProperty(PropertyName = "ic_dph", NullValueHandling = NullValueHandling.Ignore)]
         public string ICDPH { get; set; }
-        [JsonProperty(PropertyName = "email")]
+        [JsonProperty(PropertyName = "email", NullValueHandling = NullValueHandling.Ignore)]
         public string Email { get; set; }
-        [JsonProperty(PropertyName = "address")]
+        [JsonProperty(PropertyName = "address", NullValueHandling = NullValueHandling.Ignore)]
         public string Address { get; set; }
-        [JsonProperty(PropertyName = "city")]
+        [JsonProperty(PropertyName = "city", NullValueHandling = NullValueHandling.Ignore)]
         public string City { get; set; }
-        [JsonProperty(PropertyName = "zip")]
+        [JsonProperty(PropertyName = "zip", NullValueHandling = NullValueHandling.Ignore)]
         public string ZIP { get; set; }
-        [JsonProperty(PropertyName = "phone")]
+        [JsonProperty(PropertyName = "phone", NullValueHandling = NullValueHandling.Ignore)]
         public string Phone { get; set; }
-        [JsonProperty(PropertyName = "fax")]
+        [JsonProperty(PropertyName = "fax", NullValueHandling = NullValueHandling.Ignore)]
         public string Fax { get; set; }
-        [JsonProperty(PropertyName = "bank_account")]
+        [JsonProperty(PropertyName = "bank_account", NullValueHandling = NullValueHandling.Ignore)]
         public string BankAccount { get; set; }
-        [JsonProperty(PropertyName = "country_id")]
+        [JsonProperty(PropertyName = "country_id", NullValueHandling = NullValueHandling.Ignore)]
         public int CountryID { get; set; }
-        [JsonProperty(PropertyName = "country_iso_id")]
+        [JsonProperty(PropertyName = "country_iso_id", NullValueHandling = NullValueHandling.Ignore)]
         public string CountryISOID { get; set; }
-        [JsonProperty(PropertyName = "country")]
+        [JsonProperty(PropertyName = "country", NullValueHandling = NullValueHandling.Ignore)]
         public string Country { get; set; }
-        [JsonProperty(PropertyName = "delivery_address")]
+        [JsonProperty(PropertyName = "delivery_address", NullValueHandling = NullValueHandling.Ignore)]
         public string DeliveryAddress { get; set; }
-        [JsonProperty(PropertyName = "delivery_city")]
+        [JsonProperty(PropertyName = "delivery_city", NullValueHandling = NullValueHandling.Ignore)]
         public string DeliveryCity { get; set; }
-        [JsonProperty(PropertyName = "delivery_zip")]
+        [JsonProperty(PropertyName = "delivery_zip", NullValueHandling = NullValueHandling.Ignore)]
         public string DeliveryZIP { get; set; }
-        [JsonProperty(PropertyName = "delivery_country_id")]
+        [JsonProperty(PropertyName = "delivery_country_id", NullValueHandling = NullValueHandling.Ignore)]
         public int DeliveryCountryID { get; set; }
-        [JsonProperty(PropertyName = "delivery_iso_id")]
+        [JsonProperty(PropertyName = "delivery_iso_id", NullValueHandling = NullValueHandling.Ignore)]
         public string DeliveryCountryISOID { get; set; }
-        [JsonProperty(PropertyName = "delivery_country")]
+        [JsonProperty(PropertyName = "delivery_country", NullValueHandling = NullValueHandling.Ignore)]
         public string DeliveryCountry { get; set; }
-        [JsonProperty(PropertyName = "delivery_name")]
+        [JsonProperty(PropertyName = "delivery_name", NullValueHandling = NullValueHandling.Ignore)]
         public string DeliveryName { get; set; }
-        [JsonProperty(PropertyName = "match_address")]
+        [JsonProperty(PropertyName = "match_address", NullValueHandling = NullValueHandling.Ignore)]
         public bool MatchAddress { get; set; } = true;
-        [JsonProperty(PropertyName = "comment")]
+        [JsonProperty(PropertyName = "comment", NullValueHandling = NullValueHandling.Ignore)]
         public string Comment { get; set; }
-        [JsonProperty(PropertyName = "default_variable")]
+        [JsonProperty(PropertyName = "default_variable", NullValueHandling = NullValueHandling.Ignore)]
         public string DefaultVariable { get; set; }
-        [JsonProperty(PropertyName = "dicount")]
-        public decimal Discount { get; set; }
-        [JsonProperty(PropertyName = "currency")]
+        [JsonProperty(PropertyName = "dicount", NullValueHandling = NullValueHandling.Ignore)]
+        public decimal? Discount { get; set; }
+        [JsonProperty(PropertyName = "currency", NullValueHandling = NullValueHandling.Ignore)]
         public string Currency { get; set; } = Invoice.Currency.Euro;
-        [JsonProperty(PropertyName = "created")]
-        public DateTime Created { get; set; }
-        [JsonProperty(PropertyName = "modified")]
-        public DateTime Modified { get; set; }
-        [JsonProperty(PropertyName = "demo")]
+        [JsonProperty(PropertyName = "created", NullValueHandling = NullValueHandling.Ignore)]
+        public DateTime? Created { get; set; }
+        [JsonProperty(PropertyName = "modified", NullValueHandling = NullValueHandling.Ignore)]
+        public DateTime? Modified { get; set; }
+        [JsonProperty(PropertyName = "demo", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(StringBooleanConverter))]
         public bool Demo { get; set; } = false;
-        [JsonProperty(PropertyName = "tags")]
+        [JsonProperty(PropertyName = "tags", NullValueHandling = NullValueHandling.Ignore)]
         public dynamic[] Tags { get; set; }
     }
 }

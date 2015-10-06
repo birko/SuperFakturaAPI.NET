@@ -1,4 +1,4 @@
-﻿using Raven.Imports.Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,13 +9,13 @@ namespace Birko.SuperFaktura.Entities
     {
         public class Post
         {
-            [JsonProperty(PropertyName = "invoice_id")]
+            [JsonProperty(PropertyName = "invoice_id", NullValueHandling = NullValueHandling.Ignore)]
             public int InvoiceID { get; set; }
-            [JsonProperty(PropertyName = "delivery_address")]
+            [JsonProperty(PropertyName = "delivery_address", NullValueHandling = NullValueHandling.Ignore)]
             public string DeliveryAddress { get; set; }
-            [JsonProperty(PropertyName = "delivery_city")]
+            [JsonProperty(PropertyName = "delivery_city", NullValueHandling = NullValueHandling.Ignore)]
             public string DeliveryCity { get; set; }
-            [JsonProperty(PropertyName = "delivery_state")]
+            [JsonProperty(PropertyName = "delivery_state", NullValueHandling = NullValueHandling.Ignore)]
             public string DeliveryState{ get; set; }
         }
     }

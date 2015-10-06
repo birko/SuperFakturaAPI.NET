@@ -1,39 +1,54 @@
-﻿using Raven.Imports.Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Text;
+using System.Collections;
+using Birko.SuperFaktura.Entities;
 
 namespace Birko.SuperFaktura
 {
     public class PageResponse<T>
     {
-        [JsonProperty(PropertyName = "itemCount")]
+        [JsonProperty(PropertyName = "itemCount", NullValueHandling = NullValueHandling.Ignore)]
         public int ItemCount { get; set; } = 0;
-        [JsonProperty(PropertyName = "pageCount")]
+        [JsonProperty(PropertyName = "pageCount", NullValueHandling = NullValueHandling.Ignore)]
         public int PageCount { get; set; } = 0;
-        [JsonProperty(PropertyName = "perPage")]
+        [JsonProperty(PropertyName = "perPage", NullValueHandling = NullValueHandling.Ignore)]
         public int PerPage { get; set; } = 0;
-        [JsonProperty(PropertyName = "page")]
+        [JsonProperty(PropertyName = "page", NullValueHandling = NullValueHandling.Ignore)]
         public int Page { get; set; } = 0;
-        [JsonProperty(PropertyName = "Items")]
-        public T[] Items { get; set; }
+        [JsonProperty(PropertyName = "items", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(ResponseItemListConverter))]
+        public ItemList<T> Items { get; set; }
     }
 
-    public class ClientItem
+    [JsonArray]
+    public class ItemList<T>: List<T>
     {
-        [JsonProperty(PropertyName = "Client")]
+        [JsonProperty(PropertyName = "_InvoiceSettings", NullValueHandling = NullValueHandling.Ignore)]
+        public ExpandoObject InvoiceSettings { get; set; } = null;
+    }
+
+    [JsonConverter(typeof(ResponseListItemConverter))]
+    public class ClientItem: List<ExpandoObject>
+    {
+        [JsonProperty(PropertyName = "Client", NullValueHandling = NullValueHandling.Ignore)]
         public Entities.Client Client { get; set; } = null;
     }
 
-    public class InvoiceItem : ClientItem
+    [JsonConverter(typeof(ResponseListItemConverter))]
+    public class InvoiceItem: ClientItem
     {
-        [JsonProperty(PropertyName = "Invoice")]
-        public dynamic Invoice { get; set; } = null;
-        [JsonProperty(PropertyName = "InvoicePayment")]
-        public dynamic InvoicePayment { get; set; } = null;
-        [JsonProperty(PropertyName = "InvoiceEmail")]
-        public dynamic InvoiceEmail { get; set; } = null;
-        [JsonProperty(PropertyName = "PostStamp")]
-        public dynamic PostStamp { get; set; } = null;
+        [JsonProperty(PropertyName = "Invoice", NullValueHandling = NullValueHandling.Ignore)]
+        public Entities.Invoice Invoice { get; set; } = null;
+        [JsonProperty(PropertyName = "InvoicePayment", NullValueHandling = NullValueHandling.Ignore)]
+        public ExpandoObject InvoicePayment { get; set; } = null;
+        [JsonProperty(PropertyName = "InvoiceEmail", NullValueHandling = NullValueHandling.Ignore)]
+        public ExpandoObject InvoiceEmail { get; set; } = null;
+        [JsonProperty(PropertyName = "PostStamp", NullValueHandling = NullValueHandling.Ignore)]
+        public ExpandoObject PostStamp { get; set; } = null;
+        [JsonProperty(PropertyName = "_InvoiceSettings", NullValueHandling = NullValueHandling.Ignore)]
+        public ExpandoObject InvoiceSettings { get; set; } = null;
     }
 }

@@ -52,7 +52,7 @@ namespace Birko.SuperFaktura.Entities
             public const string PersonalCollcection = "personal";
             public const string CargoTransport = "hailage";
         }
-        public class Payment
+        public partial class Payment
         {
             public const string BankTransfer = "transfer";
             public const string Cash = "cash";
@@ -62,13 +62,6 @@ namespace Birko.SuperFaktura.Entities
             public const string DebitCarf = "debit";
             public const string CashOnDelivery = "cod";
             public const string MutalAccreditation = "accreditation";
-
-            public int InvoiceID { get; set; }
-            // payment consts
-            public string Type { get; set; } = Payment.BankTransfer;
-            public decimal Amount { get; set; } = 0;
-            public string Currency { get; set; } = Invoice.Currency.Euro;
-            public DateTime Date { get; set; }
         }
 
         public class Status

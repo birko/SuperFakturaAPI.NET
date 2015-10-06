@@ -1,4 +1,4 @@
-﻿using Raven.Imports.Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,22 +17,22 @@ namespace Birko.SuperFaktura.Entities
             public int Delivery { get; set; } = Invoice.Date.All;
             //Invoce.Typeconst
             [JsonProperty(PropertyName = "type")]
-            public string Type { get; set; } = Invoice.Type.Regular;
+            public string Type { get; set; }
             //Invoce.Delivery const
             [JsonProperty(PropertyName = "delivery_type")]
-            public string DeliveryType { get; set; } = Invoice.Delivery.Mail;
+            public string DeliveryType { get; set; }
             //Invoce.Paymenty const
             [JsonProperty(PropertyName = "payment_type")]
-            public string PaymentType { get; set; } = Invoice.Payment.BankTransfer;
+            public string PaymentType { get; set; }
             //Invoce.status const
             [JsonProperty(PropertyName = "status")]
             public int Status { get; set; } = Invoice.Status.All;
             [JsonProperty(PropertyName = "client_id")]
-            public int? ClientId { get; set; } = 1;
+            public int? ClientId { get; set; } = null;
             [JsonProperty(PropertyName = "amount_from")]
-            public decimal AmountFrom { get; set; } = 0;
+            public decimal? AmountFrom { get; set; } = null;
             [JsonProperty(PropertyName = "amount_since")]
-            public decimal AmountTo { get; set; } = 0;
+            public decimal? AmountTo { get; set; } = null;
             [JsonProperty(PropertyName = "paid_since")]
             public DateTime? PaidSince { get; set; } = null;
             [JsonProperty(PropertyName = "paid_to")]
@@ -62,11 +62,11 @@ namespace Birko.SuperFaktura.Entities
                 {
                     paramString += "/client_id:" + this.ClientId;
                 }
-                if (this.AmountFrom > 0)
+                if (this.AmountFrom.HasValue )
                 {
                     paramString += "/amount_from:" + this.AmountFrom;
                 }
-                if (this.AmountTo > 0)
+                if (this.AmountTo.HasValue)
                 {
                     paramString += "/amount_to:" + this.AmountTo;
                 }
