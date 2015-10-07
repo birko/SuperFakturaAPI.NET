@@ -72,7 +72,7 @@ namespace Birko.SuperFaktura.Entities
         [JsonProperty(PropertyName = "parent_id", NullValueHandling = NullValueHandling.Ignore)]
         public int? ParentID { get; set; }
         [JsonProperty(PropertyName = "import_type", NullValueHandling = NullValueHandling.Ignore)]
-        public int? ImportType { get; set; }
+        public string ImportType { get; set; }
         [JsonProperty(PropertyName = "import_id", NullValueHandling = NullValueHandling.Ignore)]
         public int? ImportID { get; set; }
         [JsonProperty(PropertyName = "import_parent_id", NullValueHandling = NullValueHandling.Ignore)]

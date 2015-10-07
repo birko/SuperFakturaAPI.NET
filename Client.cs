@@ -199,7 +199,7 @@ namespace Birko.SuperFaktura
         }
 
         // language [eng,slo,cze]
-        public async Task<dynamic> GetPdf(int invoiceId, string token, string language = "slo")
+        public async Task<byte[]> GetPdf(int invoiceId, string token, string language = "slo")
         {
             using (var client = this.CreateClient())
             {
@@ -208,10 +208,10 @@ namespace Birko.SuperFaktura
                 response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadAsAsync<dynamic>();
+                    return await response.Content.ReadAsByteArrayAsync();
                 }
             }
-            return null;
+            return new byte[0];
         }
 
         public async Task<PageResponse<InvoiceItem>> Invoice(int ID)
