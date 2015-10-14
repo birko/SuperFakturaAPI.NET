@@ -10,23 +10,23 @@ namespace Birko.SuperFaktura.Entities
         [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
         public int? ID { get; internal set; }
         [JsonProperty(PropertyName = "already_paid", NullValueHandling = NullValueHandling.Ignore)]
-        public bool AlreadyPaid { get; set; } = false;
+        public bool? AlreadyPaid { get; set; } = null;
         [JsonProperty(PropertyName = "created", NullValueHandling = NullValueHandling.Ignore)]
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime? CreatedDate { get; set; } = null;
          [JsonProperty(PropertyName = "modified", NullValueHandling = NullValueHandling.Ignore)]
-        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+        public DateTime? ModifiedDate { get; set; } = null;
         [JsonProperty(PropertyName = "comment", NullValueHandling = NullValueHandling.Ignore)]
-        public string Comment { get; set; }
+        public string Comment { get; set; } = string.Empty;
         [JsonProperty(PropertyName = "constant", NullValueHandling = NullValueHandling.Ignore)]
         public string Constant { get; set; }
         [JsonProperty(PropertyName = "delivery", NullValueHandling = NullValueHandling.Ignore)]
-        public DateTime DeliveryDate { get; set; }
+        public DateTime? DeliveryDate { get; set; } = null;
         [JsonProperty(PropertyName = "delivery_type", NullValueHandling = NullValueHandling.Ignore)]
-        public string DeliveryType { get; set; } = Delivery.Courier;
+        public string DeliveryType { get; set; }
         [JsonProperty(PropertyName = "deposit", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal Deposit { get; set; } = 0;
+        public decimal? Deposit { get; set; } = null;
         [JsonProperty(PropertyName = "discount", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal Discount { get; set; } = 0;
+        public decimal? Discount { get; set; } = null;
         [JsonProperty(PropertyName = "due", NullValueHandling = NullValueHandling.Ignore)]
         public DateTime DueDate { get; set; } = DateTime.Now;
         [JsonProperty(PropertyName = "estimate_id", NullValueHandling = NullValueHandling.Ignore)]
@@ -100,13 +100,13 @@ namespace Birko.SuperFaktura.Entities
         [JsonProperty(PropertyName = "exchange_rate", NullValueHandling = NullValueHandling.Ignore)]
         public decimal ExchangeRate{ get; set; } = 1;
         [JsonProperty(PropertyName = "amount", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal Amont{ get; set; }
+        public decimal? Amont { get; set; } = null;
         [JsonProperty(PropertyName = "vat", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal VAT{ get; set; }
+        public decimal? VAT { get; set; } = null;
         [JsonProperty(PropertyName = "paid", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal Paid{ get; set; }
+        public decimal? Paid { get; set; } = null;
         [JsonProperty(PropertyName = "amount_paid", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal AmountPaid{ get; set; }
+        public decimal? AmountPaid { get; set; } = null;
         [JsonProperty(PropertyName = "recurring", NullValueHandling = NullValueHandling.Ignore)]
         public dynamic Recurring{ get; set; }
         [JsonProperty(PropertyName = "paydate", NullValueHandling = NullValueHandling.Ignore)]
@@ -116,8 +116,7 @@ namespace Birko.SuperFaktura.Entities
         [JsonProperty(PropertyName = "token", NullValueHandling = NullValueHandling.Ignore)]
         public string Token { get; set; }
         [JsonProperty(PropertyName = "demo", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonConverter(typeof(StringBooleanConverter))]
-        public bool Demo { get; set; } = false;
+        public bool? Demo { get; set; } = null;
         [JsonProperty(PropertyName = "vat_transfer", NullValueHandling = NullValueHandling.Ignore)]
         public string VATTransfer{ get; set; }
         [JsonProperty(PropertyName = "special_vat_scheme", NullValueHandling = NullValueHandling.Ignore)]

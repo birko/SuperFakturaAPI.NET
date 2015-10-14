@@ -30,7 +30,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Entities\Stock_Item.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Entities\Stock_Movement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Params.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Request.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response.cs" />
   </ItemGroup>
 </Project>

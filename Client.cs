@@ -5,6 +5,10 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Birko.SuperFaktura.Entities;
+using Newtonsoft.Json.Linq;
+using System.Globalization;
+using System.Linq;
+using Newtonsoft.Json;
 
 namespace Birko.SuperFaktura
 {
@@ -17,6 +21,17 @@ namespace Birko.SuperFaktura
         public const string APIAUTHKEYWORD = "SFAPI";
         public const string APIURL = "https://moja.superfaktura.sk/";
 
+        public static IEnumerable<RegionInfo> getRegionsInfos()
+        {
+            var cultures = CultureInfo.GetCultures(CultureTypes.SpecificCultures)
+                .Select(c => new RegionInfo(c.LCID))
+                .Distinct()
+                .OrderBy(c=>c.TwoLetterISORegionName)
+                .ToList();
+
+            return cultures;
+        }
+
         public Client(string email, string apikey)
         {
             this.Email = email;
@@ -28,16 +43,42 @@ namespace Birko.SuperFaktura
             var client = new HttpClient();
             client.BaseAddress = new Uri(Client.APIURL);
             client.DefaultRequestHeaders.Accept.Clear();
-            //client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/*");
             client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", string.Format("{0} email={1}&apikey={2}", Client.APIAUTHKEYWORD, this.Email, this.APIKey));
 
             return client;
+        }
+
+        private async Task<dynamic> Post(string uri, object data)
+        {
+            using (var client = this.CreateClient())
+            {
+                HttpResponseMessage response = await client.PostAsync(uri, new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("data", JsonConvert.SerializeObject(data)) }));
+                response.EnsureSuccessStatusCode();
+                if (response.IsSuccessStatusCode)
+                {
+                    if (response.Content.Headers.ContentType.MediaType == "application/json")
+                    {
+                        return await response.Content.ReadAsAsync<dynamic>();
+                    }
+                    else
+                    {
+                        string jsonstring = await response.Content.ReadAsStringAsync();
+                        return JsonConvert.DeserializeObject(jsonstring);
+                    }
+                }
+            }
+            return null;
         }
 
         public void AddItem(Invoice.Item item)
         {
             if (item != null)
             {
+                if (this.Data.InvoiceItem == null)
+                {
+                    this.Data.InvoiceItem = new List<Invoice.Item>();
+                }
                 this.Data.InvoiceItem.Add(item);
             }
         }
@@ -81,6 +122,10 @@ namespace Birko.SuperFaktura
         {
             if (tagIDs != null)
             {
+                if (this.Data.Tag == null)
+                {
+                    this.Data.Tag = new List<int>();
+                }
                 foreach (var tag in tagIDs)
                 {
                     if (!this.Data.Tag.Contains(tag))
@@ -279,21 +324,16 @@ namespace Birko.SuperFaktura
         {
             if (items != null)
             {
-                using (var client = this.CreateClient())
+                if (this.Data.StockLog == null)
                 {
-                    foreach (var item in items)
-                    {
-                        this.Data.StockLog.Add(item);
-                    }
-
-                    string uri = string.Format("stock_items/addstockmovement");
-                    HttpResponseMessage response = await client.PostAsJsonAsync(uri, this.Data);
-                    response.EnsureSuccessStatusCode();
-                    if (response.IsSuccessStatusCode)
-                    {
-                        return await response.Content.ReadAsAsync<dynamic>();
-                    }
+                    this.Data.StockLog = new List<Entities.Stock.Movement>();
                 }
+                foreach (var item in items)
+                {
+                    this.Data.StockLog.Add(item);
+                }
+                string uri = string.Format("stock_items/addstockmovement");
+                return await this.Post(uri, this.Data);
             }
             return null;
         }
@@ -305,32 +345,14 @@ namespace Birko.SuperFaktura
 
         public async Task<dynamic> AddStockItem(Stock.Item item)
         {
-            using (var client = this.CreateClient())
-            {
-                string uri = string.Format("stock_items/add");
-                HttpResponseMessage response = await client.PostAsJsonAsync(uri, item);
-                response.EnsureSuccessStatusCode();
-                if (response.IsSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsAsync<dynamic>();
-                }
-            }
-            return null;
+            string uri = string.Format("stock_items/add");
+            return await this.Post(uri, item);
         }
 
         public async Task<dynamic> StockItemEdit(Stock.Item item)
         {
-            using (var client = this.CreateClient())
-            {
-                string uri = string.Format("stock_items/edit");
-                HttpResponseMessage response = await client.PostAsJsonAsync(uri, new Request() { Data = item });
-                response.EnsureSuccessStatusCode();
-                if (response.IsSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsAsync<dynamic>();
-                }
-            }
-            return null;
+            string uri = string.Format("stock_items/edit");
+            return await this.Post(uri, item);
         }
 
 
@@ -367,122 +389,50 @@ namespace Birko.SuperFaktura
 
         public async Task<dynamic> MarkAsSent(Invoice.MarkEmail email)
         {
-            using (var client = this.CreateClient())
-            {
-                string uri = string.Format("invoices/mark_as_sent");
-                HttpResponseMessage response = await client.PostAsJsonAsync(uri, new Request() { Data = email });
-                response.EnsureSuccessStatusCode();
-                if (response.IsSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsAsync<dynamic>();
-                }
-            }
-            return null;
+            string uri = string.Format("invoices/mark_as_sent");
+            return await this.Post(uri, email);
         }
 
 
         public async Task<dynamic> SendInvoiceEmail(Invoice.Email email)
         {
-            using (var client = this.CreateClient())
-            {
-                string uri = string.Format("invoices/send");
-                HttpResponseMessage response = await client.PostAsJsonAsync(uri, new Request() { Data = email });
-                response.EnsureSuccessStatusCode();
-                if (response.IsSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsAsync<dynamic>();
-                }
-            }
-            return null;
+            string uri = string.Format("invoices/send");
+            return await this.Post(uri, email);
         }
 
         public async Task<dynamic> SendInvoicePost(Invoice.Post post)
         {
-            using (var client = this.CreateClient())
-            {
-                string uri = string.Format("invoices/post");
-                HttpResponseMessage response = await client.PostAsJsonAsync(uri, new Request() { Data = post });
-                response.EnsureSuccessStatusCode();
-                if (response.IsSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsAsync<dynamic>();
-                }
-            }
-            return null;
+            string uri = string.Format("invoices/post");
+            return await this.Post(uri, post);
         }
 
         public async Task<dynamic> PayInvoice(Invoice.Payment payment)
         {
-            using (var client = this.CreateClient())
-            {
-                string uri = string.Format("invoice_payments/add/ajax:1/api:1");
-                HttpResponseMessage response = await client.PostAsJsonAsync(uri, new Request() { Data = payment });
-                response.EnsureSuccessStatusCode();
-                if (response.IsSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsAsync<dynamic>();
-                }
-            }
-            return null;
+            string uri = string.Format("invoice_payments/add/ajax:1/api:1");
+            return await this.Post(uri, payment);
         }
         public async Task<dynamic> PayExpense(Expense.Payment payment)
         {
-            using (var client = this.CreateClient())
-            {
-                string uri = string.Format("expense_payments/add");
-                HttpResponseMessage response = await client.PostAsJsonAsync(uri, new Request() { Data = payment });
-                response.EnsureSuccessStatusCode();
-                if (response.IsSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsAsync<dynamic>();
-                }
-            }
-            return null;
+            string uri = string.Format("expense_payments/add");
+            return await this.Post(uri, payment);
         }
 
         public async Task<dynamic> Save()
         {
-            using (var client = this.CreateClient())
-            {
-                string uri = string.Format((Data.Expense == null) ? "/invoices/create": "/expenses/add");
-                HttpResponseMessage response = await client.PostAsJsonAsync(uri, new Request() { Data = this.Data });
-                response.EnsureSuccessStatusCode();
-                if (response.IsSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsAsync<dynamic>();
-                }
-            }
-            return null;
+            string uri = string.Format((Data.Expense == null) ? "/invoices/create" : "/expenses/add");
+            return await this.Post(uri, this.Data);
         }
 
         public async Task<dynamic> Edit()
         {
-            using (var client = this.CreateClient())
-            {
-                string uri = string.Format((Data.Expense == null) ? "/invoices/edit": "/expenses/edit");
-                HttpResponseMessage response = await client.PostAsJsonAsync(uri, new Request() { Data = this.Data });
-                response.EnsureSuccessStatusCode();
-                if (response.IsSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsAsync<dynamic>();
-                }
-            }
-            return null;
+            string uri = string.Format((Data.Expense == null) ? "/invoices/edit" : "/expenses/edit");
+            return await this.Post(uri, this.Data);
         }
 
         public async Task<dynamic> SaveClient()
         {
-            using (var client = this.CreateClient())
-            {
-                string uri = string.Format("clients/create");
-                HttpResponseMessage response = await client.PostAsJsonAsync(uri, new Request() { Data = this.Data });
-                response.EnsureSuccessStatusCode();
-                if (response.IsSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsAsync<dynamic>();
-                }
-            }
-            return null;
+            string uri = string.Format("clients/create");
+            return await Post(uri, this.Data);
         }
 
         public void SetClient(Entities.Client client)
@@ -493,6 +443,7 @@ namespace Birko.SuperFaktura
         public void SetInvoice(Entities.Invoice invoice)
         {
             this.Data.Expense = null;
+            this.Data.StockLog = null;
             this.Data.Invoice = invoice;
         }
 
@@ -500,6 +451,7 @@ namespace Birko.SuperFaktura
         {
             this.Data.Invoice = null;
             this.Data.InvoiceItem = null;
+            this.Data.StockLog = null;
             this.Data.Expense = expense;
         }
     }

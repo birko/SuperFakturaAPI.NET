@@ -122,11 +122,31 @@ namespace Birko.SuperFaktura
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             bool convertedValue = (bool)value;
-            writer.WriteStartObject();
-            string name = writer.Path.Split('.').Last();
-            writer.WritePropertyName(name);
-            serializer.Serialize(writer, convertedValue ? "1" : "0");
-            writer.WriteEndObject();
+            writer.WriteValue(convertedValue ? "1" : "0");
+        }
+    }
+
+    public class LowerBooleanConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return (objectType == typeof(bool));
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            string value = reader.Value.ToString();
+            if (!string.IsNullOrEmpty(value) && !value.Trim().Equals("true"))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            bool convertedValue = (bool)value;
+            writer.WriteValue(convertedValue ? "true" : "false");
         }
     }
 }
