@@ -37,7 +37,7 @@ namespace Birko.SuperFaktura.Entities
         public string InternalComment{ get; set; }
         [JsonProperty(PropertyName = "invoice_currency", NullValueHandling = NullValueHandling.Ignore)]
         public string InvoiceCurrency { get; set; } = Invoice.Currency.Euro;
-        [JsonProperty(PropertyName = "idnvoice_no_formatted", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(PropertyName = "invoice_no_formatted", NullValueHandling = NullValueHandling.Ignore)]
         public string InvoiceNoFormatted { get; set; }
         [JsonProperty(PropertyName = "issued_by", NullValueHandling = NullValueHandling.Ignore)]
         public string IssuedBy { get; set; }
@@ -116,6 +116,7 @@ namespace Birko.SuperFaktura.Entities
         [JsonProperty(PropertyName = "token", NullValueHandling = NullValueHandling.Ignore)]
         public string Token { get; set; }
         [JsonProperty(PropertyName = "demo", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(StringBooleanConverter))]
         public bool? Demo { get; set; } = null;
         [JsonProperty(PropertyName = "vat_transfer", NullValueHandling = NullValueHandling.Ignore)]
         public string VATTransfer{ get; set; }

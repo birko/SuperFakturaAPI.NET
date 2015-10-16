@@ -106,7 +106,7 @@ namespace Birko.SuperFaktura
     {
         public override bool CanConvert(Type objectType)
         {
-            return (objectType == typeof(bool));
+            return (objectType == typeof(bool) || objectType == typeof(bool?));
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -126,13 +126,8 @@ namespace Birko.SuperFaktura
         }
     }
 
-    public class LowerBooleanConverter : JsonConverter
-    {
-        public override bool CanConvert(Type objectType)
-        {
-            return (objectType == typeof(bool));
-        }
-
+    public class LowerBooleanConverter : StringBooleanConverter
+    { 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             string value = reader.Value.ToString();

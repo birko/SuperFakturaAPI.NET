@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using System.Globalization;
 using System.Linq;
 using Newtonsoft.Json;
+using System.Dynamic;
 
 namespace Birko.SuperFaktura
 {
@@ -49,7 +50,7 @@ namespace Birko.SuperFaktura
             return client;
         }
 
-        private async Task<dynamic> Post(string uri, object data)
+        private async Task<PostResponse<T>> Post<T>(string uri, object data)
         {
             using (var client = this.CreateClient())
             {
@@ -59,12 +60,12 @@ namespace Birko.SuperFaktura
                 {
                     if (response.Content.Headers.ContentType.MediaType == "application/json")
                     {
-                        return await response.Content.ReadAsAsync<dynamic>();
+                        return await response.Content.ReadAsAsync<PostResponse<T>>();
                     }
                     else
                     {
                         string jsonstring = await response.Content.ReadAsStringAsync();
-                        return JsonConvert.DeserializeObject(jsonstring);
+                        return (PostResponse<T>)JsonConvert.DeserializeObject(jsonstring, typeof(PostResponse<T>));
                     }
                 }
             }
@@ -333,7 +334,7 @@ namespace Birko.SuperFaktura
                     this.Data.StockLog.Add(item);
                 }
                 string uri = string.Format("stock_items/addstockmovement");
-                return await this.Post(uri, this.Data);
+                return await this.Post<dynamic>(uri, this.Data);
             }
             return null;
         }
@@ -346,13 +347,13 @@ namespace Birko.SuperFaktura
         public async Task<dynamic> AddStockItem(Stock.Item item)
         {
             string uri = string.Format("stock_items/add");
-            return await this.Post(uri, item);
+            return await this.Post<dynamic>(uri, item);
         }
 
         public async Task<dynamic> StockItemEdit(Stock.Item item)
         {
             string uri = string.Format("stock_items/edit");
-            return await this.Post(uri, item);
+            return await this.Post<dynamic>(uri, item);
         }
 
 
@@ -390,49 +391,70 @@ namespace Birko.SuperFaktura
         public async Task<dynamic> MarkAsSent(Invoice.MarkEmail email)
         {
             string uri = string.Format("invoices/mark_as_sent");
-            return await this.Post(uri, email);
+            return await this.Post<dynamic>(uri, email);
         }
 
 
         public async Task<dynamic> SendInvoiceEmail(Invoice.Email email)
         {
             string uri = string.Format("invoices/send");
-            return await this.Post(uri, email);
+            return await this.Post<dynamic>(uri, email);
         }
 
         public async Task<dynamic> SendInvoicePost(Invoice.Post post)
         {
             string uri = string.Format("invoices/post");
-            return await this.Post(uri, post);
+            return await this.Post<dynamic>(uri, post);
         }
 
         public async Task<dynamic> PayInvoice(Invoice.Payment payment)
         {
             string uri = string.Format("invoice_payments/add/ajax:1/api:1");
-            return await this.Post(uri, payment);
+            return await this.Post<dynamic>(uri, payment);
         }
         public async Task<dynamic> PayExpense(Expense.Payment payment)
         {
             string uri = string.Format("expense_payments/add");
-            return await this.Post(uri, payment);
+            return await this.Post<dynamic>(uri, payment);
         }
 
-        public async Task<dynamic> Save()
+        public async Task<PostResponse<InvoiceItem>>SaveInvoice()
         {
-            string uri = string.Format((Data.Expense == null) ? "/invoices/create" : "/expenses/add");
-            return await this.Post(uri, this.Data);
+            string uri = string.Format("/invoices/create");
+            return await this.Post<InvoiceItem>(uri, this.Data);
+
         }
 
-        public async Task<dynamic> Edit()
+        public async Task<PostResponse<EmptyItem>> SaveExpense()
         {
-            string uri = string.Format((Data.Expense == null) ? "/invoices/edit" : "/expenses/edit");
-            return await this.Post(uri, this.Data);
+            if (this.Data.Expense != null)
+            {
+                string uri = string.Format("/expenses/add");
+                return await this.Post<EmptyItem>(uri, this.Data);
+            }
+            return null;
         }
 
-        public async Task<dynamic> SaveClient()
+        public async Task<PostResponse<InvoiceItem>> EditInvoice()
+        {
+            string uri = string.Format("/invoices/edit");
+            return await this.Post<InvoiceItem>(uri, this.Data);
+        }
+
+        public async Task<PostResponse<EmptyItem>> EditExpense()
+        {
+            if (this.Data.Expense != null)
+            {
+                string uri = string.Format("/expenses/edit");
+                return await this.Post<EmptyItem>(uri, this.Data);
+            }
+            return null;
+        }
+
+        public async Task<PostResponse<ExpandoObject>> SaveClient()
         {
             string uri = string.Format("clients/create");
-            return await Post(uri, this.Data);
+            return await Post<ExpandoObject>(uri, this.Data);
         }
 
         public void SetClient(Entities.Client client)

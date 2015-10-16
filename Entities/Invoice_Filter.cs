@@ -15,7 +15,7 @@ namespace Birko.SuperFaktura.Entities
             //Invoce.Date const
             [JsonProperty(PropertyName = "delivery")]
             public int Delivery { get; set; } = Invoice.Date.All;
-            //Invoce.Typeconst
+            //Invoce.Type const
             [JsonProperty(PropertyName = "type")]
             public string Type { get; set; }
             //Invoce.Delivery const

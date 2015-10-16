@@ -31,7 +31,11 @@ namespace Birko.SuperFaktura
     }
 
     [JsonConverter(typeof(ResponseListItemConverter))]
-    public class ClientItem: List<ExpandoObject>
+    public class EmptyItem : List<ExpandoObject>
+    {
+    }
+    [JsonConverter(typeof(ResponseListItemConverter))]
+    public class ClientItem: EmptyItem
     {
         [JsonProperty(PropertyName = "Client", NullValueHandling = NullValueHandling.Ignore)]
         public Entities.Client Client { get; set; } = null;
@@ -44,6 +48,8 @@ namespace Birko.SuperFaktura
         public Entities.Invoice Invoice { get; set; } = null;
         [JsonProperty(PropertyName = "InvoicePayment", NullValueHandling = NullValueHandling.Ignore)]
         public ExpandoObject InvoicePayment { get; set; } = null;
+        [JsonProperty(PropertyName = "InvoiceItem", NullValueHandling = NullValueHandling.Ignore)]
+        public List<ExpandoObject> InvoiceItems { get; set; } = null;
         [JsonProperty(PropertyName = "InvoiceEmail", NullValueHandling = NullValueHandling.Ignore)]
         public ExpandoObject InvoiceEmail { get; set; } = null;
         [JsonProperty(PropertyName = "PostStamp", NullValueHandling = NullValueHandling.Ignore)]
