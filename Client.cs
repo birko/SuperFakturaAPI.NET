@@ -238,7 +238,10 @@ namespace Birko.SuperFaktura
                 response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadAsAsync<Dictionary<int, string>>();
+                    if (response.Content.Headers.ContentLength > 2)
+                    {
+                        return await response.Content.ReadAsAsync<Dictionary<int, string>>();
+                    }
                 }
             }
             return null;
