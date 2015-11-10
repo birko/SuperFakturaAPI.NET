@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using System.Dynamic;
+using Birko.SuperFaktura.Entities;
 
 namespace Birko.SuperFaktura
 {
@@ -18,17 +19,30 @@ namespace Birko.SuperFaktura
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             InvoiceItem item = new InvoiceItem();
+            ClientItem clientItem = new ClientItem();
             string startPath = reader.Path;
             while (reader.TokenType != JsonToken.EndObject)
             {
                 reader.Read();
-                if (reader.TokenType == JsonToken.StartObject && reader.Path.StartsWith(startPath + "."))
+                if (
+                    (reader.TokenType == JsonToken.StartObject) && 
+                    (reader.Path.StartsWith(startPath + ".") || string.IsNullOrEmpty(startPath))
+                 )
                 {
                     string[] path = reader.Path.Split(new[] { '.' });
-                    switch (path.LastOrDefault())
+                    string lastPath = path.LastOrDefault();
+                    switch (lastPath)
                     {
                         case "Client":
                             item.Client = (Entities.Client)serializer.Deserialize(reader, typeof(Entities.Client));
+                            clientItem.Client = item.Client;
+                            break;
+                        case "ClientData":
+                            item.ClientData = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
+                            clientItem.ClientData = item.ClientData;
+                            break;
+                        case "MyData":
+                            item.MyData = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
                             break;
                         case "Invoice":
                             item.Invoice = (Entities.Invoice)serializer.Deserialize(reader, typeof(Entities.Invoice));
@@ -42,18 +56,56 @@ namespace Birko.SuperFaktura
                         case "_InvoiceSettings":
                             item.InvoiceSettings = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
                             break;
-                        case "PostStamp":
-                            item.PostStamp = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
+                        case "UnitCount":
+                            item.UnitCount = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
+                            break;
+                        case "PaymentLink":
+                            item.PaymentLink = (string)serializer.Deserialize(reader, typeof(string));
+                            break;
+                        case "Paypal":
+                            item.PayPal = (string)serializer.Deserialize(reader, typeof(string));
+                            break;
+                        case "Tag":
+                            item.Tag = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
+                            break;
+                        case "Summary":
+                            item.Summary = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
+                            break;
+                        case "SummaryInvoice":
+                            item.SummaryInvoice = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
                             break;
                         default:
-                            item.Add((ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject)));
+                            if (lastPath.StartsWith("PostStamp"))
+                            {
+                                if (item.PostStamp == null)
+                                {
+                                    item.PostStamp = new List<ExpandoObject>();
+                                }
+                                item.PostStamp.Add((ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject)));
+                            }
+                            else if (lastPath.StartsWith("InvoiceItem"))
+                            {
+                                if (item.InvoiceItems == null)
+                                {
+                                    item.InvoiceItems = new List<ExpandoObject>();
+                                }
+                                item.InvoiceItems.Add((ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject)));
+                            }
+                            else
+                            {
+                                int index = 0;
+                                if (int.TryParse(path.LastOrDefault(), out index))
+                                {
+                                    item.Add((ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject)));
+                                }
+                            }
                             break;
                     }
                     reader.Read();
                 }
             }
 
-            return item;
+            return (objectType == typeof(InvoiceItem)) ? item: clientItem;
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

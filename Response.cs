@@ -39,6 +39,9 @@ namespace Birko.SuperFaktura
     {
         [JsonProperty(PropertyName = "Client", NullValueHandling = NullValueHandling.Ignore)]
         public Entities.Client Client { get; set; } = null;
+
+        [JsonProperty(PropertyName = "ClientData", NullValueHandling = NullValueHandling.Ignore)]
+        public ExpandoObject ClientData { get; set; } = null;
     }
 
     [JsonConverter(typeof(ResponseListItemConverter))]
@@ -53,8 +56,23 @@ namespace Birko.SuperFaktura
         [JsonProperty(PropertyName = "InvoiceEmail", NullValueHandling = NullValueHandling.Ignore)]
         public ExpandoObject InvoiceEmail { get; set; } = null;
         [JsonProperty(PropertyName = "PostStamp", NullValueHandling = NullValueHandling.Ignore)]
-        public ExpandoObject PostStamp { get; set; } = null;
+        public List<ExpandoObject> PostStamp { get; set; } = null;
         [JsonProperty(PropertyName = "_InvoiceSettings", NullValueHandling = NullValueHandling.Ignore)]
         public ExpandoObject InvoiceSettings { get; set; } = null;
+        [JsonProperty(PropertyName = "MyData", NullValueHandling = NullValueHandling.Ignore)]
+        public ExpandoObject MyData { get; set; } = null;
+        [JsonProperty(PropertyName = "Summary", NullValueHandling = NullValueHandling.Ignore)]
+        public ExpandoObject Summary { get; set; } = null;
+        [JsonProperty(PropertyName = "SummaryInvoice", NullValueHandling = NullValueHandling.Ignore)]
+        public ExpandoObject SummaryInvoice { get; set; } = null;
+        [JsonProperty(PropertyName = "UnitCount", NullValueHandling = NullValueHandling.Ignore)]
+        public ExpandoObject UnitCount { get; set; } = null;
+        [JsonProperty(PropertyName = "PaymentLink", NullValueHandling = NullValueHandling.Ignore)]
+        public string PaymentLink { get; set; }
+        [JsonProperty(PropertyName = "Paypal", NullValueHandling = NullValueHandling.Ignore)]
+        public string PayPal { get; set; }
+        [JsonProperty(PropertyName = "Tag", NullValueHandling = NullValueHandling.Ignore)]
+        public ExpandoObject Tag { get; set; } = null;
+
     }
 }

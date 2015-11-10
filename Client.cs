@@ -260,7 +260,7 @@ namespace Birko.SuperFaktura
             return new byte[0];
         }
 
-        public async Task<PageResponse<InvoiceItem>> Invoice(int ID)
+        public async Task<InvoiceItem> Invoice(int ID)
         {
             using (var client = this.CreateClient())
             {
@@ -269,7 +269,7 @@ namespace Birko.SuperFaktura
                 response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadAsAsync<PageResponse<InvoiceItem>>();
+                    return await response.Content.ReadAsAsync<InvoiceItem>();
                 }
             }
             return null;
