@@ -15,6 +15,8 @@ namespace Birko.SuperFaktura.Entities
             public string DeliveryAddress { get; set; }
             [JsonProperty(PropertyName = "delivery_city", NullValueHandling = NullValueHandling.Ignore)]
             public string DeliveryCity { get; set; }
+            [JsonProperty(PropertyName = "delivery_zip", NullValueHandling = NullValueHandling.Ignore)]
+            public string DeliveryZIP { get; set; }
             [JsonProperty(PropertyName = "delivery_state", NullValueHandling = NullValueHandling.Ignore)]
             public string DeliveryState{ get; set; }
         }
