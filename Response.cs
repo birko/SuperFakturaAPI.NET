@@ -50,11 +50,11 @@ namespace Birko.SuperFaktura
         [JsonProperty(PropertyName = "Invoice", NullValueHandling = NullValueHandling.Ignore)]
         public Entities.Invoice Invoice { get; set; } = null;
         [JsonProperty(PropertyName = "InvoicePayment", NullValueHandling = NullValueHandling.Ignore)]
-        public ExpandoObject InvoicePayment { get; set; } = null;
+        public List<ExpandoObject> InvoicePayment { get; set; } = null;
         [JsonProperty(PropertyName = "InvoiceItem", NullValueHandling = NullValueHandling.Ignore)]
         public List<ExpandoObject> InvoiceItems { get; set; } = null;
         [JsonProperty(PropertyName = "InvoiceEmail", NullValueHandling = NullValueHandling.Ignore)]
-        public ExpandoObject InvoiceEmail { get; set; } = null;
+        public List<ExpandoObject> InvoiceEmail { get; set; } = null;
         [JsonProperty(PropertyName = "PostStamp", NullValueHandling = NullValueHandling.Ignore)]
         public List<ExpandoObject> PostStamp { get; set; } = null;
         [JsonProperty(PropertyName = "_InvoiceSettings", NullValueHandling = NullValueHandling.Ignore)]
@@ -72,7 +72,7 @@ namespace Birko.SuperFaktura
         [JsonProperty(PropertyName = "Paypal", NullValueHandling = NullValueHandling.Ignore)]
         public string PayPal { get; set; }
         [JsonProperty(PropertyName = "Tag", NullValueHandling = NullValueHandling.Ignore)]
-        public ExpandoObject Tag { get; set; } = null;
+        public List<ExpandoObject> Tag { get; set; } = null;
 
     }
 }
