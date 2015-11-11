@@ -35,48 +35,17 @@ namespace Birko.SuperFaktura
                             item.Client = (Entities.Client)serializer.Deserialize(reader, typeof(Entities.Client));
                             clientItem.Client = item.Client;
                             break;
-                        case "ClientData":
-                            item.ClientData = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
-                            clientItem.ClientData = item.ClientData;
-                            break;
-                        case "MyData":
-                            item.MyData = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
-                            break;
                         case "Invoice":
                             item.Invoice = (Entities.Invoice)serializer.Deserialize(reader, typeof(Entities.Invoice));
                             break;
                         case "InvoicePayment":
-                            item.InvoicePayment = (List<ExpandoObject>)serializer.Deserialize(reader, typeof(List<ExpandoObject>));
+                            item.InvoicePayment = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
                             break;
                         case "InvoiceEmail":
-                            item.InvoiceEmail = (List<ExpandoObject>)serializer.Deserialize(reader, typeof(List<ExpandoObject>));
+                            item.InvoiceEmail = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
                             break;
                         case "_InvoiceSettings":
                             item.InvoiceSettings = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
-                            break;
-                        case "UnitCount":
-                            item.UnitCount = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
-                            break;
-                        case "PaymentLink":
-                            item.PaymentLink = (string)serializer.Deserialize(reader, typeof(string));
-                            break;
-                        case "Paypal":
-                            item.PayPal = (string)serializer.Deserialize(reader, typeof(string));
-                            break;
-                        case "Tag":
-                            item.Tag = (List<ExpandoObject>)serializer.Deserialize(reader, typeof(List<ExpandoObject>));
-                            break;
-                        case "Summary":
-                            item.Summary = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
-                            break;
-                        case "SummaryInvoice":
-                            item.SummaryInvoice = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
-                            break;
-                        case "PostStamp":
-                            item.PostStamp = (List<ExpandoObject>)serializer.Deserialize(reader, typeof(List<ExpandoObject>));
-                            break;
-                        case "InvoiceItem":
-                            item.InvoiceItems = (List<ExpandoObject>)serializer.Deserialize(reader, typeof(List<ExpandoObject>));
                             break;
                         default:
                                 int index = 0;
@@ -117,18 +86,25 @@ namespace Birko.SuperFaktura
                     if (reader.TokenType == JsonToken.PropertyName)
                     {
                         reader.Read();// read property value
-                        if (reader.Path == startPath + "._InvoiceSettings")
+                        string[] path = reader.Path.Split(new[] { '.' });
+                        string lastPath = path.LastOrDefault();
+                        switch (lastPath)
                         {
-                            items.InvoiceSettings = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
-                        }
-                        else if (reader.Path.StartsWith(startPath + "."))
-                        {
-                            items.Add((InvoiceItem)serializer.Deserialize(reader, typeof(InvoiceItem)));
+                            case "_InvoiceSettings":
+                                items.InvoiceSettings = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
+                                break;
+                            default:
+                                int index = 0;
+                                if (int.TryParse(path.LastOrDefault(), out index))
+                                {
+                                    items.Add((InvoiceItem)serializer.Deserialize(reader, typeof(InvoiceItem)));
+                                }
+                                break;
                         }
                     }
                 }
-                while (reader.TokenType != JsonToken.EndObject);
-                    return items;
+                while (!(reader.TokenType == JsonToken.EndObject && startPath == reader.Path));
+                return items;
             }
 
             return serializer.Deserialize(reader, objectType);

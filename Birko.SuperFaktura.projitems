@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Entities\Client.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\Client_ContactPerson.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Entities\Client_Filter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Entities\Country.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Entities\Expense.cs" />

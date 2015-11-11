@@ -263,7 +263,7 @@ namespace Birko.SuperFaktura
             return new byte[0];
         }
 
-        public async Task<InvoiceItem> Invoice(int ID)
+        public async Task<InvoiceResponse> Invoice(int ID)
         {
             using (var client = this.CreateClient())
             {
@@ -272,7 +272,7 @@ namespace Birko.SuperFaktura
                 response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadAsAsync<InvoiceItem>();
+                    return await response.Content.ReadAsAsync<InvoiceResponse>();
                 }
             }
             return null;
@@ -391,40 +391,40 @@ namespace Birko.SuperFaktura
             return null;
         }
 
-        public async Task<dynamic> MarkAsSent(Invoice.MarkEmail email)
+        public async Task<PostResponse<ExpandoObject>> MarkAsSent(Invoice.MarkEmail email)
         {
             string uri = string.Format("invoices/mark_as_sent");
-            return await this.Post<dynamic>(uri, email);
+            return await this.Post<ExpandoObject>(uri, email);
         }
 
 
-        public async Task<dynamic> SendInvoiceEmail(Invoice.Email email)
+        public async Task<PostResponse<ExpandoObject>> SendInvoiceEmail(Invoice.Email email)
         {
             string uri = string.Format("invoices/send");
-            return await this.Post<dynamic>(uri, email);
+            return await this.Post<ExpandoObject>(uri, email);
         }
 
-        public async Task<dynamic> SendInvoicePost(Invoice.Post post)
+        public async Task<PostResponse<ExpandoObject>> SendInvoicePost(Invoice.Post post)
         {
             string uri = string.Format("invoices/post");
-            return await this.Post<dynamic>(uri, post);
+            return await this.Post<ExpandoObject>(uri, post);
         }
 
-        public async Task<dynamic> PayInvoice(Invoice.Payment payment)
+        public async Task<PostResponse<ExpandoObject>> PayInvoice(Invoice.Payment payment)
         {
             string uri = string.Format("invoice_payments/add/ajax:1/api:1");
-            return await this.Post<dynamic>(uri, payment);
+            return await this.Post<ExpandoObject>(uri, payment);
         }
-        public async Task<dynamic> PayExpense(Expense.Payment payment)
+        public async Task<PostResponse<ExpandoObject>> PayExpense(Expense.Payment payment)
         {
             string uri = string.Format("expense_payments/add");
-            return await this.Post<dynamic>(uri, payment);
+            return await this.Post<ExpandoObject>(uri, payment);
         }
 
-        public async Task<PostResponse<InvoiceItem>>SaveInvoice()
+        public async Task<PostResponse<InvoiceResponse>>SaveInvoice()
         {
             string uri = string.Format("/invoices/create");
-            return await this.Post<InvoiceItem>(uri, this.Data);
+            return await this.Post<InvoiceResponse>(uri, this.Data);
 
         }
 
@@ -478,6 +478,12 @@ namespace Birko.SuperFaktura
             this.Data.InvoiceItem = null;
             this.Data.StockLog = null;
             this.Data.Expense = expense;
+        }
+
+        public async Task<PostResponse<ExpandoObject>> AddContactPerson(Entities.Client.ContactPerson person)
+        {
+            string uri = string.Format("/contact_people/add/api:1");
+            return await this.Post<ExpandoObject>(uri, person);
         }
     }
 }

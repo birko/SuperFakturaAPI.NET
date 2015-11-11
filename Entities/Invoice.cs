@@ -28,7 +28,7 @@ namespace Birko.SuperFaktura.Entities
         [JsonProperty(PropertyName = "discount", NullValueHandling = NullValueHandling.Ignore)]
         public decimal? Discount { get; set; } = null;
         [JsonProperty(PropertyName = "due", NullValueHandling = NullValueHandling.Ignore)]
-        public DateTime DueDate { get; set; } = DateTime.Now;
+        public DateTime? DueDate { get; set; } = null;
         [JsonProperty(PropertyName = "estimate_id", NullValueHandling = NullValueHandling.Ignore)]
         public int? EstimateID { get; set; }
         [JsonProperty(PropertyName = "header_comment", NullValueHandling = NullValueHandling.Ignore)]
@@ -100,7 +100,7 @@ namespace Birko.SuperFaktura.Entities
         [JsonProperty(PropertyName = "exchange_rate", NullValueHandling = NullValueHandling.Ignore)]
         public decimal ExchangeRate{ get; set; } = 1;
         [JsonProperty(PropertyName = "amount", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal? Amont { get; set; } = null;
+        public decimal? Amount { get; set; } = null;
         [JsonProperty(PropertyName = "vat", NullValueHandling = NullValueHandling.Ignore)]
         public decimal? VAT { get; set; } = null;
         [JsonProperty(PropertyName = "paid", NullValueHandling = NullValueHandling.Ignore)]
