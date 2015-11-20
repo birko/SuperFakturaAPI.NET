@@ -11,6 +11,8 @@ namespace Birko.SuperFaktura.Entities
         {
             [JsonProperty(PropertyName = "invoice_id", NullValueHandling = NullValueHandling.Ignore)]
             public int InvoiceID { get; set; }
+            [JsonProperty(PropertyName = "delivery_name", NullValueHandling = NullValueHandling.Ignore)]
+            public string DeliveryName { get; set; }
             [JsonProperty(PropertyName = "delivery_address", NullValueHandling = NullValueHandling.Ignore)]
             public string DeliveryAddress { get; set; }
             [JsonProperty(PropertyName = "delivery_city", NullValueHandling = NullValueHandling.Ignore)]
