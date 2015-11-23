@@ -21,4 +21,16 @@ namespace Birko.SuperFaktura
         [JsonProperty(PropertyName = "Client", NullValueHandling = NullValueHandling.Ignore)]
         public Entities.Client Client { get; internal set; }
     }
+
+    public class PostData
+    {
+        [JsonProperty(PropertyName = "Post", NullValueHandling = NullValueHandling.Ignore)]
+        public Invoice.Post Post { get; internal set; } = null;
+    }
+
+    public class EmailData
+    {
+        [JsonProperty(PropertyName = "Email", NullValueHandling = NullValueHandling.Ignore)]
+        public Invoice.Email Email { get; internal set; } = null;
+    }
 }

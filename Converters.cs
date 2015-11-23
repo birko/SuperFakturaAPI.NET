@@ -41,6 +41,9 @@ namespace Birko.SuperFaktura
                         case "InvoicePayment":
                             item.InvoicePayment = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
                             break;
+                        case "PostStamp":
+                            item.PostStamp = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
+                            break;
                         case "InvoiceEmail":
                             item.InvoiceEmail = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
                             break;

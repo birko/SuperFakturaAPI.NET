@@ -401,13 +401,13 @@ namespace Birko.SuperFaktura
         public async Task<PostResponse<ExpandoObject>> SendInvoiceEmail(Invoice.Email email)
         {
             string uri = string.Format("invoices/send");
-            return await this.Post<ExpandoObject>(uri, email);
+            return await this.Post<ExpandoObject>(uri, new EmailData { Email = email });
         }
 
         public async Task<PostResponse<ExpandoObject>> SendInvoicePost(Invoice.Post post)
         {
             string uri = string.Format("invoices/post");
-            return await this.Post<ExpandoObject>(uri, post);
+            return await this.Post<ExpandoObject>(uri, new PostData { Post = post });
         }
 
         public async Task<PostResponse<ExpandoObject>> PayInvoice(Invoice.Payment payment)
