@@ -51,18 +51,18 @@ namespace Birko.SuperFaktura
                             item.InvoiceSettings = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
                             break;
                         default:
-                                int index = 0;
-                                if (int.TryParse(path.LastOrDefault(), out index))
-                                {
-                                    item.Add((ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject)));
-                                }
+                            int index = 0;
+                            if (int.TryParse(path.LastOrDefault(), out index))
+                            {
+                                item.Add((ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject)));
+                            }
                             break;
                     }
                 }
             }
-            while (!((reader.TokenType == JsonToken.EndObject || reader.TokenType == JsonToken.EndArray) && startPath == reader.Path));
+            while (reader.TokenType != JsonToken.None && !((reader.TokenType == JsonToken.EndObject || reader.TokenType == JsonToken.EndArray) && startPath == reader.Path));
 
-            return (objectType == typeof(InvoiceItem)) ? item: clientItem;
+            return (objectType == typeof(InvoiceItem)) ? item : clientItem;
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -83,30 +83,41 @@ namespace Birko.SuperFaktura
             {
                 string startPath = reader.Path;
                 ItemList<InvoiceItem> items = new ItemList<InvoiceItem>();
-                do
+                if (reader.TokenType == JsonToken.StartArray)
                 {
-                    reader.Read(); // read next json token
-                    if (reader.TokenType == JsonToken.PropertyName)
-                    {
-                        reader.Read();// read property value
-                        string[] path = reader.Path.Split(new[] { '.' });
-                        string lastPath = path.LastOrDefault();
-                        switch (lastPath)
-                        {
-                            case "_InvoiceSettings":
-                                items.InvoiceSettings = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
-                                break;
-                            default:
-                                int index = 0;
-                                if (int.TryParse(path.LastOrDefault(), out index))
-                                {
-                                    items.Add((InvoiceItem)serializer.Deserialize(reader, typeof(InvoiceItem)));
-                                }
-                                break;
-                        }
-                    }
+                    items = (ItemList<InvoiceItem>)serializer.Deserialize(reader, typeof(ItemList<InvoiceItem>));
                 }
-                while (!(reader.TokenType == JsonToken.EndObject && startPath == reader.Path));
+                else if (reader.TokenType == JsonToken.StartObject)
+                {
+                    do
+                    {
+                        reader.Read(); // read next json token
+                        if (reader.TokenType == JsonToken.PropertyName)
+                        {
+                            reader.Read();// read property value
+                            string[] path = reader.Path.Split(new[] { '.' });
+                            string lastPath = path.LastOrDefault();
+                            switch (lastPath)
+                            {
+                                case "_InvoiceSettings":
+                                    items.InvoiceSettings = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
+                                    break;
+                                default:
+
+                                    string inputData = path.LastOrDefault();
+                                    int index = 0;
+                                    var pathtest = int.TryParse(inputData, out index);
+                                    if (pathtest)
+                                    {
+                                        items.Add((InvoiceItem)serializer.Deserialize(reader, typeof(InvoiceItem)));
+                                    }
+                                    break;
+                            }
+                        }
+
+                    }
+                    while (reader.TokenType != JsonToken.None && !((reader.TokenType == JsonToken.EndObject || reader.TokenType == JsonToken.EndArray) && startPath == reader.Path));
+                }
                 return items;
             }
 
@@ -143,7 +154,7 @@ namespace Birko.SuperFaktura
     }
 
     public class LowerBooleanConverter : StringBooleanConverter
-    { 
+    {
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             string value = reader.Value.ToString();
