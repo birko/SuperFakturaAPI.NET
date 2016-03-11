@@ -72,6 +72,7 @@ namespace Birko.SuperFaktura
     }
     public class ResponseItemListConverter : JsonConverter
     {
+        public static int TimeoutSeconds { get; set; } = 180;
         public override bool CanConvert(Type objectType)
         {
             return false;
@@ -89,6 +90,7 @@ namespace Birko.SuperFaktura
                 }
                 else if (reader.TokenType == JsonToken.StartObject)
                 {
+                    var startTime = DateTime.UtcNow;
                     do
                     {
                         reader.Read(); // read next json token
@@ -115,6 +117,14 @@ namespace Birko.SuperFaktura
                             }
                         }
 
+                        if (TimeoutSeconds != int.MaxValue)
+                        {
+                            var timeDiff = DateTime.UtcNow - startTime;
+                            if (timeDiff.Seconds > TimeoutSeconds)
+                            {
+                                throw new TimeoutException("SuperFaktura invoice list parsing takes to long. Check the source data or adjust timeout interval");
+                            }
+                        }
                     }
                     while (reader.TokenType != JsonToken.None && !((reader.TokenType == JsonToken.EndObject || reader.TokenType == JsonToken.EndArray) && startPath == reader.Path));
                 }
