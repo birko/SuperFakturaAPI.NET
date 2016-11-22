@@ -39,8 +39,6 @@ namespace Birko.SuperFaktura
     {
         [JsonProperty(PropertyName = "Client", NullValueHandling = NullValueHandling.Ignore)]
         public Entities.Client Client { get; set; } = null;
-
-       
     }
 
     [JsonConverter(typeof(ResponseListItemConverter))]
@@ -81,6 +79,7 @@ namespace Birko.SuperFaktura
         [JsonProperty(PropertyName = "SummaryInvoice", NullValueHandling = NullValueHandling.Ignore)]
         public ExpandoObject SummaryInvoice { get; set; } = null;
         [JsonProperty(PropertyName = "UnitCount", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(DictionaryConverter<string, decimal>))]
         public Dictionary<string, decimal> UnitCount { get; set; } = null;
         [JsonProperty(PropertyName = "PaymentLink", NullValueHandling = NullValueHandling.Ignore)]
         public string PaymentLink { get; set; }
