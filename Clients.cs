@@ -24,24 +24,24 @@ namespace Birko.SuperFaktura
             var result = await superFaktura.Get(string.Format("clients/index.json{0}", filter.ToParameters(listInfo))).ConfigureAwait(false);
             if (listInfo)
             {
-                return JsonConvert.DeserializeObject<PagedResponse>(result);
+                return superFaktura.DeserializeResult<PagedResponse>(result);
             }
             else
             {
-                return new PagedResponse { Items = JsonConvert.DeserializeObject<ItemList<ListItem>>(result) };
+                return new PagedResponse { Items = superFaktura.DeserializeResult<ItemList<ListItem>>(result) };
             }
         }
 
         public async Task<Response<ListItem>> Save(Request.Client.Client client)
         {
             var result = await superFaktura.Post("clients/create", new { Client = client }).ConfigureAwait(false);
-            return JsonConvert.DeserializeObject<Response<ListItem>>(result);
+            return superFaktura.DeserializeResult<Response<ListItem>>(result);
         }
 
         public async Task<Response<Response.Client.ContactPerson>> AddContactPerson(Request.Client.ContactPerson person)
         {
             var result = await superFaktura.Post("/contact_people/add/api:1", new { ContactPerson = person }).ConfigureAwait(false);
-            return JsonConvert.DeserializeObject<Response<Response.Client.ContactPerson>>(result);
+            return superFaktura.DeserializeResult<Response<Response.Client.ContactPerson>>(result);
         }
     }
 }

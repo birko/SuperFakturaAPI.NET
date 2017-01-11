@@ -15,6 +15,7 @@ namespace Birko.SuperFaktura
     {
         public const string APIAUTHKEYWORD = "SFAPI";
         public const string APIURL = "https://moja.superfaktura.sk/";
+        public bool EnsureSuccessStatusCode { get; set; } = true;
 
         public string Email { get; private set; }
         public string ApiKey { get; private set; }
@@ -54,13 +55,32 @@ namespace Birko.SuperFaktura
             return client;
         }
 
+        internal T DeserializeResult<T>(string result)
+        {
+            TestError(result);
+            return JsonConvert.DeserializeObject<T>(result);
+        }
+
+        internal static void TestError(string result)
+        {
+            var testResult = JsonConvert.DeserializeObject<Response<ExpandoObject>>(result);
+            if (testResult.Error != null && testResult.Error.Value > 0)
+            {
+                var exception = new Exceptions.Exception(testResult.Error.Value, testResult.Message, testResult.ErrorMessage);
+                throw (exception);
+            }
+        }
+
         internal async Task<string> Get(string uri)
         {
             using (var client = CreateClient())
             {
                 HttpResponseMessage response = await client.GetAsync(uri).ConfigureAwait(false);
-                response.EnsureSuccessStatusCode();
-                if (response.IsSuccessStatusCode)
+                if (EnsureSuccessStatusCode)
+                {
+                    response.EnsureSuccessStatusCode();
+                }
+                if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
                 {
                     return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 }
@@ -73,8 +93,11 @@ namespace Birko.SuperFaktura
             using (var client = CreateClient())
             {
                 HttpResponseMessage response = await client.GetAsync(uri).ConfigureAwait(false);
-                response.EnsureSuccessStatusCode();
-                if (response.IsSuccessStatusCode)
+                if (EnsureSuccessStatusCode)
+                {
+                    response.EnsureSuccessStatusCode();
+                }
+                if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
                 {
                     return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                 }
@@ -87,7 +110,10 @@ namespace Birko.SuperFaktura
             using (var client = CreateClient())
             {
                 HttpResponseMessage response = await client.PostAsync(uri, new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("data", data) })).ConfigureAwait(false);
-                response.EnsureSuccessStatusCode();
+                if (EnsureSuccessStatusCode || !EnsureSuccessStatusCode)
+                {
+                    response.EnsureSuccessStatusCode();
+                }
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -104,25 +130,25 @@ namespace Birko.SuperFaktura
         public async Task<Dictionary<int, string>> GetCountries()
         {
             var result = await Get(string.Format("{0}countries", APIURL)).ConfigureAwait(false);
-            return JsonConvert.DeserializeObject<Dictionary<int, string>>(result);
+            return DeserializeResult<Dictionary<int, string>>(result);
         }
 
         public async Task<Dictionary<string, Sequence[]>> GetSequences()
         {
             var result = await Get("sequences/index.json").ConfigureAwait(false);
-            return JsonConvert.DeserializeObject<Dictionary<string, Sequence[]>>(result);
+            return DeserializeResult<Dictionary<string, Sequence[]>>(result);
         }
 
         public async Task<Dictionary<int, string>> GetTags()
         {
             var result = await Get("tags/index.json").ConfigureAwait(false);
-            return JsonConvert.DeserializeObject<Dictionary<int, string>>(result);
+            return DeserializeResult<Dictionary<int, string>>(result);
         }
 
         public async Task<Logo[]> GetLogos()
         {
             var result = await Get("/users/logo").ConfigureAwait(false);
-            return JsonConvert.DeserializeObject<Logo[]>(result);
+            return DeserializeResult<Logo[]>(result);
         }
 
         public async Task<Response<Register>> Register(string email, bool sendEmail = true)
@@ -135,9 +161,10 @@ namespace Birko.SuperFaktura
                     SendEmail = sendEmail
                 }
             });
-            return JsonConvert.DeserializeObject<Response<Register>>(result);
+            return DeserializeResult<Response<Register>>(result);
         }
     }
+
 
     public class SuperFakturaCZ : SuperFaktura
     {

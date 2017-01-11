@@ -17,6 +17,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters\ItemListConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\StockItemConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\StringBooleanConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\Exception.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Expenses.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Invoices.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Client\Client.cs" />
