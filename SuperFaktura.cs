@@ -58,86 +58,84 @@ namespace Birko.SuperFaktura
         {
             using (var client = CreateClient())
             {
-                HttpResponseMessage response = await client.GetAsync(uri);
+                HttpResponseMessage response = await client.GetAsync(uri).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadAsStringAsync();
+                    return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 }
             }
-            return await Task.FromResult<string>(null);
+            return await Task.FromResult<string>(null).ConfigureAwait(false);
         }
 
         internal async Task<byte[]> GetByte(string uri)
         {
             using (var client = CreateClient())
             {
-                HttpResponseMessage response = await client.GetAsync(uri);
+                HttpResponseMessage response = await client.GetAsync(uri).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadAsByteArrayAsync();
+                    return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                 }
             }
-            return await Task.FromResult<byte[]>(null);
+            return await Task.FromResult<byte[]>(null).ConfigureAwait(false);
         }
 
         internal async Task<string> Post(string uri, string data)
         {
             using (var client = CreateClient())
             {
-                HttpResponseMessage response = await client.PostAsync(uri, new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("data", data) }));
+                HttpResponseMessage response = await client.PostAsync(uri, new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("data", data) })).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadAsStringAsync();
+                    return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 }
             }
-            return await Task.FromResult<string>(null);
+            return await Task.FromResult<string>(null).ConfigureAwait(false);
         }
 
         internal async Task<string> Post(string uri, object data)
         {
-            return await Post(uri, JsonConvert.SerializeObject(data));
+            return await Post(uri, JsonConvert.SerializeObject(data)).ConfigureAwait(false);
         }
 
         public async Task<Dictionary<int, string>> GetCountries()
         {
-            return JsonConvert.DeserializeObject<Dictionary<int, string>>(await Get(string.Format("{0}countries", APIURL)));
+            var result = await Get(string.Format("{0}countries", APIURL)).ConfigureAwait(false);
+            return JsonConvert.DeserializeObject<Dictionary<int, string>>(result);
         }
 
         public async Task<Dictionary<string, Sequence[]>> GetSequences()
         {
-            return JsonConvert.DeserializeObject<Dictionary<string, Sequence[]>>(await Get("sequences/index.json"));
+            var result = await Get("sequences/index.json").ConfigureAwait(false);
+            return JsonConvert.DeserializeObject<Dictionary<string, Sequence[]>>(result);
         }
 
         public async Task<Dictionary<int, string>> GetTags()
         {
-            return JsonConvert.DeserializeObject<Dictionary<int, string>>(await Get("tags/index.json"));
+            var result = await Get("tags/index.json").ConfigureAwait(false);
+            return JsonConvert.DeserializeObject<Dictionary<int, string>>(result);
         }
 
         public async Task<Logo[]> GetLogos()
         {
-            return JsonConvert.DeserializeObject<Logo[]>(await Get("/users/logo"));
+            var result = await Get("/users/logo").ConfigureAwait(false);
+            return JsonConvert.DeserializeObject<Logo[]>(result);
         }
 
         public async Task<Response<Register>> Register(string email, bool sendEmail = true)
         {
-            return JsonConvert.DeserializeObject<Response<Register>>(await Post("/users/create", new
+            var result = await Post("/users/create", new
             {
-                User =  new User {
+                User = new User
+                {
                     Email = email,
                     SendEmail = sendEmail
                 }
-            }));
-        }
-
-        public static IEnumerable<RegionInfo> GetRegionInfos()
-        {
-            return CultureInfo.GetCultures(CultureTypes.SpecificCultures)
-                .Select(c => new RegionInfo(c.LCID))
-                .Distinct()
-                .OrderBy(c => c.TwoLetterISORegionName);
+            });
+            return JsonConvert.DeserializeObject<Response<Register>>(result);
         }
     }
 

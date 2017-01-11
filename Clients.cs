@@ -21,25 +21,27 @@ namespace Birko.SuperFaktura
 
         public async Task<PagedResponse> Get(Filter filter, bool listInfo = true)
         {
-            var url = string.Format("clients/index.json{0}", filter.ToParameters(listInfo));
+            var result = await superFaktura.Get(string.Format("clients/index.json{0}", filter.ToParameters(listInfo))).ConfigureAwait(false);
             if (listInfo)
             {
-                return JsonConvert.DeserializeObject<PagedResponse>(await superFaktura.Get(url));
+                return JsonConvert.DeserializeObject<PagedResponse>(result);
             }
             else
             {
-                return new PagedResponse { Items = JsonConvert.DeserializeObject<ItemList<ListItem>>(await superFaktura.Get(url)) };
+                return new PagedResponse { Items = JsonConvert.DeserializeObject<ItemList<ListItem>>(result) };
             }
         }
 
         public async Task<Response<ListItem>> Save(Request.Client.Client client)
         {
-            return JsonConvert.DeserializeObject<Response<ListItem>>(await superFaktura.Post("clients/create", new { Client = client }));
+            var result = await superFaktura.Post("clients/create", new { Client = client }).ConfigureAwait(false);
+            return JsonConvert.DeserializeObject<Response<ListItem>>(result);
         }
 
         public async Task<Response<Response.Client.ContactPerson>> AddContactPerson(Request.Client.ContactPerson person)
         {
-            return JsonConvert.DeserializeObject<Response<Response.Client.ContactPerson>>(await superFaktura.Post("/contact_people/add/api:1", new { ContactPerson = person }));
+            var result = await superFaktura.Post("/contact_people/add/api:1", new { ContactPerson = person }).ConfigureAwait(false);
+            return JsonConvert.DeserializeObject<Response<Response.Client.ContactPerson>>(result);
         }
     }
 }
