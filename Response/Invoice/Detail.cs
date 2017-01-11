@@ -9,19 +9,23 @@ namespace Birko.SuperFaktura.Response.Invoice
 {
     public class DetailBasic
     {
-        [JsonProperty(PropertyName = "ClientData", NullValueHandling = NullValueHandling.Ignore)]
-        public ClientData ClientData { get; set; } = null;
         [JsonProperty(PropertyName = "Invoice", NullValueHandling = NullValueHandling.Ignore)]
         public Invoice Invoice { get; set; } = null;
-        [JsonProperty(PropertyName = "InvoiceItem", NullValueHandling = NullValueHandling.Ignore)]
-        public Item[] InvoiceItems { get; set; } = null;
-        [JsonProperty(PropertyName = "MyData", NullValueHandling = NullValueHandling.Ignore)]
-        public MyData MyData { get; set; } = null;
         [JsonProperty(PropertyName = "Tag", NullValueHandling = NullValueHandling.Ignore)]
         public Tag[] Tag { get; set; } = null;
     }
 
-    public class Detail: DetailBasic
+    public class DetailData : DetailBasic
+    {
+        [JsonProperty(PropertyName = "ClientData", NullValueHandling = NullValueHandling.Ignore)]
+        public ClientData ClientData { get; set; } = null;
+        [JsonProperty(PropertyName = "InvoiceItem", NullValueHandling = NullValueHandling.Ignore)]
+        public Item[] InvoiceItems { get; set; } = null;
+        [JsonProperty(PropertyName = "MyData", NullValueHandling = NullValueHandling.Ignore)]
+        public MyData MyData { get; set; } = null;
+    }
+
+    public class Detail: DetailData
     {
         [JsonProperty(PropertyName = "Client", NullValueHandling = NullValueHandling.Ignore)]
         public Client.Client Client { get; set; } = null;
