@@ -39,9 +39,9 @@ namespace Birko.SuperFaktura
             }
         }
 
-        public async Task<Response.Invoice.ResponsePayment> Pay(Request.Invoice.Payment payment)
+        public async Task<ResponsePayment> Pay(Request.Invoice.Payment payment)
         {
-            return JsonConvert.DeserializeObject<Response.Invoice.ResponsePayment>(await superFaktura.Post("invoice_payments/add/ajax:1/api:1", new { InvoicePayment = payment }));
+            return JsonConvert.DeserializeObject<ResponsePayment>(await superFaktura.Post("invoice_payments/add/ajax:1/api:1", new { InvoicePayment = payment }));
         }
 
         public async Task<byte[]> GetPdf(int invoiceId, string token, string language = LanguageType.Slovak)

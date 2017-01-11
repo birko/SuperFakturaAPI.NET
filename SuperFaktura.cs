@@ -65,7 +65,7 @@ namespace Birko.SuperFaktura
                     return await response.Content.ReadAsStringAsync();
                 }
             }
-            return null;
+            return await Task.FromResult<string>(null);
         }
 
         internal async Task<byte[]> GetByte(string uri)
@@ -79,7 +79,7 @@ namespace Birko.SuperFaktura
                     return await response.Content.ReadAsByteArrayAsync();
                 }
             }
-            return null;
+            return await Task.FromResult<byte[]>(null);
         }
 
         internal async Task<string> Post(string uri, string data)
@@ -93,7 +93,7 @@ namespace Birko.SuperFaktura
                     return await response.Content.ReadAsStringAsync();
                 }
             }
-            return null;
+            return await Task.FromResult<string>(null);
         }
 
         internal async Task<string> Post(string uri, object data)
