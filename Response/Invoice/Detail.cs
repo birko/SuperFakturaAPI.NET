@@ -1,4 +1,4 @@
-﻿using Birko.SuperFaktura.Converters;
+?﻿using Birko.SuperFaktura.Converters;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -41,7 +41,7 @@ namespace Birko.SuperFaktura.Response.Invoice
         public SummaryInvoice SummaryInvoice { get; set; } = null;
         [JsonProperty(PropertyName = "UnitCount", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(DictionaryConverter<string, decimal?>))]
-        public Dictionary<string, decimal> UnitCount { get; set; } = null;
+        public Dictionary<string, decimal?> UnitCount { get; set; } = null;
         [JsonProperty(PropertyName = "PaymentLink", NullValueHandling = NullValueHandling.Ignore)]
         public string PaymentLink { get; set; }
         [JsonProperty(PropertyName = "Paypal", NullValueHandling = NullValueHandling.Ignore)]
