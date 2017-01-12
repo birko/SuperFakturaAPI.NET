@@ -29,6 +29,7 @@ namespace Birko.SuperFaktura
         public Invoices Invoices { get; private set; }
         public Stock Stock { get; private set; }
 
+        private DateTime? _lastRequest = null;
 
         public SuperFaktura(string email, string apiKey, string apptitle = null, string module = "API", int? companyId = null)
         {
@@ -70,9 +71,20 @@ namespace Birko.SuperFaktura
                 throw (exception);
             }
         }
+        private void RequestDelay()
+        {
+            DateTime now = DateTime.Now;
+            if (_lastRequest != null && (now - _lastRequest.Value).Seconds <= 1)
+            {
+                Task.Delay(new TimeSpan(0, 0, 0, 1, 0)).Wait();
+                now = DateTime.Now;
+            }
+            _lastRequest = now;
+        }
 
         internal async Task<string> Get(string uri)
         {
+            RequestDelay();
             using (var client = CreateClient())
             {
                 HttpResponseMessage response = await client.GetAsync(uri).ConfigureAwait(false);
@@ -90,6 +102,7 @@ namespace Birko.SuperFaktura
 
         internal async Task<byte[]> GetByte(string uri)
         {
+            RequestDelay();
             using (var client = CreateClient())
             {
                 HttpResponseMessage response = await client.GetAsync(uri).ConfigureAwait(false);
@@ -107,6 +120,7 @@ namespace Birko.SuperFaktura
 
         internal async Task<string> Post(string uri, string data)
         {
+            RequestDelay();
             using (var client = CreateClient())
             {
                 HttpResponseMessage response = await client.PostAsync(uri, new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("data", data) })).ConfigureAwait(false);
