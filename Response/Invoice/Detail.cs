@@ -40,7 +40,7 @@ namespace Birko.SuperFaktura.Response.Invoice
         [JsonProperty(PropertyName = "SummaryInvoice", NullValueHandling = NullValueHandling.Ignore)]
         public SummaryInvoice SummaryInvoice { get; set; } = null;
         [JsonProperty(PropertyName = "UnitCount", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonConverter(typeof(DictionaryConverter<string, decimal>))]
+        [JsonConverter(typeof(DictionaryConverter<string, decimal?>))]
         public Dictionary<string, decimal> UnitCount { get; set; } = null;
         [JsonProperty(PropertyName = "PaymentLink", NullValueHandling = NullValueHandling.Ignore)]
         public string PaymentLink { get; set; }
