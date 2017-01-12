@@ -60,11 +60,11 @@ namespace Birko.SuperFaktura
             {
                 superFaktura.DeserializeResult<Response<ExpandoObject>>(testResult);
             }
-            catch (Exceptions.Exception ex)
+            catch (Exceptions.Exception)
             {
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 if (result == null || result.Length == 0)
                 {
