@@ -98,7 +98,7 @@ namespace Birko.SuperFaktura
             return superFaktura.DeserializeResult<Response<ResponseEmail>>(result);
         }
 
-        public async Task<Response<Detail>> Save(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null)
+        public async Task<Response<Detail>> Save(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Setting setting = null)
         {
             var result = await superFaktura.Post("/invoices/create", new
             {
@@ -106,6 +106,9 @@ namespace Birko.SuperFaktura
                 InvoiceItem = items,
                 Tag = tags,
                 Client = client,
+                InvoiceSetting = new {
+                    settings = (setting != null) ? setting : new Request.Invoice.Setting()
+                }
             }).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<Detail>>(result);
         }

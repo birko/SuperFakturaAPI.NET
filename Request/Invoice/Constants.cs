@@ -78,7 +78,7 @@ namespace Birko.SuperFaktura.Request.Invoice
         public const string PayPal = "paypal";
         public const string TrustPay = "trustpay";
         public const string CreditCard = "credit";
-        public const string DebitCarf = "debit";
+        public const string DebitCard = "debit";
         public const string CashOnDelivery = "cod";
         public const string MutalAccreditation = "accreditation";
     }
