@@ -107,7 +107,7 @@ namespace Birko.SuperFaktura
                 Tag = tags,
                 Client = client,
                 InvoiceSetting = new {
-                    settings = (setting != null) ? setting : new Request.Invoice.Setting()
+                    settings = JsonConvert.SerializeObject((setting != null) ? setting : new Setting())
                 }
             }).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<Detail>>(result);
