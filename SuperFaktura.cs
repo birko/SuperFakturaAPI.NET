@@ -56,10 +56,10 @@ namespace Birko.SuperFaktura
             return client;
         }
 
-        internal T DeserializeResult<T>(string result)
+        internal T DeserializeResult<T>(string result, JsonSerializerSettings setting = null)
         {
             TestError(result);
-            return JsonConvert.DeserializeObject<T>(result);
+            return JsonConvert.DeserializeObject<T>(result, setting);
         }
 
         internal static void TestError(string result)
@@ -144,19 +144,64 @@ namespace Birko.SuperFaktura
         public async Task<Dictionary<int, string>> GetCountries()
         {
             var result = await Get(string.Format("{0}countries", APIURL)).ConfigureAwait(false);
-            return DeserializeResult<Dictionary<int, string>>(result);
+            try
+            {
+                return DeserializeResult<Dictionary<int, string>>(result);
+            }
+            catch (JsonSerializationException ex)
+            {
+                try
+                {
+                    DeserializeResult<string[]>(result);
+                    return null;
+                }
+                catch
+                {
+                    throw ex;
+                }
+            }
         }
 
         public async Task<Dictionary<string, Sequence[]>> GetSequences()
         {
             var result = await Get("sequences/index.json").ConfigureAwait(false);
-            return DeserializeResult<Dictionary<string, Sequence[]>>(result);
+            try
+            {
+                return DeserializeResult<Dictionary<string, Sequence[]>>(result);
+            }
+            catch (JsonSerializationException ex)
+            {
+                try
+                {
+                    DeserializeResult<Sequence[][]>(result);
+                    return null;
+                }
+                catch
+                {
+                    throw ex;
+                }
+            }
         }
 
         public async Task<Dictionary<int, string>> GetTags()
         {
             var result = await Get("tags/index.json").ConfigureAwait(false);
-            return DeserializeResult<Dictionary<int, string>>(result);
+            try
+            {
+                return DeserializeResult<Dictionary<int, string>>(result);
+            }
+            catch (JsonSerializationException ex)
+            {
+                try
+                {
+                    DeserializeResult<string[]>(result);
+                    return null;
+                }
+                catch
+                {
+                    throw ex;
+                }
+            }
         }
 
         public async Task<Logo[]> GetLogos()
