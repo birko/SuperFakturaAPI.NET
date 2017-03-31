@@ -24,12 +24,52 @@ namespace Birko.SuperFaktura
         public string Module { get; private set; }
         public int TimeoutSeconds { get; set; } = 30;
 
-        public Clients Clients { get; private set; }
-        public Expenses Expenses { get; private set; }
-        public Invoices Invoices { get; private set; }
-        public Stock Stock { get; private set; }
-
+        private Clients _clients = null;
+        private Expenses _expenses = null;
+        private Invoices _invoices = null;
+        private Stock _stock = null;
         private DateTime? _lastRequest = null;
+
+        public Clients Clients {
+            get {
+                if (_clients == null) {
+                    _clients = new Clients(this);
+                }
+                return _clients;
+            }
+        }
+
+        public Expenses Expenses {
+            get
+            {
+                if (_expenses == null)
+                {
+                    _expenses = new Expenses(this);
+                }
+                return _expenses;
+            }
+        }
+        public Invoices Invoices {
+            get
+            {
+                if (_invoices == null)
+                {
+                    _invoices = new Invoices(this);
+                }
+                return _invoices;
+            }
+        }
+
+        public Stock Stock {
+            get
+            {
+                if (_stock== null)
+                {
+                    _stock = new Stock(this);
+                }
+                return _stock;
+            }
+        }
 
         public SuperFaktura(string email, string apiKey, string apptitle = null, string module = "API", int? companyId = null)
         {
@@ -38,10 +78,6 @@ namespace Birko.SuperFaktura
             CompanyId = companyId;
             AppTitle = apptitle;
             Module = module;
-            Clients = new Clients(this);
-            Expenses = new Expenses(this);
-            Invoices = new Invoices(this);
-            Stock = new Stock(this);
         }
 
         protected HttpClient CreateClient()
