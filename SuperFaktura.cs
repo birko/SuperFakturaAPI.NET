@@ -100,10 +100,17 @@ namespace Birko.SuperFaktura
 
         internal static void TestError(string result)
         {
-            var testResult = JsonConvert.DeserializeObject<Response<ExpandoObject>>(result);
-            if (testResult.Error != null && testResult.Error.Value > 0)
+            try
             {
-                var exception = new Exceptions.Exception(testResult.Error.Value, testResult.Message, testResult.ErrorMessage);
+                var testResult = JsonConvert.DeserializeObject<Response<ExpandoObject>>(result);
+                if (testResult.Error != null && testResult.Error.Value > 0)
+                {
+                    var exception = new Exceptions.Exception(testResult.Error.Value, testResult.Message, testResult.ErrorMessage);
+                    throw (exception);
+                }
+            }
+            catch (Exception ex) {
+                var exception = new Exceptions.Exception(0, ex.Message, string.Format("Returned Response: {0}", result));
                 throw (exception);
             }
         }
