@@ -6,17 +6,17 @@ namespace Birko.SuperFaktura.Exceptions
 {
     public class Exception : System.Exception
     {
-        public int Error { get; set; }
+        public int? Error { get; set; }
         public string ErrorMessage { get; set; }
         public string ResponseMessage { get; set; }
 
-        public Exception(int code, string message) : this(code, message, string.Empty, null)
+        public Exception(int? code, string message) : this(code, message, string.Empty, null)
         { }
-        public Exception(int code, string message, Exception inner) : this(code, message, string.Empty, inner)
+        public Exception(int? code, string message, Exception inner) : this(code, message, string.Empty, inner)
         { }
-        public Exception(int code, string message, string errorMessage) : this(code, message, errorMessage, null)
+        public Exception(int? code, string message, string errorMessage) : this(code, message, errorMessage, null)
         { }
-        public Exception(int code, string message, string errorMessage, Exception inner)
+        public Exception(int? code, string message, string errorMessage, Exception inner)
             : base(string.Format("\nCode: {0},\nMessage: {1}\nErrorMessage: {2}", code, message, errorMessage), inner)
         {
             Error = code;
@@ -34,6 +34,19 @@ namespace Birko.SuperFaktura.Exceptions
                 Data = (object)null
             };
         }
+    }
 
+    public class ParseException : Exception
+    {
+        public ParseException(string message) : this(message, string.Empty, null)
+        { }
+        public ParseException(string message, Exception inner) : this(message, string.Empty, inner)
+        { }
+        public ParseException(string message, string errorMessage) : this(message, errorMessage, null)
+        { }
+        public ParseException(string message, string errorMessage, Exception inner)
+            : base(null, message, errorMessage, inner)
+        {
+        }
     }
 }

@@ -55,22 +55,22 @@ namespace Birko.SuperFaktura
             }
             var result = await superFaktura.GetByte(string.Format("{0}/invoices/pdf/{1}/token:{2}", language, invoiceId, token)).ConfigureAwait(false);
             //Code below tests if response is a SuperFaktura error response or PDF File
-            string testResult = Encoding.UTF8.GetString(result);
             try
             {
+                string testResult = Encoding.UTF8.GetString(result);
                 superFaktura.DeserializeResult<Response<ExpandoObject>>(testResult);
             }
-            catch (Exceptions.Exception)
-            {
-                throw;
-            }
-            catch (Exception)
+            catch (Exceptions.ParseException)
             {
                 if (result == null || result.Length == 0)
                 {
                     throw;
                 }
-                //deserialization failed. it is a pdf file
+                //test deserialization failed. it is a pdf file
+            }
+            catch (Exception)
+            {
+                throw;
             }
             return result;
         }

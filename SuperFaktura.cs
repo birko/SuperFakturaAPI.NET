@@ -109,11 +109,13 @@ namespace Birko.SuperFaktura
                     throw (exception);
                 }
             }
-            catch (Exception ex) {
-                var exception = new Exceptions.Exception(0, ex.Message, string.Format("Returned Response: {0}", result));
+            catch (Exception ex)
+            {
+                var exception = new Exceptions.ParseException(ex.Message, string.Format("Returned Response: {0}", result));
                 throw (exception);
             }
         }
+
         private void RequestDelay()
         {
             DateTime now = DateTime.Now;
