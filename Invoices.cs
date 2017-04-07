@@ -106,14 +106,15 @@ namespace Birko.SuperFaktura
                 InvoiceItem = items,
                 Tag = tags,
                 Client = client,
-                InvoiceSetting = new {
+                InvoiceSetting = new
+                {
                     settings = JsonConvert.SerializeObject((setting != null) ? setting : new Setting())
                 }
             }).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<Detail>>(result);
         }
 
-        public async Task<Response<DetailData>> Update(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null)
+        public async Task<Response<DetailData>> Update(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Setting setting = null)
         {
             var result = await superFaktura.Post("/invoices/Edit", new
             {
@@ -121,6 +122,10 @@ namespace Birko.SuperFaktura
                 InvoiceItem = items,
                 Tag = tags,
                 Client = client,
+                InvoiceSetting = new
+                {
+                    settings = JsonConvert.SerializeObject((setting != null) ? setting : new Setting())
+                }
             }).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<DetailData>>(result);
         }
