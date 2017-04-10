@@ -1,12 +1,13 @@
 # SuperFakturaAPI.NET
 .NET client library for SuperFaktura API.
-Codes are wrapped as .net Shared Library. So you can download them and include into your programs or .dll libraries
+Codes are wrapped as .net Shared Library. So you can download them and include into your programs or .dll libraries.
+Library uses System.Net.Http.HttpClient as communication layer and Newtonsoft.Json for serialization and deserialization
 
 ## Client structure
 The main api client has this hierarchy. Most of used classes is from **Birko.SuperFaktura** namespace
 
 ### 1. SuperFaktura
-Also: **SuperFakturaCZ**  and **SuperFakturaAt**
+Also: **SuperFakturaCZ**  and **SuperFakturaAT**
 Main class. Ensures the propper API calling, serialization of request parameters and deserialization of response from SuperFaktura servers.
 It ensures that the delay between api calls is more than 1 second.
 
@@ -90,3 +91,4 @@ Used namespaces:
 * **Delete(int ID)** - deletes stock item
 * **AddStockMovement(IEnumerable<Request.Stock.Log> items)** - adds stock movement logs to stock item 
 * **AddStockMovement(Request.Stock.Log item)** - adds stock movement log  to stock item
+
