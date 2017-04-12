@@ -3,6 +3,8 @@
 Codes are wrapped as .net Shared Library. So you can download them and include into your programs or .dll libraries.
 Library uses System.Net.Http.HttpClient as communication layer and Newtonsoft.Json for serialization and deserialization
 
+Implementation used by [FinStat.sk](http://www.finstat.sk)
+
 ## Client structure
 The main api client has this hierarchy. Most of used classes is from **Birko.SuperFaktura** namespace
 
