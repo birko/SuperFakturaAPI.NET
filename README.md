@@ -19,6 +19,7 @@ It ensures that the delay between api calls is more than 1 second.
 * **Stock** - instance of Stock class, description bellow
 
 #### 1.2. Public Methods
+* **SuperFaktura(string email, string apiKey, string apptitle = null, string module = "API", int? companyId = null)** - constructor. email and apiKey are mandatory parameters. Given from SuperFaktura.
 * **GetCountries()** - returns Dictionary of available countries from servers. Key: is the country ID, Value: is country name
 * **GetSequences()** - returns Dictionary of available sequences in your SuperFactura account,  Key: is the sequence name ID, Value: is array of Response.Sequence objects
 * **GetTags()** - returns Dictionary of your used tags from servers. Key: is the tag ID, Value: is tag name
@@ -26,7 +27,7 @@ It ensures that the delay between api calls is more than 1 second.
 * **Register(string email, bool sendEmail)** - registers new user to your SuperFaktura account.
 
 ### 2. Clients
-Class that wrappes all API calls for clients handling in SuperFaktura
+Class that wrappes all API calls for clients handling in SuperFaktura.
 Used namespaces:
 * Birko.SuperFaktura.Request.Client
 * Birko.SuperFaktura.Response
@@ -38,7 +39,7 @@ Used namespaces:
 * **AddContactPerson(Request.Client.ContactPerson person)** - add client contact person
 
 ### 3. Expenses
-Class that wrappes all API calls for expenses handling in SuperFaktura
+Class that wrappes all API calls for expenses handling in SuperFaktura.
 Used namespaces:
 * Birko.SuperFaktura.Request.Expense
 * Birko.SuperFaktura.Response
@@ -77,7 +78,7 @@ Used namespaces:
 
 
 ### 5. Stock
-Class that wrappes all API calls for stock handling in SuperFaktura
+Class that wrappes all API calls for stock handling in SuperFaktura.
 Used namespaces:
 * Birko.SuperFaktura.Request.Stock
 * Birko.SuperFaktura.Response
