@@ -11,67 +11,23 @@ using System.Threading.Tasks;
 
 namespace Birko.SuperFaktura
 {
-    public class SuperFaktura
+    public abstract class AbstractSuperFaktura
     {
         public const string APIAUTHKEYWORD = "SFAPI";
-        public const string APIURL = "https://moja.superfaktura.sk/";
-        public bool EnsureSuccessStatusCode { get; set; } = true;
+        public string APIURL { get; protected set; }
 
         public string Email { get; private set; }
         public string ApiKey { get; private set; }
         public int? CompanyId { get; private set; }
         public string AppTitle { get; private set; }
         public string Module { get; private set; }
+
+        public bool EnsureSuccessStatusCode { get; set; } = true;
         public int TimeoutSeconds { get; set; } = 30;
 
-        private Clients _clients = null;
-        private Expenses _expenses = null;
-        private Invoices _invoices = null;
-        private Stock _stock = null;
         private DateTime? _lastRequest = null;
 
-        public Clients Clients {
-            get {
-                if (_clients == null) {
-                    _clients = new Clients(this);
-                }
-                return _clients;
-            }
-        }
-
-        public Expenses Expenses {
-            get
-            {
-                if (_expenses == null)
-                {
-                    _expenses = new Expenses(this);
-                }
-                return _expenses;
-            }
-        }
-        public Invoices Invoices {
-            get
-            {
-                if (_invoices == null)
-                {
-                    _invoices = new Invoices(this);
-                }
-                return _invoices;
-            }
-        }
-
-        public Stock Stock {
-            get
-            {
-                if (_stock== null)
-                {
-                    _stock = new Stock(this);
-                }
-                return _stock;
-            }
-        }
-
-        public SuperFaktura(string email, string apiKey, string apptitle = null, string module = "API", int? companyId = null)
+        public AbstractSuperFaktura(string email, string apiKey, string apptitle = null, string module = "API", int? companyId = null)
         {
             Email = email;
             ApiKey = apiKey;
@@ -185,6 +141,61 @@ namespace Birko.SuperFaktura
         {
             return await Post(uri, JsonConvert.SerializeObject(data)).ConfigureAwait(false);
         }
+    }
+
+    public class SuperFaktura : AbstractSuperFaktura
+    {
+        private Clients _clients = null;
+        private Expenses _expenses = null;
+        private Invoices _invoices = null;
+        private Stock _stock = null;
+
+        public Clients Clients {
+            get {
+                if (_clients == null) {
+                    _clients = new Clients(this);
+                }
+                return _clients;
+            }
+        }
+
+        public Expenses Expenses {
+            get
+            {
+                if (_expenses == null)
+                {
+                    _expenses = new Expenses(this);
+                }
+                return _expenses;
+            }
+        }
+        public Invoices Invoices {
+            get
+            {
+                if (_invoices == null)
+                {
+                    _invoices = new Invoices(this);
+                }
+                return _invoices;
+            }
+        }
+
+        public Stock Stock {
+            get
+            {
+                if (_stock== null)
+                {
+                    _stock = new Stock(this);
+                }
+                return _stock;
+            }
+        }
+
+        public SuperFaktura(string email, string apiKey, string apptitle = null, string module = "API", int? companyId = null)
+            : base(email,apiKey, apptitle, module, companyId)
+        {
+            APIURL = "https://moja.superfaktura.sk/";
+        }
 
         public async Task<Dictionary<int, string>> GetCountries()
         {
@@ -272,21 +283,19 @@ namespace Birko.SuperFaktura
 
     public class SuperFakturaCZ : SuperFaktura
     {
-        public new const string APIURL = "https://moje.superfaktura.cz/";
-
         public SuperFakturaCZ(string email, string apiKey, string apptitle = null, string module = "API", int? companyId = null)
             : base(email, apiKey, apptitle, module, companyId)
         {
+            APIURL = "https://moje.superfaktura.cz/";
         }
     }
 
     public class SuperFakturaAT : SuperFaktura
     {
-        public new const string APIURL = "http://meine.superfaktura.at/";
-
         public SuperFakturaAT(string email, string apiKey, string apptitle = null, string module = "API", int? companyId = null)
             : base(email, apiKey, apptitle, module, companyId)
         {
+            APIURL = "http://meine.superfaktura.at/";
         }
     }
 }

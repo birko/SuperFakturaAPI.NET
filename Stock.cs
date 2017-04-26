@@ -13,9 +13,9 @@ namespace Birko.SuperFaktura
 {
     public class Stock
     {
-        private readonly SuperFaktura superFaktura;
+        private readonly AbstractSuperFaktura superFaktura;
 
-        public Stock(SuperFaktura superFaktura)
+        public Stock(AbstractSuperFaktura superFaktura)
         {
             this.superFaktura = superFaktura;
         }

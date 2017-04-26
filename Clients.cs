@@ -12,9 +12,9 @@ namespace Birko.SuperFaktura
 {
     public class Clients
     {
-        private readonly SuperFaktura superFaktura;
+        private readonly AbstractSuperFaktura superFaktura;
 
-        public Clients(SuperFaktura superFaktura)
+        public Clients(AbstractSuperFaktura superFaktura)
         {
             this.superFaktura = superFaktura;
         }
