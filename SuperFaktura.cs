@@ -51,7 +51,15 @@ namespace Birko.SuperFaktura
         internal T DeserializeResult<T>(string result, JsonSerializerSettings setting = null)
         {
             TestError(result);
-            return JsonConvert.DeserializeObject<T>(result, setting);
+            try
+            {
+                return JsonConvert.DeserializeObject<T>(result, setting);
+            }
+            catch (Exception ex)
+            {
+                var exception = new Exceptions.ParseException(ex.Message, string.Format("Returned Response: {0}", result));
+                throw (exception);
+            }
         }
 
         internal static void TestError(string result)

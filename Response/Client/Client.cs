@@ -25,5 +25,10 @@ namespace Birko.SuperFaktura.Response.Client
         public bool? Update { get; set; } = null;
         [JsonProperty(PropertyName = "uuid", NullValueHandling = NullValueHandling.Ignore)]
         public string UUID { get; set; }
+
+        [JsonProperty(PropertyName = "Country", NullValueHandling = NullValueHandling.Ignore)]
+        public Invoice.Country CountryInfo { get; set; }
+        [JsonProperty(PropertyName = "DeliveryCountry", NullValueHandling = NullValueHandling.Ignore)]
+        public Invoice.Country DeliveryCountryInfo { get; set; }
     }
 }
