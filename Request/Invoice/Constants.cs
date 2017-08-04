@@ -91,4 +91,10 @@ namespace Birko.SuperFaktura.Request.Invoice
         public const int Paid = 3;
         public const int Overdue = 99;
     }
+
+    public static class AccountingDetailType
+    {
+        public const string Item = "item";
+        public const string Service = "service";
+    }
 }

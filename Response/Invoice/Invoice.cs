@@ -12,20 +12,8 @@ namespace Birko.SuperFaktura.Response.Invoice
         public int? UserID { get; set; }
         [JsonProperty(PropertyName = "user_profile_id", NullValueHandling = NullValueHandling.Ignore)]
         public int? UserProfileID { get; set; }
-        [JsonProperty(PropertyName = "parent_id", NullValueHandling = NullValueHandling.Ignore)]
-        public int? ParentID { get; set; }
-        [JsonProperty(PropertyName = "already_paid", NullValueHandling = NullValueHandling.Ignore)]
-        public bool? AlreadyPaid { get; set; } = null;
         [JsonProperty(PropertyName = "modified", NullValueHandling = NullValueHandling.Ignore)]
         public DateTime? Modified { get; set; } = null;
-        [JsonProperty(PropertyName = "deposit", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal? Deposit { get; set; } = null;
-        [JsonProperty(PropertyName = "estimate_id", NullValueHandling = NullValueHandling.Ignore)]
-        public int? EstimateID { get; set; }
-        [JsonProperty(PropertyName = "proforma_id", NullValueHandling = NullValueHandling.Ignore)]
-        public int? ProformaId { get; set; }
-        [JsonProperty(PropertyName = "sequence_id", NullValueHandling = NullValueHandling.Ignore)]
-        public int? SequenceId { get; set; }
         [JsonProperty(PropertyName = "import_type", NullValueHandling = NullValueHandling.Ignore)]
         public string ImportType { get; set; }
         [JsonProperty(PropertyName = "import_id", NullValueHandling = NullValueHandling.Ignore)]
@@ -44,8 +32,6 @@ namespace Birko.SuperFaktura.Response.Invoice
         public string ItemsData { get; set; }
         [JsonProperty(PropertyName = "invoice_no", NullValueHandling = NullValueHandling.Ignore)]
         public string InvoiceNumber { get; set; }
-        [JsonProperty(PropertyName = "order_no", NullValueHandling = NullValueHandling.Ignore)]
-        public string OrderNumber { get; set; }
         [JsonProperty(PropertyName = "mask", NullValueHandling = NullValueHandling.Ignore)]
         public string Mask { get; set; }
         [JsonProperty(PropertyName = "status", NullValueHandling = NullValueHandling.Ignore)]
@@ -60,7 +46,7 @@ namespace Birko.SuperFaktura.Response.Invoice
         [JsonProperty(PropertyName = "special_vat_scheme", NullValueHandling = NullValueHandling.Ignore)]
         public dynamic SpecialVATScheme { get; set; }
         [JsonProperty(PropertyName = "summary_invoice", NullValueHandling = NullValueHandling.Ignore)]
-        public dynamic summary_invoice { get; set; }
+        public dynamic SummaryInvoice { get; set; }
         [JsonProperty(PropertyName = "paid", NullValueHandling = NullValueHandling.Ignore)]
         public decimal? Paid { get; set; } = null;
         [JsonProperty(PropertyName = "amount_paid", NullValueHandling = NullValueHandling.Ignore)]
@@ -68,7 +54,7 @@ namespace Birko.SuperFaktura.Response.Invoice
         [JsonProperty(PropertyName = "recurring", NullValueHandling = NullValueHandling.Ignore)]
         public dynamic Recurring { get; set; }
         [JsonProperty(PropertyName = "paydate", NullValueHandling = NullValueHandling.Ignore)]
-        public dynamic PayDate { get; set; }
+        public DateTime? PayDate { get; set; }
         [JsonProperty(PropertyName = "tags", NullValueHandling = NullValueHandling.Ignore)]
         public string Tags { get; set; }
         [JsonProperty(PropertyName = "home_currency", NullValueHandling = NullValueHandling.Ignore)]
@@ -79,8 +65,6 @@ namespace Birko.SuperFaktura.Response.Invoice
         public decimal? Amount { get; set; } = null;
         [JsonProperty(PropertyName = "vat", NullValueHandling = NullValueHandling.Ignore)]
         public decimal? VAT { get; set; } = null;
-        [JsonProperty(PropertyName = "delivery_type", NullValueHandling = NullValueHandling.Ignore)]
-        public string DeliveryType { get; set; }
         [JsonProperty(PropertyName = "discount", NullValueHandling = NullValueHandling.Ignore)]
         public decimal? Discount { get; set; } = null;
     }

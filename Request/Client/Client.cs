@@ -60,6 +60,8 @@ namespace Birko.SuperFaktura.Request.Client
         public string DeliveryName { get; set; }
         [JsonProperty(PropertyName = "match_address", NullValueHandling = NullValueHandling.Ignore)]
         public bool MatchAddress { get; set; } = true;
+        [JsonProperty(PropertyName = "update_addressbook", NullValueHandling = NullValueHandling.Ignore)]
+        public bool UpdateAddressBook { get; set; } = false;
         [JsonProperty(PropertyName = "comment", NullValueHandling = NullValueHandling.Ignore)]
         public string Comment { get; set; } = string.Empty;
         [JsonProperty(PropertyName = "default_variable", NullValueHandling = NullValueHandling.Ignore)]

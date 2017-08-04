@@ -27,6 +27,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Request\Expense\Expense.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Expense\Filter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Expense\Payment.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\AccountingDetail.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\BankAccount.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\Constants.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\Email.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\Filter.cs" />
