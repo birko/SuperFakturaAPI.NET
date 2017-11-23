@@ -55,7 +55,7 @@ Used namespaces:
 * **Edit(Request.Expense.Expense expense)** - updates expense
 * **Pay(Request.Expense.Payment payment)** - adds payment to expense
 * **GetExpenseCategories()** - returns list of ExpenseCategories
-
+* **DeletePayment(int expensePaymentID)** - deletes expense payment
 ### 4. Invoices
 Class that wrappes all API calls for expenses invoice in SuperFaktura.
 Used namespaces:
@@ -72,11 +72,12 @@ Used namespaces:
 * **SetInvoiceLanguage(int ID, string language)** - sets the default language for given invoice
 * **MarkAsSent(Request.Invoice.MarkEmail email)** - marks given email to invoice as send
 * **SendEmail(Request.Invoice.Email email)** - sends Email  with invoice
-* **Save(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Setting setting = null)** - creates new invoice
-* **Update(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Setting setting = null)** - updates invoice
+* **Save(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Setting setting = null, Extra extra = null)** - creates new invoice
+* **Update(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Setting setting = null, Extra extra = null)** - updates invoice
 * **DeleteItem(int invoiceID, int itemID)** - deletes item from invoice
 * **Delete(int invoiceID)** - deletes invoice
 * **SendPost(Post post)** - send invoice throw regular post
+* **DeletePayment(int invoicePaymentID)** - deletes invoice payment
 
 
 ### 5. Stock
