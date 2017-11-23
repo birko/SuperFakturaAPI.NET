@@ -19,5 +19,7 @@ namespace Birko.SuperFaktura.Request.Invoice
         public bool BySquare { get; set; } = true;
         [JsonProperty(PropertyName = "paypal", NullValueHandling = NullValueHandling.Ignore)]
         public bool PayPal { get; set; } = true;
+        [JsonProperty(PropertyName = "show_prices", NullValueHandling = NullValueHandling.Ignore)]
+        public bool ShowPrices { get; set; } = false;
     }
 }

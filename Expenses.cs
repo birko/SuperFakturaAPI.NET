@@ -67,5 +67,11 @@ namespace Birko.SuperFaktura
             var result = await superFaktura.Get("expenses/expense_categories").ConfigureAwait(false);
             return superFaktura.DeserializeResult<CategoryItem[]>(result);
         }
+
+        public async Task<Response<ExpandoObject>> DeletePayment(int expensePaymentID)
+        {
+            var result = await superFaktura.Get(string.Format("/expense_payments/delete/{0}", expensePaymentID)).ConfigureAwait(false);
+            return superFaktura.DeserializeResult<Response<ExpandoObject>>(result);
+        }
     }
 }

@@ -31,6 +31,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\BankAccount.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\Constants.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\Email.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\Extra.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\Filter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\Invoice.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\Item.cs" />
