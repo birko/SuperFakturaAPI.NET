@@ -100,35 +100,45 @@ namespace Birko.SuperFaktura
 
         public async Task<Response<Detail>> Save(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Setting setting = null, Dictionary<string, object> extra = null)
         {
-            var result = await superFaktura.Post("/invoices/create", new
+            var data = new Dictionary<string, object>()
             {
-                Invoice = invoice,
-                InvoiceItem = items,
-                Tag = tags,
-                Client = client,
-                InvoiceSetting = new
+                { "Invoice", invoice },
+                { "InvoiceItem", items },
+                { "Tag", tags },
+                { "Client", client },
+                { "InvoiceSetting", new
                 {
                     settings = JsonConvert.SerializeObject((setting != null) ? setting : new Setting())
-                },
-                InvoiceExtra = (extra != null) ? extra : new Dictionary<string, object>()
-            }).ConfigureAwait(false);
+                }},
+            };
+            if (extra != null && extra.Any() && extra.Any(x=>x.Value != null))
+            {
+                data.Add("InvoiceExtra", extra);
+            }
+
+            var result = await superFaktura.Post("/invoices/create", data).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<Detail>>(result);
         }
 
         public async Task<Response<DetailData>> Update(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Setting setting = null, Dictionary<string, object> extra = null)
         {
-            var result = await superFaktura.Post("/invoices/Edit", new
+            var data = new Dictionary<string, object>()
             {
-                Invoice = invoice,
-                InvoiceItem = items,
-                Tag = tags,
-                Client = client,
-                InvoiceSetting = new
+                { "Invoice", invoice },
+                { "InvoiceItem", items },
+                { "Tag", tags },
+                { "Client", client },
+                { "InvoiceSetting", new
                 {
                     settings = JsonConvert.SerializeObject((setting != null) ? setting : new Setting())
-                },
-                InvoiceExtra = (extra != null) ? extra : new Dictionary<string, object>()
-            }).ConfigureAwait(false);
+                }},
+            };
+            if (extra != null && extra.Any() && extra.Any(x=>x.Value != null))
+            {
+                data.Add("InvoiceExtra", extra);
+            }
+
+            var result = await superFaktura.Post("/invoices/Edit", data).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<DetailData>>(result);
         }
 
