@@ -98,7 +98,7 @@ namespace Birko.SuperFaktura
             return superFaktura.DeserializeResult<Response<ResponseEmail>>(result);
         }
 
-        public async Task<Response<Detail>> Save(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Setting setting = null, Extra extra = null)
+        public async Task<Response<Detail>> Save(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Setting setting = null, Dictionary<string, object> extra = null)
         {
             var result = await superFaktura.Post("/invoices/create", new
             {
@@ -110,12 +110,12 @@ namespace Birko.SuperFaktura
                 {
                     settings = JsonConvert.SerializeObject((setting != null) ? setting : new Setting())
                 },
-                InvoiceExtra = extra
+                InvoiceExtra = (extra != null) ? extra : new Dictionary<string, object>()
             }).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<Detail>>(result);
         }
 
-        public async Task<Response<DetailData>> Update(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Setting setting = null, Extra extra = null)
+        public async Task<Response<DetailData>> Update(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Setting setting = null, Dictionary<string, object> extra = null)
         {
             var result = await superFaktura.Post("/invoices/Edit", new
             {
@@ -127,7 +127,7 @@ namespace Birko.SuperFaktura
                 {
                     settings = JsonConvert.SerializeObject((setting != null) ? setting : new Setting())
                 },
-                InvoiceExtra = extra
+                InvoiceExtra = (extra != null) ? extra : new Dictionary<string, object>()
             }).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<DetailData>>(result);
         }
