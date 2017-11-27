@@ -144,8 +144,17 @@ namespace Birko.SuperFaktura
 
         public async Task<Response<bool>> DeleteItem(int invoiceID, int itemID)
         {
-            var result = await superFaktura.Get(string.Format("invoice_items/delete/{1}/invoice_id:{0}", invoiceID, itemID)).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Response<bool>>(result);
+            return await DeleteItem(invoiceID, new int[] { itemID });
+        }
+
+        public async Task<Response<bool>> DeleteItem(int invoiceID, int[] itemID)
+        {
+            if (itemID != null && itemID.Any())
+            {
+                var result = await superFaktura.Get(string.Format("invoice_items/delete/{1}/invoice_id:{0}", invoiceID, string.Join(",", itemID))).ConfigureAwait(false);
+                return superFaktura.DeserializeResult<Response<bool>>(result);
+            }
+            return null;
         }
 
         public async Task<Response<ExpandoObject>> Delete(int invoiceID)
