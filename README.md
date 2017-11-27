@@ -75,6 +75,7 @@ Used namespaces:
 * **Save(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Setting setting = null, Extra extra = null)** - creates new invoice
 * **Update(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Setting setting = null, Extra extra = null)** - updates invoice
 * **DeleteItem(int invoiceID, int itemID)** - deletes item from invoice
+* **DeleteItem(int invoiceID, int[] itemID)** - deletes items from invoice
 * **Delete(int invoiceID)** - deletes invoice
 * **SendPost(Post post)** - send invoice throw regular post
 * **DeletePayment(int invoicePaymentID)** - deletes invoice payment
