@@ -286,6 +286,12 @@ namespace Birko.SuperFaktura
             });
             return DeserializeResult<Response<Register>>(result);
         }
+
+        public async Task<Response<ExpandoObject>> CashRegister(int cashRegisterId, Request.PagedSearchParameters filter, bool listInfo = true)
+        {
+            var result = await Get(string.Format("/cash_register_items/index/{0}{1}", cashRegisterId, filter.ToParameters(listInfo))));
+            return DeserializeResult<Response<ExpandoObject>>(result);
+        }
     }
 
 

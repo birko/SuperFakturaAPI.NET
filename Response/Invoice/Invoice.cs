@@ -20,8 +20,6 @@ namespace Birko.SuperFaktura.Response.Invoice
         public int? ImportID { get; set; }
         [JsonProperty(PropertyName = "import_parent_id", NullValueHandling = NullValueHandling.Ignore)]
         public int? ImportParentID { get; set; }
-        [JsonProperty(PropertyName = "tax_document", NullValueHandling = NullValueHandling.Ignore)]
-        public string TaxDocument { get; set; }
         [JsonProperty(PropertyName = "lang", NullValueHandling = NullValueHandling.Ignore)]
         public string Lang { get; set; }
         [JsonProperty(PropertyName = "client_data", NullValueHandling = NullValueHandling.Ignore)]

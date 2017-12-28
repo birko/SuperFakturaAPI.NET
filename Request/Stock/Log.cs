@@ -8,7 +8,7 @@ namespace Birko.SuperFaktura.Request.Stock
     public class Log
     {
         [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
-        public int ID { get; internal set; }
+        public int? ID { get; internal set; }
         [JsonProperty(PropertyName = "stock_item_id", NullValueHandling = NullValueHandling.Ignore)]
         public int StockItemID { get; internal set; }
         [JsonProperty(PropertyName = "name", NullValueHandling = NullValueHandling.Ignore)]

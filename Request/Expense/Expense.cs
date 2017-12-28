@@ -8,7 +8,7 @@ namespace Birko.SuperFaktura.Request.Expense
     public class Expense
     {
         [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
-        public int ID { get; internal set; }
+        public int? ID { get; internal set; }
         [JsonProperty(PropertyName = "name", NullValueHandling = NullValueHandling.Ignore)]
         public string Name { get; set; }
         [JsonProperty(PropertyName = "already_paid", NullValueHandling = NullValueHandling.Ignore)]

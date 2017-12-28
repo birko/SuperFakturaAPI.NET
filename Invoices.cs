@@ -174,5 +174,11 @@ namespace Birko.SuperFaktura
             var result = await superFaktura.Get(string.Format("/invoice_payments/delete/{0}", invoicePaymentID)).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<ExpandoObject>>(result);
         }
+
+        public async Task<Response<ExpandoObject>> SendSMS(SMS data)
+        {
+            var result = await superFaktura.Post(string.Format("/sms/send"), data).ConfigureAwait(false);
+            return superFaktura.DeserializeResult<Response<ExpandoObject>>(result);
+        }
     }
 }
