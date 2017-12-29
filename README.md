@@ -27,6 +27,7 @@ It ensures that the delay between api calls is more than 1 second.
 * **GetTags()** - returns Dictionary of your used tags from servers. Key: is the tag ID, Value: is tag name
 * **GetLogos()** - returns array of Response.Logo objects. List of logos uploaded to SuperFaktura
 * **Register(string email, bool sendEmail)** - registers new user to your SuperFaktura account.
+* **CashRegister(int id, Request.PagedSearchParameters filter, bool listInfo)** gets the cash register infos
 
 ### 2. Clients
 Class that wrappes all API calls for clients handling in SuperFaktura.
@@ -56,6 +57,8 @@ Used namespaces:
 * **Pay(Request.Expense.Payment payment)** - adds payment to expense
 * **GetExpenseCategories()** - returns list of ExpenseCategories
 * **DeletePayment(int expensePaymentID)** - deletes expense payment
+
+
 ### 4. Invoices
 Class that wrappes all API calls for expenses invoice in SuperFaktura.
 Used namespaces:
@@ -79,6 +82,7 @@ Used namespaces:
 * **Delete(int invoiceID)** - deletes invoice
 * **SendPost(Post post)** - send invoice throw regular post
 * **DeletePayment(int invoicePaymentID)** - deletes invoice payment
+* **SendSMS(Request.Invoice.SMS data)** - sends SMS message
 
 
 ### 5. Stock
