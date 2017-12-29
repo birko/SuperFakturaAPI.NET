@@ -38,9 +38,11 @@ namespace Birko.SuperFaktura
 
         protected HttpClient CreateClient()
         {
-            var client = new HttpClient();
-            client.Timeout = new TimeSpan(0, 0, 0, TimeoutSeconds, 0);
-            client.BaseAddress = new Uri(APIURL);
+            var client = new HttpClient
+            {
+                Timeout = new TimeSpan(0, 0, 0, TimeoutSeconds, 0),
+                BaseAddress = new Uri(APIURL)
+            };
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/*");
             client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", string.Format("{0} email={1}&apikey={2}&company_id={3}", APIAUTHKEYWORD, Email, ApiKey, CompanyId));
@@ -289,7 +291,7 @@ namespace Birko.SuperFaktura
 
         public async Task<Response<ExpandoObject>> CashRegister(int cashRegisterId, Request.PagedSearchParameters filter, bool listInfo = true)
         {
-            var result = await Get(string.Format("/cash_register_items/index/{0}{1}", cashRegisterId, filter.ToParameters(listInfo))));
+            var result = await Get(string.Format("/cash_register_items/index/{0}{1}", cashRegisterId, filter.ToParameters(listInfo)));
             return DeserializeResult<Response<ExpandoObject>>(result);
         }
     }
