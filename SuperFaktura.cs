@@ -26,6 +26,7 @@ namespace Birko.SuperFaktura
         public int TimeoutSeconds { get; set; } = 30;
 
         private DateTime? _lastRequest = null;
+        private static Dictionary<string, HttpClient> _clientList = null;
 
         public AbstractSuperFaktura(string email, string apiKey, string apptitle = null, string module = "API", int? companyId = null)
         {
@@ -36,17 +37,33 @@ namespace Birko.SuperFaktura
             Module = module;
         }
 
-        protected HttpClient CreateClient()
+        protected HttpClient CreateClient(bool force = false)
         {
-            var client = new HttpClient
+            if (_clientList == null)
             {
-                Timeout = new TimeSpan(0, 0, 0, TimeoutSeconds, 0),
-                BaseAddress = new Uri(APIURL)
-            };
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/*");
+                _clientList = new Dictionary<string, HttpClient>();
+            }
+            HttpClient client = null;
+            if (!_clientList.ContainsKey(APIURL) || force)
+            {
+                client = new HttpClient
+                {
+                    BaseAddress = new Uri(APIURL)
+                };
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/*");
+                if (!_clientList.ContainsKey(APIURL))
+                {
+                    _clientList.Add(APIURL, client);
+                }
+                _clientList[APIURL] = client;
+            }
+            else
+            {
+                client = _clientList[APIURL];
+            }
+            client.Timeout = new TimeSpan(0, 0, 0, TimeoutSeconds, 0);
             client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", string.Format("{0} email={1}&apikey={2}&company_id={3}", APIAUTHKEYWORD, Email, ApiKey, CompanyId));
-
             return client;
         }
 
