@@ -44,7 +44,7 @@ namespace Birko.SuperFaktura
                 _clientList = new Dictionary<string, HttpClient>();
             }
             HttpClient client = null;
-            if (!_clientList.ContainsKey(APIURL) || force)
+            if (!_clientList.ContainsKey(APIURL) || force || _clientList[APIURL].Timeout.Seconds != TimeoutSeconds)
             {
                 client = new HttpClient
                 {
@@ -52,17 +52,20 @@ namespace Birko.SuperFaktura
                 };
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/*");
+                client.Timeout = new TimeSpan(0, 0, 0, TimeoutSeconds, 0);
                 if (!_clientList.ContainsKey(APIURL))
                 {
                     _clientList.Add(APIURL, client);
                 }
-                _clientList[APIURL] = client;
+                else
+                {
+                    _clientList[APIURL] = client;
+                }
             }
             else
             {
                 client = _clientList[APIURL];
             }
-            client.Timeout = new TimeSpan(0, 0, 0, TimeoutSeconds, 0);
             client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", string.Format("{0} email={1}&apikey={2}&company_id={3}", APIAUTHKEYWORD, Email, ApiKey, CompanyId));
             return client;
         }
