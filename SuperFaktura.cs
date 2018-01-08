@@ -113,17 +113,15 @@ namespace Birko.SuperFaktura
         internal async Task<string> Get(string uri)
         {
             RequestDelay();
-            using (var client = CreateClient())
+            var client = CreateClient();
+            HttpResponseMessage response = await client.GetAsync(uri).ConfigureAwait(false);
+            if (EnsureSuccessStatusCode)
             {
-                HttpResponseMessage response = await client.GetAsync(uri).ConfigureAwait(false);
-                if (EnsureSuccessStatusCode)
-                {
-                    response.EnsureSuccessStatusCode();
-                }
-                if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                }
+                response.EnsureSuccessStatusCode();
+            }
+            if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             }
             return await Task.FromResult<string>(null).ConfigureAwait(false);
         }
@@ -131,17 +129,15 @@ namespace Birko.SuperFaktura
         internal async Task<byte[]> GetByte(string uri)
         {
             RequestDelay();
-            using (var client = CreateClient())
+            var client = CreateClient();
+            HttpResponseMessage response = await client.GetAsync(uri).ConfigureAwait(false);
+            if (EnsureSuccessStatusCode)
             {
-                HttpResponseMessage response = await client.GetAsync(uri).ConfigureAwait(false);
-                if (EnsureSuccessStatusCode)
-                {
-                    response.EnsureSuccessStatusCode();
-                }
-                if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-                }
+                response.EnsureSuccessStatusCode();
+            }
+            if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
+            {
+                return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
             }
             return await Task.FromResult<byte[]>(null).ConfigureAwait(false);
         }
@@ -149,17 +145,15 @@ namespace Birko.SuperFaktura
         internal async Task<string> Post(string uri, string data)
         {
             RequestDelay();
-            using (var client = CreateClient())
+            var client = CreateClient();
+            HttpResponseMessage response = await client.PostAsync(uri, new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("data", data) })).ConfigureAwait(false);
+            if (EnsureSuccessStatusCode || !EnsureSuccessStatusCode)
             {
-                HttpResponseMessage response = await client.PostAsync(uri, new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("data", data) })).ConfigureAwait(false);
-                if (EnsureSuccessStatusCode || !EnsureSuccessStatusCode)
-                {
-                    response.EnsureSuccessStatusCode();
-                }
-                if (response.IsSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                }
+                response.EnsureSuccessStatusCode();
+            }
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             }
             return await Task.FromResult<string>(null).ConfigureAwait(false);
         }
