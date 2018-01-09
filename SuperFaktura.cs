@@ -223,7 +223,7 @@ namespace Birko.SuperFaktura
 
         public async Task<Dictionary<int, string>> GetCountries()
         {
-            var result = await Get(string.Format("{0}countries", APIURL)).ConfigureAwait(false);
+            var result = await Get("countries").ConfigureAwait(false);
             try
             {
                 return DeserializeResult<Dictionary<int, string>>(result);
