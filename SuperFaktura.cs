@@ -117,48 +117,72 @@ namespace Birko.SuperFaktura
         {
             RequestDelay();
             var client = CreateClient();
-            HttpResponseMessage response = await client.GetAsync(uri).ConfigureAwait(false);
-            if (EnsureSuccessStatusCode)
+            try
             {
-                response.EnsureSuccessStatusCode();
+                HttpResponseMessage response = await client.GetAsync(uri).ConfigureAwait(false);
+                if (EnsureSuccessStatusCode)
+                {
+                    response.EnsureSuccessStatusCode();
+                }
+                if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                }
+                return await Task.FromResult<string>(null).ConfigureAwait(false);
             }
-            if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
+            catch (Exception ex)
             {
-                return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                CreateClient(true);
+                throw new Exceptions.Exception(null, string.Format("Error requesting Get: {0}", uri), ex, uri);
             }
-            return await Task.FromResult<string>(null).ConfigureAwait(false);
         }
 
         internal async Task<byte[]> GetByte(string uri)
         {
             RequestDelay();
             var client = CreateClient();
-            HttpResponseMessage response = await client.GetAsync(uri).ConfigureAwait(false);
-            if (EnsureSuccessStatusCode)
+            try
             {
-                response.EnsureSuccessStatusCode();
+                HttpResponseMessage response = await client.GetAsync(uri).ConfigureAwait(false);
+                if (EnsureSuccessStatusCode)
+                {
+                    response.EnsureSuccessStatusCode();
+                }
+                if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+                }
+                return await Task.FromResult<byte[]>(null).ConfigureAwait(false);
             }
-            if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
+            catch (Exception ex)
             {
-                return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+                CreateClient(true);
+                throw new Exceptions.Exception(null, string.Format("Error requesting Get: {0}", uri), ex, uri);
             }
-            return await Task.FromResult<byte[]>(null).ConfigureAwait(false);
         }
 
         internal async Task<string> Post(string uri, string data)
         {
             RequestDelay();
             var client = CreateClient();
-            HttpResponseMessage response = await client.PostAsync(uri, new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("data", data) })).ConfigureAwait(false);
-            if (EnsureSuccessStatusCode || !EnsureSuccessStatusCode)
+            try
             {
-                response.EnsureSuccessStatusCode();
+                HttpResponseMessage response = await client.PostAsync(uri, new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("data", data) })).ConfigureAwait(false);
+                if (EnsureSuccessStatusCode)
+                {
+                    response.EnsureSuccessStatusCode();
+                }
+                if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                }
+                return await Task.FromResult<string>(null).ConfigureAwait(false);
             }
-            if (response.IsSuccessStatusCode)
+            catch (Exception ex)
             {
-                return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                CreateClient(true);
+                throw new Exceptions.Exception(null, string.Format("Error requesting Post: {0}\nData: {1}", uri, data), ex, uri);
             }
-            return await Task.FromResult<string>(null).ConfigureAwait(false);
         }
 
         internal async Task<string> Post(string uri, object data)
