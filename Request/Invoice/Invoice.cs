@@ -71,6 +71,7 @@ namespace Birko.SuperFaktura.Request.Invoice
         [JsonProperty(PropertyName = "logo_id", NullValueHandling = NullValueHandling.Ignore)]
         public int? LogoID { get; set; }
         [JsonProperty(PropertyName = "tax_document", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.StringBooleanConverter))]
         public bool? TaxDocument { get; set; }
 
     }
