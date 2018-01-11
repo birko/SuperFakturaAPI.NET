@@ -25,8 +25,16 @@ namespace Birko.SuperFaktura
         public bool EnsureSuccessStatusCode { get; set; } = true;
         public int TimeoutSeconds { get; set; } = 30;
 
-        private DateTime? _lastRequest = null;
+        private static Dictionary<string, DateTime> _lastRequest = null;
         private static Dictionary<string, HttpClient> _clientList = null;
+
+        private string ProfileKey
+        {
+            get
+            {
+                return string.Format("{0}-{1}", APIURL, ApiKey);
+            }
+        }
 
         public AbstractSuperFaktura(string email, string apiKey, string apptitle = null, string module = "API", int? companyId = null)
         {
@@ -44,29 +52,31 @@ namespace Birko.SuperFaktura
                 _clientList = new Dictionary<string, HttpClient>();
             }
             HttpClient client = null;
-            if (!_clientList.ContainsKey(APIURL) || force || _clientList[APIURL].Timeout.Seconds != TimeoutSeconds)
+            var key = ProfileKey;
+            if (force || !_clientList.ContainsKey(key) || _clientList[key].Timeout.Seconds != TimeoutSeconds)
             {
                 client = new HttpClient
                 {
-                    BaseAddress = new Uri(APIURL)
+                    BaseAddress = new Uri(APIURL),
+                    Timeout = new TimeSpan(0, 0, 0, TimeoutSeconds, 0)
                 };
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/*");
-                client.Timeout = new TimeSpan(0, 0, 0, TimeoutSeconds, 0);
-                if (!_clientList.ContainsKey(APIURL))
+                client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", string.Format("{0} email={1}&apikey={2}&company_id={3}", APIAUTHKEYWORD, Email, ApiKey, CompanyId));
+                if (!_clientList.ContainsKey(key))
                 {
-                    _clientList.Add(APIURL, client);
+                    _clientList.Add(key, client);
                 }
                 else
                 {
-                    _clientList[APIURL] = client;
+                    _clientList[key] = client;
                 }
             }
             else
             {
-                client = _clientList[APIURL];
+                client = _clientList[key];
             }
-            client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", string.Format("{0} email={1}&apikey={2}&company_id={3}", APIAUTHKEYWORD, Email, ApiKey, CompanyId));
+
             return client;
         }
 
@@ -105,21 +115,34 @@ namespace Birko.SuperFaktura
         private void RequestDelay()
         {
             DateTime now = DateTime.Now;
-            if (_lastRequest != null && (now - _lastRequest.Value).Seconds <= 1)
+            if (_lastRequest == null)
+            {
+                _lastRequest = new Dictionary<string, DateTime>();
+            }
+            var key = ProfileKey;
+            if (_lastRequest.ContainsKey(key) && (now - _lastRequest[key]).Seconds <= 1)
             {
                 Task.Delay(new TimeSpan(0, 0, 0, 1, 0)).Wait();
                 now = DateTime.Now;
             }
-            _lastRequest = now;
+            if (_lastRequest.ContainsKey(key))
+            {
+                _lastRequest[key] = now;
+            }
+            else
+            {
+                _lastRequest.Add(key, now);
+            }
         }
 
         internal async Task<string> Get(string uri)
         {
             RequestDelay();
             var client = CreateClient();
+            HttpResponseMessage response = null;
             try
             {
-                HttpResponseMessage response = await client.GetAsync(uri).ConfigureAwait(false);
+                response = await client.GetAsync(uri).ConfigureAwait(false);
                 if (EnsureSuccessStatusCode)
                 {
                     response.EnsureSuccessStatusCode();
@@ -132,8 +155,7 @@ namespace Birko.SuperFaktura
             }
             catch (Exception ex)
             {
-                CreateClient(true);
-                throw new Exceptions.Exception(null, string.Format("Error requesting Get: {0}", uri), ex, uri);
+                throw HandleRequestException(uri, response, ex);
             }
         }
 
@@ -141,9 +163,10 @@ namespace Birko.SuperFaktura
         {
             RequestDelay();
             var client = CreateClient();
+            HttpResponseMessage response = null;
             try
             {
-                HttpResponseMessage response = await client.GetAsync(uri).ConfigureAwait(false);
+                response = await client.GetAsync(uri).ConfigureAwait(false);
                 if (EnsureSuccessStatusCode)
                 {
                     response.EnsureSuccessStatusCode();
@@ -156,8 +179,7 @@ namespace Birko.SuperFaktura
             }
             catch (Exception ex)
             {
-                CreateClient(true);
-                throw new Exceptions.Exception(null, string.Format("Error requesting Get: {0}", uri), ex, uri);
+                throw HandleRequestException(uri, response, ex);
             }
         }
 
@@ -165,9 +187,10 @@ namespace Birko.SuperFaktura
         {
             RequestDelay();
             var client = CreateClient();
+            HttpResponseMessage response = null;
             try
             {
-                HttpResponseMessage response = await client.PostAsync(uri, new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("data", data) })).ConfigureAwait(false);
+                response = await client.PostAsync(uri, new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("data", data) })).ConfigureAwait(false);
                 if (EnsureSuccessStatusCode)
                 {
                     response.EnsureSuccessStatusCode();
@@ -180,14 +203,25 @@ namespace Birko.SuperFaktura
             }
             catch (Exception ex)
             {
-                CreateClient(true);
-                throw new Exceptions.Exception(null, string.Format("Error requesting Post: {0}\nData: {1}", uri, data), ex, uri);
+                throw HandleRequestException(uri, response, ex, data);
             }
         }
 
         internal async Task<string> Post(string uri, object data)
         {
             return await Post(uri, JsonConvert.SerializeObject(data)).ConfigureAwait(false);
+        }
+
+        private Exceptions.Exception HandleRequestException(string uri, HttpResponseMessage response, Exception ex, string data = null)
+        {
+            //CreateClient(true);
+            return new Exceptions.Exception(null,
+                string.Format("ReasonPhrase: {0}\nContent: {1}\nRequest: {2}\nData: {3}",
+                    response.ToString(),
+                    response.Content.ToString(),
+                    response.RequestMessage.ToString(),
+                    data
+                ), ex, uri);
         }
     }
 

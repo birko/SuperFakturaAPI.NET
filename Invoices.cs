@@ -108,7 +108,7 @@ namespace Birko.SuperFaktura
                 { "Client", client },
                 { "InvoiceSetting", new
                 {
-                    settings = JsonConvert.SerializeObject((setting != null) ? setting : new Setting())
+                    settings = JsonConvert.SerializeObject(setting ?? new Setting())
                 }},
             };
             if (extra != null && extra.Any() && extra.Any(x=>x.Value != null))
@@ -130,7 +130,7 @@ namespace Birko.SuperFaktura
                 { "Client", client },
                 { "InvoiceSetting", new
                 {
-                    settings = JsonConvert.SerializeObject((setting != null) ? setting : new Setting())
+                    settings = JsonConvert.SerializeObject(setting ?? new Setting())
                 }},
             };
             if (extra != null && extra.Any() && extra.Any(x=>x.Value != null))
