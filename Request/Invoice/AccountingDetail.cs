@@ -13,6 +13,8 @@ namespace Birko.SuperFaktura.Request.Invoice
         public string Order { get; set; }
         [JsonProperty(PropertyName = "type", NullValueHandling = NullValueHandling.Ignore)]
         public string Type { get; set; } = AccountingDetailType.Item;
+        [JsonProperty(PropertyName = "operation", NullValueHandling = NullValueHandling.Ignore)]
+        public string Operation { get; set; }
         [JsonProperty(PropertyName = "analytics_account", NullValueHandling = NullValueHandling.Ignore)]
         public string AnalyticsAccount { get; set; }
         [JsonProperty(PropertyName = "synthetic_account", NullValueHandling = NullValueHandling.Ignore)]
