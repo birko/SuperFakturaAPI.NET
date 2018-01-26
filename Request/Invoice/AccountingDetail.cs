@@ -19,5 +19,7 @@ namespace Birko.SuperFaktura.Request.Invoice
         public string AnalyticsAccount { get; set; }
         [JsonProperty(PropertyName = "synthetic_account", NullValueHandling = NullValueHandling.Ignore)]
         public string SyntheticAccount { get; set; }
+        [JsonProperty(PropertyName = "preconfidence", NullValueHandling = NullValueHandling.Ignore)]
+        public string PreConfidence { get; set; }
     }
 }
