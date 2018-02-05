@@ -26,6 +26,10 @@ namespace Birko.SuperFaktura.Request.Invoice
         public string DeliveryType { get; set; } = null;
         [JsonProperty(PropertyName = "deposit", NullValueHandling = NullValueHandling.Ignore)]
         public decimal? Deposit { get; set; } = null;
+        [JsonProperty(PropertyName = "discount", NullValueHandling = NullValueHandling.Ignore)]
+        public decimal? Discount { get; set; } = null;
+        [JsonProperty(PropertyName = "discount_total ", NullValueHandling = NullValueHandling.Ignore)]
+        public decimal? DiscountTotal { get; set; } = null;
         [JsonProperty(PropertyName = "due", NullValueHandling = NullValueHandling.Ignore)]
         public DateTime? DueDate { get; set; } = null;
         [JsonProperty(PropertyName = "estimate_id", NullValueHandling = NullValueHandling.Ignore)]
