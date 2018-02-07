@@ -217,9 +217,9 @@ namespace Birko.SuperFaktura
             //CreateClient(true);
             return new Exceptions.Exception(null,
                 string.Format("ReasonPhrase: {0}\nContent: {1}\nRequest: {2}\nData: {3}",
-                    response.ToString(),
-                    response.Content.ToString(),
-                    response.RequestMessage.ToString(),
+                    response?.ToString(),
+                    response?.Content?.ToString(),
+                    response?.RequestMessage?.ToString(),
                     data
                 ), ex, uri);
         }
