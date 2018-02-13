@@ -215,10 +215,18 @@ namespace Birko.SuperFaktura
         private Exceptions.Exception HandleRequestException(string uri, HttpResponseMessage response, Exception ex, string data = null)
         {
             //CreateClient(true);
+            string content = null;
+            if (response != null)
+            {
+                var contentTask = response.Content.ReadAsStringAsync();
+                contentTask.ConfigureAwait(false);
+                contentTask.Wait();
+                content = contentTask.Result;
+            }
             string message = string.Format("ReasonPhrase: {0}\nContent: {1}\nRequest: {2}\nData: {3}",
-                    response?.ToString(),
-                    response?.Content?.ToString(),
-                    response?.RequestMessage?.ToString(),
+                    response,
+                    content,
+                    response?.RequestMessage,
                     data
                 );
             return new Exceptions.Exception(null, message, ex, uri);
