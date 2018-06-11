@@ -355,19 +355,19 @@ namespace Birko.SuperFaktura
             var result = await Get("/users/logo").ConfigureAwait(false);
             return DeserializeResult<Logo[]>(result);
         }
-
-        public async Task<Response<Register>> Register(string email, bool sendEmail = true)
-        {
-            var result = await Post("/users/create", new
-            {
-                User = new User
-                {
-                    Email = email,
-                    SendEmail = sendEmail
-                }
-            });
-            return DeserializeResult<Response<Register>>(result);
-        }
+        //was removed from api 16.05.2018
+        //public async Task<Response<Register>> Register(string email, bool sendEmail = true)
+        //{
+        //    var result = await Post("/users/create", new
+        //    {
+        //        User = new User
+        //        {
+        //            Email = email,
+        //            SendEmail = sendEmail
+        //        }
+        //    });
+        //    return DeserializeResult<Response<Register>>(result);
+        //}
 
         public async Task<Response<ExpandoObject>> CashRegister(int cashRegisterId, Request.PagedSearchParameters filter, bool listInfo = true)
         {

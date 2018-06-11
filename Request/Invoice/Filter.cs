@@ -10,6 +10,8 @@ namespace Birko.SuperFaktura.Request.Invoice
         //Invoce.Date const
         [JsonProperty(PropertyName = "created")]
         public int Created { get; set; } = DateType.All;
+        [JsonProperty(PropertyName = "modified")]
+        public int Modified { get; set; } = DateType.All;
         //Invoce.Date const
         [JsonProperty(PropertyName = "delivery")]
         public int Delivery { get; set; } = DateType.All;
@@ -39,11 +41,20 @@ namespace Birko.SuperFaktura.Request.Invoice
         public string Ignore { get; set; }
         [JsonProperty(PropertyName = "order_no")]
         public string OrderNumber{ get; set; }
+        [JsonProperty(PropertyName = "created_since")]
+        public DateTime? CreatedSince { get; set; } = null;
+        [JsonProperty(PropertyName = "created_to")]
+        public DateTime? CreatedTo { get; set; } = null;
+        [JsonProperty(PropertyName = "modified_since")]
+        public DateTime? ModifiedSince { get; set; } = null;
+        [JsonProperty(PropertyName = "modified_to")]
+        public DateTime? ModifiedTo { get; set; } = null;
 
         public override string ToParameters(bool listInfo = true)
         {
             string paramString = base.ToParameters(listInfo);
             paramString += "/created:" + Created;
+            paramString += "/modified:" + Modified;
             paramString += "/delivery:" + Delivery;
             if (!string.IsNullOrEmpty(Type))
             {
@@ -70,14 +81,6 @@ namespace Birko.SuperFaktura.Request.Invoice
             {
                 paramString += "/amount_to:" + AmountTo;
             }
-            if (PaidSince.HasValue)
-            {
-                paramString += "/paid_since:" + PaidSince;
-            }
-            if (PaidTo.HasValue)
-            {
-                paramString += "/paid_to:" + PaidTo;
-            }
             if (!string.IsNullOrEmpty(Ignore))
             {
                 paramString += "/ignore:" + Ignore;
@@ -85,6 +88,30 @@ namespace Birko.SuperFaktura.Request.Invoice
             if (!string.IsNullOrEmpty(OrderNumber))
             {
                 paramString += "/order_no:" + OrderNumber;
+            }
+            if (PaidSince.HasValue)
+            {
+                paramString += "/paid_since:" + PaidSince.Value.ToString("yyyy-MM-dd");
+            }
+            if (PaidTo.HasValue)
+            {
+                paramString += "/paid_to:" + PaidTo.Value.ToString("yyyy-MM-dd");
+            }
+            if (CreatedSince.HasValue)
+            {
+                paramString += "/created_since:" + CreatedSince.Value.ToString("yyyy-MM-dd");
+            }
+            if (CreatedTo.HasValue)
+            {
+                paramString += "/created_to:" + CreatedTo.Value.ToString("yyyy-MM-dd");
+            }
+            if(ModifiedSince.HasValue)
+            {
+                paramString += "/modified_since:" + ModifiedSince.Value.ToString("yyyy-MM-dd");
+            }
+            if (ModifiedTo.HasValue)
+            {
+                paramString += "/modified_to:" + ModifiedTo.Value.ToString("yyyy-MM-dd");
             }
 
             return paramString;
