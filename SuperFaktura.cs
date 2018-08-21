@@ -27,6 +27,7 @@ namespace Birko.SuperFaktura
 
         private static Dictionary<string, DateTime> _lastRequest = null;
         private static Dictionary<string, HttpClient> _clientList = null;
+        private static Dictionary<string, int> _requestCount = null;
 
         private string ProfileKey
         {
@@ -83,6 +84,7 @@ namespace Birko.SuperFaktura
         internal T DeserializeResult<T>(string result, JsonSerializerSettings setting = null)
         {
             TestError(result);
+            TestThrottle(result);
             try
             {
                 return JsonConvert.DeserializeObject<T>(result, setting);
@@ -112,6 +114,26 @@ namespace Birko.SuperFaktura
             }
         }
 
+        internal void TestThrottle(string result)
+        {
+            try
+            {
+                var testResult = JsonConvert.DeserializeObject<ThrottledTest>(result);
+                if (!string.IsNullOrEmpty(testResult.Throttled))
+                {
+                    var startIndex = testResult.Throttled.IndexOf("You have already made ");
+                    var endIndex = testResult.Throttled.IndexOf(" requests today.");
+                    var stringCount = testResult.Throttled.Substring(startIndex, endIndex - startIndex).Replace("You have already made ", string.Empty);
+                    IncreaseRequestCount(int.Parse(stringCount), true);
+                }
+            }
+            catch (Exception ex)
+            {
+                var exception = new Exceptions.ParseException(ex.Message, string.Format("Returned Response: {0}", result));
+                throw (exception);
+            }
+        }
+
         private void RequestDelay()
         {
             DateTime now = DateTime.Now;
@@ -119,12 +141,21 @@ namespace Birko.SuperFaktura
             {
                 _lastRequest = new Dictionary<string, DateTime>();
             }
-            var key = ProfileKey;
-            if (_lastRequest.ContainsKey(key) && (now - _lastRequest[key]).Seconds <= 1)
+            if (_requestCount == null)
             {
-                Task.Delay(new TimeSpan(0, 0, 0, 1, 0)).Wait();
-                now = DateTime.Now;
+                _requestCount = new Dictionary<string, int>();
             }
+            var key = ProfileKey;
+            //request throttling
+            if (_requestCount.ContainsKey(key) && _requestCount[key] >= 1000)
+            {
+                Task.Delay(TimeSpan.FromSeconds(5)).Wait();
+            }
+            else if (_lastRequest.ContainsKey(key) && (now - _lastRequest[key]).Seconds <= 1)
+            {
+                Task.Delay(TimeSpan.FromSeconds(1)).Wait();
+            }
+            now = DateTime.Now;
             if (_lastRequest.ContainsKey(key))
             {
                 _lastRequest[key] = now;
@@ -142,6 +173,7 @@ namespace Birko.SuperFaktura
             HttpResponseMessage response = null;
             try
             {
+                IncreaseRequestCount();
                 response = await client.GetAsync(uri).ConfigureAwait(false);
                 if (EnsureSuccessStatusCode)
                 {
@@ -166,6 +198,7 @@ namespace Birko.SuperFaktura
             HttpResponseMessage response = null;
             try
             {
+                IncreaseRequestCount();
                 response = await client.GetAsync(uri).ConfigureAwait(false);
                 if (EnsureSuccessStatusCode)
                 {
@@ -190,6 +223,7 @@ namespace Birko.SuperFaktura
             HttpResponseMessage response = null;
             try
             {
+                IncreaseRequestCount();
                 response = await client.PostAsync(uri, new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("data", data) })).ConfigureAwait(false);
                 if (EnsureSuccessStatusCode)
                 {
@@ -210,6 +244,27 @@ namespace Birko.SuperFaktura
         internal async Task<string> Post(string uri, object data)
         {
             return await Post(uri, JsonConvert.SerializeObject(data)).ConfigureAwait(false);
+        }
+
+        private void IncreaseRequestCount(int count = 1, bool set = false)
+        {
+            var key = ProfileKey;
+            if (_requestCount == null)
+            {
+                _requestCount = new Dictionary<string, int>();
+            }
+            if (!_requestCount.ContainsKey(key))
+            {
+                _requestCount.Add(key, 0);
+            }
+            if (set)
+            {
+                _requestCount[key] = count;
+            }
+            else
+            {
+                _requestCount[key] += count;
+            }
         }
 
         private Exceptions.Exception HandleRequestException(string uri, HttpResponseMessage response, Exception ex, string data = null)
