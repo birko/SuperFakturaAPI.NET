@@ -124,7 +124,7 @@ namespace Birko.SuperFaktura
                     var startIndex = testResult.Throttled.IndexOf("You have already made ");
                     var endIndex = testResult.Throttled.IndexOf(" requests today.");
                     var stringCount = testResult.Throttled.Substring(startIndex, endIndex - startIndex).Replace("You have already made ", string.Empty);
-                    IncreaseRequestCount(int.Parse(stringCount), true);
+                    IncreaseRequestCount(ProfileKey, int.Parse(stringCount), true);
                 }
             }
             catch (Exception ex)
@@ -173,7 +173,7 @@ namespace Birko.SuperFaktura
             HttpResponseMessage response = null;
             try
             {
-                IncreaseRequestCount();
+                IncreaseRequestCount(ProfileKey);
                 response = await client.GetAsync(uri).ConfigureAwait(false);
                 if (EnsureSuccessStatusCode)
                 {
@@ -198,7 +198,7 @@ namespace Birko.SuperFaktura
             HttpResponseMessage response = null;
             try
             {
-                IncreaseRequestCount();
+                IncreaseRequestCount(ProfileKey);
                 response = await client.GetAsync(uri).ConfigureAwait(false);
                 if (EnsureSuccessStatusCode)
                 {
@@ -223,7 +223,7 @@ namespace Birko.SuperFaktura
             HttpResponseMessage response = null;
             try
             {
-                IncreaseRequestCount();
+                IncreaseRequestCount(ProfileKey);
                 response = await client.PostAsync(uri, new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("data", data) })).ConfigureAwait(false);
                 if (EnsureSuccessStatusCode)
                 {
@@ -246,9 +246,8 @@ namespace Birko.SuperFaktura
             return await Post(uri, JsonConvert.SerializeObject(data)).ConfigureAwait(false);
         }
 
-        private void IncreaseRequestCount(int count = 1, bool set = false)
+        private static void IncreaseRequestCount(string key, int count = 1, bool set = false)
         {
-            var key = ProfileKey;
             if (_requestCount == null)
             {
                 _requestCount = new Dictionary<string, int>();
