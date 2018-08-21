@@ -87,7 +87,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Response\Stock\Log.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Stock\PagedResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Subscription.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Response\ThrottledTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\User.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Stock.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SuperFaktura.cs" />

@@ -63,7 +63,5 @@ namespace Birko.SuperFaktura.Response.Invoice
         public decimal? Amount { get; set; } = null;
         [JsonProperty(PropertyName = "vat", NullValueHandling = NullValueHandling.Ignore)]
         public decimal? VAT { get; set; } = null;
-        [JsonProperty(PropertyName = "discount", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal? Discount { get; set; } = null;
     }
 }

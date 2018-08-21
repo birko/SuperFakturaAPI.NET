@@ -84,7 +84,7 @@ namespace Birko.SuperFaktura
         internal T DeserializeResult<T>(string result, JsonSerializerSettings setting = null)
         {
             TestError(result);
-            TestThrottle(result);
+            result = TestThrottle(result);
             try
             {
                 return JsonConvert.DeserializeObject<T>(result, setting);
@@ -114,18 +114,22 @@ namespace Birko.SuperFaktura
             }
         }
 
-        internal void TestThrottle(string result)
+        internal string TestThrottle(string result)
         {
             try
             {
-                var testResult = JsonConvert.DeserializeObject<ThrottledTest>(result);
-                if (!string.IsNullOrEmpty(testResult.Throttled))
+                var testResult = (Newtonsoft.Json.Linq.JObject)JsonConvert.DeserializeObject(result);
+                if (testResult.ContainsKey("throttled"))
                 {
-                    var startIndex = testResult.Throttled.IndexOf("You have already made ");
-                    var endIndex = testResult.Throttled.IndexOf(" requests today.");
-                    var stringCount = testResult.Throttled.Substring(startIndex, endIndex - startIndex).Replace("You have already made ", string.Empty);
+                    var text = testResult.Value<string>("throttled");
+                    var startIndex = text.IndexOf("You have already made ");
+                    var endIndex = text.IndexOf(" requests today.");
+                    var stringCount = text.Substring(startIndex, endIndex - startIndex).Replace("You have already made ", string.Empty);
                     IncreaseRequestCount(ProfileKey, int.Parse(stringCount), true);
+                    testResult.Remove("throttled");
+                    return testResult.ToString();
                 }
+                return result;
             }
             catch (Exception ex)
             {
