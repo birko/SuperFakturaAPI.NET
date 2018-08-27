@@ -11,18 +11,11 @@ namespace Birko.SuperFaktura.Request.Stock
         public int? ID { get; internal set; }
         [JsonProperty(PropertyName = "stock_item_id", NullValueHandling = NullValueHandling.Ignore)]
         public int StockItemID { get; internal set; }
-        [JsonProperty(PropertyName = "name", NullValueHandling = NullValueHandling.Ignore)]
-        public string Name { get; set; }
-        [JsonProperty(PropertyName = "description", NullValueHandling = NullValueHandling.Ignore)]
-        public string Description { get; set; }
-        [JsonProperty(PropertyName = "sku", NullValueHandling = NullValueHandling.Ignore)]
-        public string SKU { get; set; }
-        [JsonProperty(PropertyName = "unit_price", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal UnitPrice { get; set; }
-        [JsonProperty(PropertyName = "vat", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal VAT { get; set; } = 20;
-        [JsonProperty(PropertyName = "stock", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal Stock { get; set; }
-
+        [JsonProperty(PropertyName = "quantity", NullValueHandling = NullValueHandling.Ignore)]
+        public decimal Quantity { get; set; }
+        [JsonProperty(PropertyName = "note", NullValueHandling = NullValueHandling.Ignore)]
+        public string Note { get; set; }
+        [JsonProperty(PropertyName = "created", NullValueHandling = NullValueHandling.Ignore)]
+        public DateTime Created { get; set; } = DateTime.Now;
     }
 }

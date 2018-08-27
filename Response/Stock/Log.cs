@@ -13,7 +13,5 @@ namespace Birko.SuperFaktura.Response.Stock
 
     public class Log : Request.Stock.Log
     {
-        [JsonProperty(PropertyName = "quantity", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal Quantity { get; internal set; }
     }
 }
