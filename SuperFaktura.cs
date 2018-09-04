@@ -25,6 +25,8 @@ namespace Birko.SuperFaktura
         public bool EnsureSuccessStatusCode { get; set; } = true;
         public int TimeoutSeconds { get; set; } = 30;
 
+        public RateLimits RateLimit { get; set; } = null;
+
         private static Dictionary<string, DateTime> _lastRequest = null;
         private static Dictionary<string, HttpClient> _clientList = null;
         private static Dictionary<string, int> _requestCount = null;
@@ -114,6 +116,7 @@ namespace Birko.SuperFaktura
             }
         }
 
+        [Obsolete("Throttled was moved to HTTP header by SF on 4.9.2018")]
         internal string TestThrottle(string result)
         {
             try
@@ -170,6 +173,101 @@ namespace Birko.SuperFaktura
             }
         }
 
+        private void ParseResponse(HttpResponseMessage response)
+        {
+            if (response != null)
+            {
+                if (response.Headers != null && response.Headers.Any())
+                {
+                    if (
+                        response.Headers.Contains("X-RateLimit-DailyLimit")
+                        || response.Headers.Contains("X-RateLimit-DailyRemaining")
+                        || response.Headers.Contains("X-RateLimit-DailyReset")
+                        || response.Headers.Contains("X-RateLimit-MonthlyLimit")
+                        || response.Headers.Contains("X-RateLimit-MonthlyRemaining")
+                        || response.Headers.Contains("X-RateLimit-MonthlyReset")
+                        || response.Headers.Contains("X-RateLimit-Message")
+                    )
+                    {
+                        if (RateLimit == null)
+                        {
+                            RateLimit = new RateLimits();
+                        }
+                        RateLimit.Message = response.Headers.Contains("X-RateLimit-Message") ? response.Headers.GetValues("X-RateLimit-Message").Last() : null;
+                        if (
+                            response.Headers.Contains("X-RateLimit-DailyLimit")
+                            && long.TryParse(response.Headers.GetValues("X-RateLimit-DailyLimit").Last(), out long limit)
+                        )
+                        {
+                            if (RateLimit.Daily == null)
+                            {
+                                RateLimit.Daily = new DetailLimit();
+                            }
+                            RateLimit.Daily.Limit = limit;
+                        }
+                        if (
+                            response.Headers.Contains("X-RateLimit-DailyRemaining")
+                            && long.TryParse(response.Headers.GetValues("X-RateLimit-DailyRemaining").Last(), out limit)
+                        )
+                        {
+                            if (RateLimit.Daily == null)
+                            {
+                                RateLimit.Daily = new DetailLimit();
+                            }
+                            RateLimit.Daily.Remaining = limit;
+                        }
+                        if (
+                            response.Headers.Contains("X-RateLimit-DailyReset")
+                            && DateTime.TryParseExact(response.Headers.GetValues("X-RateLimit-DailyReset").Last(), "dd.MM.yyyy hh:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date)
+                        )
+                        {
+                            if (RateLimit.Daily == null)
+                            {
+                                RateLimit.Daily = new DetailLimit();
+                            }
+                            RateLimit.Daily.Reset = date;
+                        }
+                        if (
+                            response.Headers.Contains("X-RateLimit-MonthlyLimit")
+                            && long.TryParse(response.Headers.GetValues("X-RateLimit-MonthlyLimit").Last(), out limit)
+                        )
+                        {
+                            if (RateLimit.Monthly == null)
+                            {
+                                RateLimit.Monthly = new DetailLimit();
+                            }
+                            RateLimit.Monthly.Limit = limit;
+                        }
+                        if (
+                            response.Headers.Contains("X-RateLimit-MonthlyRemaining")
+                            && long.TryParse(response.Headers.GetValues("X-RateLimit-MonthlyRemaining").Last(), out limit)
+                        )
+                        {
+                            if (RateLimit.Monthly == null)
+                            {
+                                RateLimit.Monthly = new DetailLimit();
+                            }
+                            RateLimit.Monthly.Remaining = limit;
+                        }
+                        if (
+                            response.Headers.Contains("X-RateLimit-MonthlyReset")
+                            && DateTime.TryParseExact(response.Headers.GetValues("X-RateLimit-MonthlyReset").Last(), "dd.MM.yyyy hh:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
+                        {
+                            if (RateLimit.Monthly == null)
+                            {
+                                RateLimit.Monthly = new DetailLimit();
+                            }
+                            RateLimit.Monthly.Reset = date;
+                        }
+                    }
+                }
+                if (EnsureSuccessStatusCode)
+                {
+                    response.EnsureSuccessStatusCode();
+                }
+            }
+        }
+
         internal async Task<string> Get(string uri)
         {
             RequestDelay();
@@ -179,10 +277,7 @@ namespace Birko.SuperFaktura
             {
                 IncreaseRequestCount(ProfileKey);
                 response = await client.GetAsync(uri).ConfigureAwait(false);
-                if (EnsureSuccessStatusCode)
-                {
-                    response.EnsureSuccessStatusCode();
-                }
+                ParseResponse(response);
                 if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
                 {
                     return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -204,10 +299,7 @@ namespace Birko.SuperFaktura
             {
                 IncreaseRequestCount(ProfileKey);
                 response = await client.GetAsync(uri).ConfigureAwait(false);
-                if (EnsureSuccessStatusCode)
-                {
-                    response.EnsureSuccessStatusCode();
-                }
+                ParseResponse(response);
                 if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
                 {
                     return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
@@ -229,10 +321,7 @@ namespace Birko.SuperFaktura
             {
                 IncreaseRequestCount(ProfileKey);
                 response = await client.PostAsync(uri, new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("data", data) })).ConfigureAwait(false);
-                if (EnsureSuccessStatusCode)
-                {
-                    response.EnsureSuccessStatusCode();
-                }
+                ParseResponse(response);
                 if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
                 {
                     return await response.Content.ReadAsStringAsync().ConfigureAwait(false);

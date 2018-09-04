@@ -20,6 +20,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\Exception.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Expenses.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Invoices.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RateLimits.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Client\Client.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Client\ContactPerson.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Client\Filter.cs" />
