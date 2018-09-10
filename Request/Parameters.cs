@@ -34,7 +34,7 @@ namespace Birko.SuperFaktura.Request
             }
             if (!string.IsNullOrEmpty(SKU))
             {
-                paramString += "/sku:" + Convert.ToBase64String(Encoding.UTF8.GetBytes(SKU);
+                paramString += "/sku:" + Convert.ToBase64String(Encoding.UTF8.GetBytes(SKU));
             }
 
             return paramString;
