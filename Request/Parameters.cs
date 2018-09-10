@@ -23,12 +23,18 @@ namespace Birko.SuperFaktura.Request
     {
         [JsonProperty(PropertyName = "search")]
         public string Search { get; set; } = string.Empty;
+        [JsonProperty(PropertyName = "sku")]
+        public string SKU { get; set; } = string.Empty;
         public override string ToParameters(bool listInfo = true)
         {
             string paramString = base.ToParameters(listInfo);
             if (!string.IsNullOrEmpty(Search))
             {
                 paramString += "/search:" + Convert.ToBase64String(Encoding.UTF8.GetBytes(Search));
+            }
+            if (!string.IsNullOrEmpty(SKU))
+            {
+                paramString += "/sku:" + Convert.ToBase64String(Encoding.UTF8.GetBytes(SKU);
             }
 
             return paramString;
