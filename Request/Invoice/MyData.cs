@@ -26,6 +26,7 @@ namespace Birko.SuperFaktura.Request.Invoice
         [JsonProperty(PropertyName = "zip", NullValueHandling = NullValueHandling.Ignore)]
         public string ZIP{ get; set; }
         [JsonProperty(PropertyName = "update_profile", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.StringBooleanConverter))]
         public bool? UpdateProfile { get; set; } = false;
     }
 }
