@@ -34,7 +34,7 @@ namespace Birko.SuperFaktura.Response.Invoice
         [JsonProperty(PropertyName = "InvoiceEmail", NullValueHandling = NullValueHandling.Ignore)]
         public Email[] InvoiceEmail { get; set; } = null;
         [JsonProperty(PropertyName = "PostStamp", NullValueHandling = NullValueHandling.Ignore)]
-        public List<PostStamp> PostStamp { get; set; } = null;
+        public PostStamp[] PostStamp { get; set; } = null;
         [JsonProperty(PropertyName = "Summary", NullValueHandling = NullValueHandling.Ignore)]
         public Summary Summary { get; set; } = null;
         [JsonProperty(PropertyName = "SummaryInvoice", NullValueHandling = NullValueHandling.Ignore)]

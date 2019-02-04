@@ -36,6 +36,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\Invoice.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\Item.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\MarkEmail.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\MyData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\Payment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\Post.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\Setting.cs" />

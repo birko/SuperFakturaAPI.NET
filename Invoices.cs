@@ -36,7 +36,7 @@ namespace Birko.SuperFaktura
             }
             else
             {
-                return new PagedResponse { Items = superFaktura.DeserializeResult<ItemList<ListItem>>(result) };
+                return new PagedResponse { Items = superFaktura.DeserializeResult<ItemList<Detail>>(result) };
             }
         }
 
@@ -98,7 +98,35 @@ namespace Birko.SuperFaktura
             return superFaktura.DeserializeResult<Response<ResponseEmail>>(result);
         }
 
-        public async Task<Response<Detail>> Save(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Setting setting = null, Dictionary<string, object> extra = null)
+        public async Task<Response<Detail>> Save(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Setting setting = null, Dictionary<string, object> extra = null, Request.Invoice.MyData myData = null)
+        {
+            var data = new Dictionary<string, object>()
+            {
+                { "Invoice", invoice },
+                { "InvoiceItem", items },
+                { "Tag", tags },
+                { "Client", client },
+                { "InvoiceSetting", new
+                {
+                    settings = JsonConvert.SerializeObject(setting ?? new Setting())
+                }},
+            };
+
+            if (extra != null && extra.Any() && extra.Any(x=>x.Value != null))
+            {
+                data.Add("InvoiceExtra", extra);
+            }
+
+            if (myData != null)
+            {
+                data.Add("MyData", myData);
+            }
+
+            var result = await superFaktura.Post("/invoices/create", data).ConfigureAwait(false);
+            return superFaktura.DeserializeResult<Response<Detail>>(result);
+        }
+
+        public async Task<Response<DetailData>> Update(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Setting setting = null, Dictionary<string, object> extra = null, Request.Invoice.MyData myData = null)
         {
             var data = new Dictionary<string, object>()
             {
@@ -116,26 +144,9 @@ namespace Birko.SuperFaktura
                 data.Add("InvoiceExtra", extra);
             }
 
-            var result = await superFaktura.Post("/invoices/create", data).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Response<Detail>>(result);
-        }
-
-        public async Task<Response<DetailData>> Update(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Setting setting = null, Dictionary<string, object> extra = null)
-        {
-            var data = new Dictionary<string, object>()
+            if (myData != null)
             {
-                { "Invoice", invoice },
-                { "InvoiceItem", items },
-                { "Tag", tags },
-                { "Client", client },
-                { "InvoiceSetting", new
-                {
-                    settings = JsonConvert.SerializeObject(setting ?? new Setting())
-                }},
-            };
-            if (extra != null && extra.Any() && extra.Any(x=>x.Value != null))
-            {
-                data.Add("InvoiceExtra", extra);
+                data.Add("MyData", myData);
             }
 
             var result = await superFaktura.Post("/invoices/Edit", data).ConfigureAwait(false);
@@ -179,6 +190,24 @@ namespace Birko.SuperFaktura
         {
             var result = await superFaktura.Post(string.Format("/sms/send"), data).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<ExpandoObject>>(result);
+        }
+
+        public async Task<Detail[]> GetInvoiceDetails(IEnumerable<int> ids)
+        {
+            if (ids != null && ids.Any())
+            {
+                var result = await superFaktura.Get(string.Format("/invoices/getInvoiceDetails/{0}", string.Join(",", ids.Distinct()))).ConfigureAwait(false);
+                return superFaktura.DeserializeResult<Detail[]>(result);
+            }
+            return null;
+        }
+
+        public async Task<Response<Detail>> CreateFromProforma(int proformaID)
+        {
+            var proforma = await superFaktura.Get(string.Format("/invoices/regular.json/{0}", proformaID)).ConfigureAwait(false);
+            var data =  superFaktura.DeserializeResult<ExpandoObject>(proforma);
+            var result = await superFaktura.Post("/invoices/create", new { data =  data}).ConfigureAwait(false);
+            return superFaktura.DeserializeResult<Response<Detail>>(result);
         }
     }
 }

@@ -9,16 +9,18 @@ namespace Birko.SuperFaktura.Request.Invoice
         public const string Slovak = "slo";
         public const string Czech = "cze";
         public const string English = "eng";
+        public const string German = "deu";
         public const string Russian = "rus";
         public const string Ukrainian = "ukr";
         public const string Hungarian = "hun";
         public const string Polish  = "pol";
         public const string Romanian = "rom";
+        public const string Croatian = "hrv";
 
         public static string[] Languages {
             get
             {
-                return new[] { Slovak, Czech, English, Russian, Ukrainian, Hungarian, Polish, Romanian };
+                return new[] { Slovak, Czech, English, German, Russian, Ukrainian, Hungarian, Polish, Romanian, Croatian };
             }
         }
     }
@@ -38,6 +40,7 @@ namespace Birko.SuperFaktura.Request.Invoice
     {
         public const string Document = "document";
         public const string Item = "item";
+        public const string Retail = "item_ext";
     }
     public static class DateType
     {

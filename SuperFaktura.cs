@@ -502,24 +502,40 @@ namespace Birko.SuperFaktura
             var result = await Get("/users/logo").ConfigureAwait(false);
             return DeserializeResult<Logo[]>(result);
         }
-        //was removed from api 16.05.2018
-        //public async Task<Response<Register>> Register(string email, bool sendEmail = true)
-        //{
-        //    var result = await Post("/users/create", new
-        //    {
-        //        User = new User
-        //        {
-        //            Email = email,
-        //            SendEmail = sendEmail
-        //        }
-        //    });
-        //    return DeserializeResult<Response<Register>>(result);
-        //}
+
+        public async Task<Response<Register>> Register(string email, bool sendEmail = true)
+        {
+            var result = await Post("/users/create", new
+            {
+                User = new User
+                {
+                    Email = email,
+                    SendEmail = sendEmail
+                }
+            });
+            return DeserializeResult<Response<Register>>(result);
+        }
+
+        public async Task<Response<ExpandoObject[]>> GetUserCompaniesDatar(bool allCompanies = true)
+        {
+            var result = await Get(string.Format("/users/getUserCompaniesData/{0}", allCompanies));
+            return DeserializeResult<Response<ExpandoObject[]>>(result);
+        }
 
         public async Task<Response<ExpandoObject>> CashRegister(int cashRegisterId, Request.PagedSearchParameters filter, bool listInfo = true)
         {
             var result = await Get(string.Format("/cash_register_items/index/{0}{1}", cashRegisterId, filter.ToParameters(listInfo)));
             return DeserializeResult<Response<ExpandoObject>>(result);
+        }
+
+        public async Task<Response<ExpandoObject>> GetCourierData(string curierType, object data)
+        {
+            if (new[] { "slp", "csp" }.Contains(curierType))
+            {
+                var result = await Post(string.Format("/{0}_exports/export", curierType), new { data = data });
+                return DeserializeResult<Response<ExpandoObject>>(result);
+            }
+            return null;
         }
     }
 
