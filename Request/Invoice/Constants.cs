@@ -36,12 +36,14 @@ namespace Birko.SuperFaktura.Request.Invoice
         public const string SwissFranc = "CHF";
         public const string RussianRuble = "RUB";
     }
+
     public static class RoundingType
     {
         public const string Document = "document";
         public const string Item = "item";
         public const string Retail = "item_ext";
     }
+
     public static class DateType
     {
         public const int All = 0;
@@ -55,6 +57,7 @@ namespace Birko.SuperFaktura.Request.Invoice
         // from to values. must be used paramater CreatedSince and CreatedTo
         public const int Interval = 3;
     }
+
     public static class Type
     {
         public const string Regular = "regular";
@@ -66,6 +69,7 @@ namespace Birko.SuperFaktura.Request.Invoice
 
         public static string[] Types = new[] { Regular, ProForma, Estimate, Cancel, Order, Delivery };
     }
+
     public static class DeliveryType
     {
         public const string Mail = "mail";
@@ -74,6 +78,7 @@ namespace Birko.SuperFaktura.Request.Invoice
         public const string Haulage = "haulage";
         public const string PickupPoint = "pickup_point";
     }
+
     public static class PaymentType
     {
         public const string BankTransfer = "transfer";
@@ -99,5 +104,12 @@ namespace Birko.SuperFaktura.Request.Invoice
     {
         public const string Item = "item";
         public const string Service = "service";
+    }
+
+    public static class EstimateStatus
+    {
+        public const int NotApproved = 1;
+        public const int Approved = 2;
+        public const int Rejected = 3;
     }
 }

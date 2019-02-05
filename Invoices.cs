@@ -209,5 +209,11 @@ namespace Birko.SuperFaktura
             var result = await superFaktura.Post("/invoices/create", new { data =  data}).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<Detail>>(result);
         }
+
+        public async Task<Response<ExpandoObject>> SetEstimateStatus(int estimateID, int status)
+        {
+            var result = await superFaktura.Get(string.Format("/invoices/set_estimate_status/{0}/{1}/ajax:1", estimateID, status)).ConfigureAwait(false);
+            return superFaktura.DeserializeResult<Response<ExpandoObject>>(result);
+        }
     }
 }
