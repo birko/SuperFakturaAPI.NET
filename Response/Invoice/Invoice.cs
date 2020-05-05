@@ -51,8 +51,6 @@ namespace Birko.SuperFaktura.Response.Invoice
         public decimal? AmountPaid { get; set; } = null;
         [JsonProperty(PropertyName = "recurring", NullValueHandling = NullValueHandling.Ignore)]
         public dynamic Recurring { get; set; }
-        [JsonProperty(PropertyName = "paydate", NullValueHandling = NullValueHandling.Ignore)]
-        public DateTime? PayDate { get; set; }
         [JsonProperty(PropertyName = "tags", NullValueHandling = NullValueHandling.Ignore)]
         public string Tags { get; set; }
         [JsonProperty(PropertyName = "home_currency", NullValueHandling = NullValueHandling.Ignore)]

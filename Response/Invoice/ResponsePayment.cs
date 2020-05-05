@@ -35,5 +35,10 @@ namespace Birko.SuperFaktura.Response.Invoice
         public decimal Paid { get; set; }
         [JsonProperty(PropertyName = "to_pay", NullValueHandling = NullValueHandling.Ignore)]
         public decimal ToPay { get; set; }
+        [JsonProperty(PropertyName = "to_pay_home_cur", NullValueHandling = NullValueHandling.Ignore)]
+        public decimal ToPayHommeCurrency { get; set; }
+
+        [JsonProperty(PropertyName = "flash_message", NullValueHandling = NullValueHandling.Ignore)]
+        public FlashMessage FlashMessage { get; set; }
     }
 }

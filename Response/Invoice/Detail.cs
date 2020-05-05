@@ -15,12 +15,19 @@ namespace Birko.SuperFaktura.Response.Invoice
         public Tag[] Tag { get; set; } = null;
     }
 
-    public class DetailData : DetailBasic
+
+    public class DetailInvoice : DetailBasic
+    {
+        [JsonProperty(PropertyName = "InvoiceItem", NullValueHandling = NullValueHandling.Ignore)]
+        public Item[] InvoiceItems { get; set; } = null;
+    }
+
+    public class DetailData : DetailInvoice
     {
         [JsonProperty(PropertyName = "ClientData", NullValueHandling = NullValueHandling.Ignore)]
         public ClientData ClientData { get; set; } = null;
-        [JsonProperty(PropertyName = "InvoiceItem", NullValueHandling = NullValueHandling.Ignore)]
-        public Item[] InvoiceItems { get; set; } = null;
+
+
         [JsonProperty(PropertyName = "MyData", NullValueHandling = NullValueHandling.Ignore)]
         public MyData MyData { get; set; } = null;
     }

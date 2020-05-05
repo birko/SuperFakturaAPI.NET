@@ -16,11 +16,13 @@ namespace Birko.SuperFaktura.Request.Invoice
         public const string Polish  = "pol";
         public const string Romanian = "rom";
         public const string Croatian = "hrv";
+        public const string Slovenian = "slv";
 
-        public static string[] Languages {
+        public static string[] Languages
+        {
             get
             {
-                return new[] { Slovak, Czech, English, German, Russian, Ukrainian, Hungarian, Polish, Romanian, Croatian };
+                return new[] { Slovak, Czech, English, German, Russian, Ukrainian, Hungarian, Polish, Romanian, Croatian, Slovenian };
             }
         }
     }

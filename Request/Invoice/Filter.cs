@@ -15,6 +15,8 @@ namespace Birko.SuperFaktura.Request.Invoice
         //Invoce.Date const
         [JsonProperty(PropertyName = "delivery")]
         public int Delivery { get; set; } = DateType.All;
+        [JsonProperty(PropertyName = "paid")]
+        public int Paid { get; set; } = DateType.All;
         //Invoce.Type const
         [JsonProperty(PropertyName = "type")]
         public string Type { get; set; }
@@ -50,12 +52,20 @@ namespace Birko.SuperFaktura.Request.Invoice
         [JsonProperty(PropertyName = "modified_to")]
         public DateTime? ModifiedTo { get; set; } = null;
 
+        [JsonProperty(PropertyName = "delivery_since")]
+        public DateTime? DeliverySince { get; set; } = null;
+        [JsonProperty(PropertyName = "delivery_to")]
+        public DateTime? DeliveryTo { get; set; } = null;
+        [JsonProperty(PropertyName = "tag")]
+        public int? Tag { get; set; } = null;
+
         public override string ToParameters(bool listInfo = true)
         {
             string paramString = base.ToParameters(listInfo);
             paramString += "/created:" + Created;
             paramString += "/modified:" + Modified;
             paramString += "/delivery:" + Delivery;
+            paramString += "/paid:" + Paid;
             if (!string.IsNullOrEmpty(Type))
             {
                 paramString += "/type:" + Type;
@@ -112,6 +122,19 @@ namespace Birko.SuperFaktura.Request.Invoice
             if (ModifiedTo.HasValue)
             {
                 paramString += "/modified_to:" + ModifiedTo.Value.ToString("yyyy-MM-dd");
+            }
+
+            if (DeliverySince.HasValue)
+            {
+                paramString += "/delivery_since:" + ModifiedSince.Value.ToString("yyyy-MM-dd");
+            }
+            if (DeliveryTo.HasValue)
+            {
+                paramString += "/delivery_to:" + ModifiedTo.Value.ToString("yyyy-MM-dd");
+            }
+            if (Tag.HasValue)
+            {
+                paramString += "/tag:" + Tag;
             }
 
             return paramString;

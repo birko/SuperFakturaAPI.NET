@@ -58,6 +58,8 @@ namespace Birko.SuperFaktura.Request.Client
         public string DeliveryCountry { get; set; }
         [JsonProperty(PropertyName = "delivery_name", NullValueHandling = NullValueHandling.Ignore)]
         public string DeliveryName { get; set; }
+        [JsonProperty(PropertyName = "delivery_phone", NullValueHandling = NullValueHandling.Ignore)]
+        public string DeliveryPhone { get; set; }
         [JsonProperty(PropertyName = "match_address", NullValueHandling = NullValueHandling.Ignore)]
         public bool MatchAddress { get; set; } = true;
         [JsonProperty(PropertyName = "update_addressbook", NullValueHandling = NullValueHandling.Ignore)]
@@ -72,5 +74,7 @@ namespace Birko.SuperFaktura.Request.Client
         public string Currency { get; set; } = Invoice.CurrencyType.Euro;
         [JsonProperty(PropertyName = "tags", NullValueHandling = NullValueHandling.Ignore)]
         public string Tags { get; set; }
+        [JsonProperty(PropertyName = "swift", NullValueHandling = NullValueHandling.Ignore)]
+        public string SWIFT { get; set; }
     }
 }

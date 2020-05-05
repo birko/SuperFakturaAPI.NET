@@ -27,6 +27,12 @@ namespace Birko.SuperFaktura
             return superFaktura.DeserializeResult<Detail>(result);
         }
 
+        public async Task<Dictionary<int, Detail>> Get(IEnumerable<int> IDS)
+        {
+            var result = await superFaktura.Get(string.Format("invoices/getInvoiceDetails/{0}", string.Join(",", IDS))).ConfigureAwait(false);
+            return superFaktura.DeserializeResult<Dictionary<int, Detail>>(result);
+        }
+
         public async Task<PagedResponse> Get(Request.Invoice.Filter filter, bool listInfo = true)
         {
             var result = await superFaktura.Get(string.Format("invoices/index.json{0}", filter.ToParameters(listInfo))).ConfigureAwait(false);
@@ -44,6 +50,12 @@ namespace Birko.SuperFaktura
         {
             var result = await superFaktura.Post("invoice_payments/add/ajax:1/api:1", new { InvoicePayment = payment }).ConfigureAwait(false);
             return superFaktura.DeserializeResult<ResponsePayment>(result);
+        }
+
+        public async Task<Response<DetailBasic>> NotPay(int invoiceID)
+        {
+            var result = await superFaktura.Get(string.Format("invoices/will_not_be_paid/{0}", invoiceID)).ConfigureAwait(false);
+            return superFaktura.DeserializeResult<Response<DetailBasic>>(result);
         }
 
         public async Task<byte[]> GetPdf(int invoiceId, string token, string language = LanguageType.Slovak)
@@ -98,7 +110,7 @@ namespace Birko.SuperFaktura
             return superFaktura.DeserializeResult<Response<ResponseEmail>>(result);
         }
 
-        public async Task<Response<Detail>> Save(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Setting setting = null, Dictionary<string, object> extra = null, Request.Invoice.MyData myData = null)
+        public async Task<Response<Detail>> Save(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Setting setting = null, Extra extra = null, Request.Invoice.MyData myData = null)
         {
             var data = new Dictionary<string, object>()
             {
@@ -112,7 +124,7 @@ namespace Birko.SuperFaktura
                 }},
             };
 
-            if (extra != null && extra.Any() && extra.Any(x=>x.Value != null))
+            if (extra != null)
             {
                 data.Add("InvoiceExtra", extra);
             }
@@ -153,17 +165,17 @@ namespace Birko.SuperFaktura
             return superFaktura.DeserializeResult<Response<DetailData>>(result);
         }
 
-        public async Task<Response<bool>> DeleteItem(int invoiceID, int itemID)
+        public async Task<Response<DetailInvoice>> DeleteItem(int invoiceID, int itemID)
         {
             return await DeleteItem(invoiceID, new int[] { itemID });
         }
 
-        public async Task<Response<bool>> DeleteItem(int invoiceID, int[] itemID)
+        public async Task<Response<DetailInvoice>> DeleteItem(int invoiceID, int[] itemID)
         {
             if (itemID != null && itemID.Any())
             {
                 var result = await superFaktura.Get(string.Format("invoice_items/delete/{1}/invoice_id:{0}", invoiceID, string.Join(",", itemID))).ConfigureAwait(false);
-                return superFaktura.DeserializeResult<Response<bool>>(result);
+                return superFaktura.DeserializeResult<Response<DetailInvoice>>(result);
             }
             return null;
         }
@@ -171,6 +183,12 @@ namespace Birko.SuperFaktura
         public async Task<Response<ExpandoObject>> Delete(int invoiceID)
         {
             var result = await superFaktura.Get(string.Format("invoices/delete/{0}", invoiceID)).ConfigureAwait(false);
+            return superFaktura.DeserializeResult<Response<ExpandoObject>>(result);
+        }
+
+        public async Task<Response<ExpandoObject>> MarkAsSend(int invoiceID)
+        {
+            var result = await superFaktura.Get(string.Format("invoices/mark_sent/{0}", invoiceID)).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<ExpandoObject>>(result);
         }
 

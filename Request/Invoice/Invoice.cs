@@ -52,6 +52,8 @@ namespace Birko.SuperFaktura.Request.Invoice
         public string IssuedByWeb { get; set; }
         [JsonProperty(PropertyName = "name", NullValueHandling = NullValueHandling.Ignore)]
         public string Name { get; set; }
+        [JsonProperty(PropertyName = "paydate", NullValueHandling = NullValueHandling.Ignore)]
+        public DateTime? PayDate { get; set; } = null;
         [JsonProperty(PropertyName = "payment_type", NullValueHandling = NullValueHandling.Ignore)]
         public string PaymentType { get; set; } = Birko.SuperFaktura.Request.Invoice.PaymentType.BankTransfer;
         [JsonProperty(PropertyName = "proforma_id", NullValueHandling = NullValueHandling.Ignore)]
