@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -50,7 +50,8 @@ namespace Birko.SuperFaktura.Response.Invoice
         [JsonProperty(PropertyName = "tax", NullValueHandling = NullValueHandling.Ignore)]
         public decimal Tax { get; set; } = 20;
         [JsonProperty(PropertyName = "tax_deposit", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal TaxDeposit { get; set; } = 20;
+        [JsonConverter(typeof(Converters.LowerBooleanConverter))]
+        public bool? TaxDeposit { get; set; }
         [JsonProperty(PropertyName = "unit", NullValueHandling = NullValueHandling.Ignore)]
         public string Unit { get; set; } = "ks";
         [JsonProperty(PropertyName = "unit_price", NullValueHandling = NullValueHandling.Ignore)]
