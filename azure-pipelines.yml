@@ -18,7 +18,7 @@ steps:
   inputs:
     SourceFolder: '$(Build.SourcesDirectory)'
     Contents: '**'
-    TargetFolder: '$(Build.SourcesDirectory)\SuperFakturaAPI.NET'
+    TargetFolder: '$(Build.SourcesDirectory)/SuperFakturaAPI.NET'
     CleanTargetFolder: true
     OverWrite: true
 
@@ -38,10 +38,7 @@ steps:
       LICENSE
       README.md
 
-- task: CmdLine@2
-  inputs:
-    script: 'ls'
-    workingDirectory: '$(Build.SourcesDirectory)'
+
 
 - task: CmdLine@2
   displayName: 'SuperFaktura solution'
@@ -49,6 +46,10 @@ steps:
     script: 'git clone https://birko:$(SUPERFAKTURAGITPASSWORD)@dev.azure.com/birko/SuperFaktura/_git/SuperFaktura'
     workingDirectory: '$(Build.SourcesDirectory)'
 
+- task: CmdLine@2
+  inputs:
+    script: 'ls -R'
+    workingDirectory: '$(Build.SourcesDirectory)'
 
 - task: NuGetToolInstaller@1
 
