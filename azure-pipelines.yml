@@ -61,10 +61,9 @@ steps:
     versionEnvVar: PackageVersion
 
 - task: NuGetCommand@2
-  displayName: "nuget push"
+  displayName: "nuget push to birko"
   inputs:
     command: 'push'
     packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
-    nuGetFeedType: 'internal'
-    publishVstsFeed: '88ef312b-3327-4bc0-a145-0a6a612d5256/a5f3606c-baf3-4ccd-af8e-20f4f82bb6f6'
-    allowPackageConflicts: true
+    nuGetFeedType: 'external'
+    publishFeedCredentials: 'birko-nuget'
