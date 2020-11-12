@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Birko</Authors>
+    <Company>Birko</Company>
+    <PackageId>SuperFaktura</PackageId>
+    <PackageProjectUrl>https://github.com/birko/SuperFakturaAPI.NET</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/birko/SuperFakturaAPI.NET</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <Import Project="..\..\SuperFakturaAPI.NET\SuperFakturaAPI.NET.projitems" Label="Shared" />
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+</Project>
