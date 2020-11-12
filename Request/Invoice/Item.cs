@@ -1,7 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Birko.SuperFaktura.Request.Invoice
 {
@@ -29,6 +26,8 @@ namespace Birko.SuperFaktura.Request.Invoice
         public string DiscountDescription { get; set; }
         [JsonProperty(PropertyName = "load_data_from_stock", NullValueHandling = NullValueHandling.Ignore)]
         public bool LoadDataFromStock { get; set; } = true;
+        [JsonProperty(PropertyName = "use_document_currency", NullValueHandling = NullValueHandling.Ignore)]
+        public bool UseDocumentCurrency { get; set; } = true;
         [JsonProperty(PropertyName = "AccountingDetail", NullValueHandling = NullValueHandling.Ignore)]
         public AccountingDetail AccountingDetail { get; set; } = null;
     }

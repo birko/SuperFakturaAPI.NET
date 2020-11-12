@@ -1,12 +1,9 @@
 ﻿using Birko.SuperFaktura.Converters;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Birko.SuperFaktura.Request.Stock
 {
-    public class Item
+    public class Item: Data
     {
         [JsonProperty(PropertyName = "description", NullValueHandling = NullValueHandling.Ignore)]
         public string Description { get; set; }

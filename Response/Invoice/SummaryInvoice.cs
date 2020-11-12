@@ -1,13 +1,10 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Birko.SuperFaktura.Response.Invoice
 {
     public class SummaryInvoice
     {
-
         [JsonProperty(PropertyName = "vat_base_separate_negative", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.DictionaryConverter<string, decimal?>))]
         public Dictionary<string, decimal?>  VATBaseSeparateNegative { get; set; }
@@ -20,6 +17,5 @@ namespace Birko.SuperFaktura.Response.Invoice
         [JsonProperty(PropertyName = "vat_separate_positive", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.DictionaryConverter<string, decimal?>))]
         public Dictionary<string, decimal?> VATSeparatePositive { get; set; }
-
     }
 }

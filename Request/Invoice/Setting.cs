@@ -1,7 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Birko.SuperFaktura.Request.Invoice
 {
@@ -21,5 +18,7 @@ namespace Birko.SuperFaktura.Request.Invoice
         public bool PayPal { get; set; } = true;
         [JsonProperty(PropertyName = "show_prices", NullValueHandling = NullValueHandling.Ignore)]
         public bool ShowPrices { get; set; } = false;
+        [JsonProperty(PropertyName = "callback_payment", NullValueHandling = NullValueHandling.Ignore)]
+        public string CallbackPayment { get; set; } = null;
     }
 }

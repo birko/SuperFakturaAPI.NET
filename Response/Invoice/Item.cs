@@ -1,8 +1,5 @@
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
 using System.Dynamic;
-using System.Text;
 
 namespace Birko.SuperFaktura.Response.Invoice
 {

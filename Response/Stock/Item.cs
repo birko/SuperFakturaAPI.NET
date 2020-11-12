@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Birko.SuperFaktura.Response.Stock
 {
@@ -20,7 +18,6 @@ namespace Birko.SuperFaktura.Response.Stock
         [JsonProperty(PropertyName = "modified", NullValueHandling = NullValueHandling.Ignore)]
         public DateTime Modified { get; internal set; }
     }
-
 
     public class Detail : Item
     {

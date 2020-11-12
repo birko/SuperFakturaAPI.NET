@@ -39,16 +39,10 @@ steps:
       README.md
 
 
-
 - task: CmdLine@2
   displayName: 'SuperFaktura solution'
   inputs:
     script: 'git clone https://birko:$(SUPERFAKTURAGITPASSWORD)@dev.azure.com/birko/SuperFaktura/_git/SuperFaktura'
-    workingDirectory: '$(Build.SourcesDirectory)'
-
-- task: CmdLine@2
-  inputs:
-    script: 'ls -R'
     workingDirectory: '$(Build.SourcesDirectory)'
 
 - task: NuGetToolInstaller@1

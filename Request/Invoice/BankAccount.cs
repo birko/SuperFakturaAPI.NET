@@ -1,11 +1,8 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Birko.SuperFaktura.Request.Invoice
 {
-    public class BankAccount
+    public class BankAccount: Data
     {
         [JsonProperty(PropertyName = "default", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.StringBooleanConverter))]

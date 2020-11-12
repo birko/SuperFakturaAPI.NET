@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Birko.SuperFaktura.Exceptions
+﻿namespace Birko.SuperFaktura.Exceptions
 {
     public class Exception : System.Exception
     {

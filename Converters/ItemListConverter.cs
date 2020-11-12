@@ -1,10 +1,8 @@
 ﻿using Birko.SuperFaktura.Response;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using System.Text;
 
 namespace Birko.SuperFaktura.Converters
 {
@@ -44,8 +42,7 @@ namespace Birko.SuperFaktura.Converters
                                     break;
                                 default:
                                     string inputData = path.LastOrDefault();
-                                    int index = 0;
-                                    var pathtest = int.TryParse(inputData, out index);
+                                    var pathtest = int.TryParse(inputData, out int _);
                                     if (pathtest)
                                     {
                                         items.Add((T)serializer.Deserialize(reader, typeof(T)));

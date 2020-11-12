@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Birko.SuperFaktura.Response
 {
@@ -30,6 +28,5 @@ namespace Birko.SuperFaktura.Response
         public string SequenceFormatted { get; set; }
         [JsonProperty(PropertyName = "user_profile_id", NullValueHandling = NullValueHandling.Ignore)]
         public int UserProfileID { get; set; }
-
     }
 }

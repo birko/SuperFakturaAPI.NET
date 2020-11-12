@@ -1,4 +1,5 @@
 ﻿using Birko.SuperFaktura.Response;
+using Birko.SuperFaktura.Response.Invoice;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -16,11 +17,11 @@ namespace Birko.SuperFaktura
         public const string APIAUTHKEYWORD = "SFAPI";
         public string APIURL { get; protected set; }
 
-        public string Email { get; private set; }
-        public string ApiKey { get; private set; }
-        public int? CompanyId { get; private set; }
-        public string AppTitle { get; private set; }
-        public string Module { get; private set; }
+        public string Email { get; }
+        public string ApiKey { get; }
+        public int? CompanyId { get; internal set; }
+        public string AppTitle { get; }
+        public string Module { get; }
 
         public bool EnsureSuccessStatusCode { get; set; } = true;
         public int TimeoutSeconds { get; set; } = 30;
@@ -31,6 +32,8 @@ namespace Birko.SuperFaktura
         private static Dictionary<string, HttpClient> _clientList = null;
         private static Dictionary<string, int> _requestCount = null;
 
+        public string LastCheckSum { get; private set; }
+
         private string ProfileKey
         {
             get
@@ -39,7 +42,7 @@ namespace Birko.SuperFaktura
             }
         }
 
-        public AbstractSuperFaktura(string email, string apiKey, string apptitle = null, string module = "API", int? companyId = null)
+        protected AbstractSuperFaktura(string email, string apiKey, string apptitle = null, string module = "API", int? companyId = null)
         {
             Email = email;
             ApiKey = apiKey;
@@ -54,8 +57,9 @@ namespace Birko.SuperFaktura
             {
                 _clientList = new Dictionary<string, HttpClient>();
             }
-            HttpClient client = null;
+
             var key = ProfileKey;
+            HttpClient client;
             if (force || !_clientList.ContainsKey(key) || _clientList[key].Timeout.Seconds != TimeoutSeconds)
             {
                 client = new HttpClient
@@ -65,15 +69,8 @@ namespace Birko.SuperFaktura
                 };
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/*");
-                client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", string.Format("{0} email={1}&apikey={2}&company_id={3}", APIAUTHKEYWORD, Email, ApiKey, CompanyId));
-                if (!_clientList.ContainsKey(key))
-                {
-                    _clientList.Add(key, client);
-                }
-                else
-                {
-                    _clientList[key] = client;
-                }
+                client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", string.Format("{0} email={1}&apikey={2}&company_id={3}&module={4}", APIAUTHKEYWORD, Email, ApiKey, CompanyId, Module));
+                _clientList[key] = client;
             }
             else
             {
@@ -86,7 +83,6 @@ namespace Birko.SuperFaktura
         internal T DeserializeResult<T>(string result, JsonSerializerSettings setting = null)
         {
             TestError(result);
-            result = TestThrottle(result);
             try
             {
                 return JsonConvert.DeserializeObject<T>(result, setting);
@@ -108,31 +104,6 @@ namespace Birko.SuperFaktura
                     var exception = new Exceptions.Exception(testResult.Error.Value, testResult.Message, testResult.ErrorMessage);
                     throw (exception);
                 }
-            }
-            catch (Exception ex)
-            {
-                var exception = new Exceptions.ParseException(ex.Message, string.Format("Returned Response: {0}", result));
-                throw (exception);
-            }
-        }
-
-        [Obsolete("Throttled was moved to HTTP header by SF on 4.9.2018")]
-        internal string TestThrottle(string result)
-        {
-            try
-            {
-                var testResult = (Newtonsoft.Json.Linq.JObject)JsonConvert.DeserializeObject(result);
-                if (testResult.ContainsKey("throttled"))
-                {
-                    var text = testResult.Value<string>("throttled");
-                    var startIndex = text.IndexOf("You have already made ");
-                    var endIndex = text.IndexOf(" requests today.");
-                    var stringCount = text.Substring(startIndex, endIndex - startIndex).Replace("You have already made ", string.Empty);
-                    IncreaseRequestCount(ProfileKey, int.Parse(stringCount), true);
-                    testResult.Remove("throttled");
-                    return testResult.ToString();
-                }
-                return result;
             }
             catch (Exception ex)
             {
@@ -163,21 +134,14 @@ namespace Birko.SuperFaktura
                 Task.Delay(TimeSpan.FromSeconds(1)).Wait();
             }
             now = DateTime.Now;
-            if (_lastRequest.ContainsKey(key))
-            {
-                _lastRequest[key] = now;
-            }
-            else
-            {
-                _lastRequest.Add(key, now);
-            }
+            _lastRequest[key] = now;
         }
 
         private void ParseResponse(HttpResponseMessage response)
         {
             if (response != null)
             {
-                if (response.Headers != null && response.Headers.Any())
+                if (response.Headers?.Any() == true)
                 {
                     if (
                         response.Headers.Contains("X-RateLimit-DailyLimit")
@@ -312,7 +276,7 @@ namespace Birko.SuperFaktura
             }
         }
 
-        internal async Task<string> Post(string uri, string data)
+        internal async Task<string> Post(string uri, string data, string checkSum = null)
         {
             RequestDelay();
             var client = CreateClient();
@@ -320,6 +284,7 @@ namespace Birko.SuperFaktura
             try
             {
                 IncreaseRequestCount(ProfileKey);
+                this.LastCheckSum = checkSum;
                 response = await client.PostAsync(uri, new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("data", data) })).ConfigureAwait(false);
                 ParseResponse(response);
                 if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
@@ -334,9 +299,27 @@ namespace Birko.SuperFaktura
             }
         }
 
-        internal async Task<string> Post(string uri, object data)
+        internal async Task<string> Post(string uri, Request.Data data)
         {
-            return await Post(uri, JsonConvert.SerializeObject(data)).ConfigureAwait(false);
+            var checkSum = CheckSum(data);
+            data.CheckSum = checkSum;
+            return await Post(uri, JsonConvert.SerializeObject(data), checkSum).ConfigureAwait(false);
+        }
+
+        private string CheckSum(Request.Data data)
+        {
+            data.Date = DateTime.Now.ToString("yyyy-MM-dd");
+            StringBuilder sum = new StringBuilder();
+            using (var md5 = System.Security.Cryptography.MD5.Create())
+            {
+                byte[] hashBytes = md5.ComputeHash(System.Text.Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)));
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < hashBytes.Length; i++)
+                {
+                    sum.Append(hashBytes[i].ToString("X2"));
+                }
+            }
+            return data.CheckSum;
         }
 
         private static void IncreaseRequestCount(string key, int count = 1, bool set = false)
@@ -389,42 +372,27 @@ namespace Birko.SuperFaktura
 
         public Clients Clients {
             get {
-                if (_clients == null) {
-                    _clients = new Clients(this);
-                }
-                return _clients;
+                return _clients ?? (_clients = new Clients(this));
             }
         }
 
         public Expenses Expenses {
             get
             {
-                if (_expenses == null)
-                {
-                    _expenses = new Expenses(this);
-                }
-                return _expenses;
+                return _expenses ?? (_expenses = new Expenses(this));
             }
         }
         public Invoices Invoices {
             get
             {
-                if (_invoices == null)
-                {
-                    _invoices = new Invoices(this);
-                }
-                return _invoices;
+                return _invoices ?? (_invoices = new Invoices(this));
             }
         }
 
         public Stock Stock {
             get
             {
-                if (_stock== null)
-                {
-                    _stock = new Stock(this);
-                }
-                return _stock;
+                return _stock ?? (_stock = new Stock(this));
             }
         }
 
@@ -487,14 +455,77 @@ namespace Birko.SuperFaktura
             {
                 try
                 {
-                    DeserializeResult<string[]>(result);
-                    return null;
+                    var deserialized = DeserializeResult<string[]>(result);
+                    var data = new Dictionary<int, string>();
+                    int i  = 1;
+                    foreach(var tag in deserialized)
+                    {
+                        data.Add(i, tag);
+                        i++;
+                    }
+                    return data;
                 }
                 catch
                 {
                     throw ex;
                 }
             }
+        }
+
+        public async Task<Tag> AddTag(Request.Invoice.Tag tag)
+        {
+            var result = await Post("tags/add", tag).ConfigureAwait(false);
+            return DeserializeResult<Tag>(result);
+        }
+
+        public async Task<Tag> EditTag(int id, Request.Invoice.Tag tag)
+        {
+            var result = await Post(string.Format("tags/edit/{0}", id), tag).ConfigureAwait(false);
+            return DeserializeResult<Tag>(result);
+        }
+
+        public async Task<string> DeleteTag(int id)
+        {
+            var result = await Get(string.Format("tags/delete/{0}", id)).ConfigureAwait(false);
+            return result;
+        }
+        public async Task<Dictionary<int, BankAccount>> GetBankAccounts()
+        {
+            var result = await Get("bank_accounts/index").ConfigureAwait(false);
+            try
+            {
+                return DeserializeResult<Dictionary<int, BankAccount>>(result);
+            }
+            catch (JsonSerializationException ex)
+            {
+                try
+                {
+                    var deserialized = DeserializeResult<BankAccount[]>(result);
+                    return deserialized.ToDictionary(x => x.ID, x => x);
+                }
+                catch
+                {
+                    throw ex;
+                }
+            }
+        }
+
+        public async Task<BankAccount> AddBankAccount(Request.Invoice.BankAccount account)
+        {
+            var result = await Post("bank_accounts/add", account).ConfigureAwait(false);
+            return DeserializeResult<BankAccount>(result);
+        }
+
+        public async Task<BankAccount> EditBankAccount(int id, Request.Invoice.BankAccount account)
+        {
+            var result = await Post(string.Format("bank_accounts/update/{0}", id), account).ConfigureAwait(false);
+            return DeserializeResult<BankAccount>(result);
+        }
+
+        public async Task<string> DeleteBankAccount(int id)
+        {
+            var result = await Get(string.Format("bank_accounts/delete/{0}", id)).ConfigureAwait(false);
+            return result;
         }
 
         public async Task<Logo[]> GetLogos()
@@ -505,26 +536,26 @@ namespace Birko.SuperFaktura
 
         public async Task<Response<Register>> Register(string email, bool sendEmail = true)
         {
-            var result = await Post("/users/create", new
+            var result = await Post("/users/create", new Request.UserData
             {
                 User = new User
                 {
                     Email = email,
                     SendEmail = sendEmail
                 }
-            });
+            }).ConfigureAwait(false);
             return DeserializeResult<Response<Register>>(result);
         }
 
         public async Task<Response<ExpandoObject[]>> GetUserCompaniesDatar(bool allCompanies = true)
         {
-            var result = await Get(string.Format("/users/getUserCompaniesData/{0}", allCompanies));
+            var result = await Get(string.Format("/users/getUserCompaniesData/{0}", allCompanies)).ConfigureAwait(false);
             return DeserializeResult<Response<ExpandoObject[]>>(result);
         }
 
         public async Task<Response<ExpandoObject>> CashRegister(int cashRegisterId, Request.PagedSearchParameters filter, bool listInfo = true)
         {
-            var result = await Get(string.Format("/cash_register_items/index/{0}{1}", cashRegisterId, filter.ToParameters(listInfo)));
+            var result = await Get(string.Format("/cash_register_items/index/{0}{1}", cashRegisterId, filter.ToParameters(listInfo))).ConfigureAwait(false);
             return DeserializeResult<Response<ExpandoObject>>(result);
         }
 
@@ -532,13 +563,17 @@ namespace Birko.SuperFaktura
         {
             if (new[] { "slp", "csp" }.Contains(curierType))
             {
-                var result = await Post(string.Format("/{0}_exports/export", curierType), new { data = data });
+                var result = await Post(string.Format("/{0}_exports/export", curierType), new Request.DataData { Data = data }).ConfigureAwait(false);
                 return DeserializeResult<Response<ExpandoObject>>(result);
             }
             return null;
         }
-    }
 
+        public async Task<string> ResponseByChecksum(string checksum)
+        {
+            return await Get(string.Format("/api_logs/getResponseByChecksum/{0}", checksum)).ConfigureAwait(false);
+        }
+    }
 
     public class SuperFakturaCZ : SuperFaktura
     {

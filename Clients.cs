@@ -1,11 +1,6 @@
 ﻿using Birko.SuperFaktura.Request.Client;
 using Birko.SuperFaktura.Response;
 using Birko.SuperFaktura.Response.Client;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Birko.SuperFaktura
@@ -34,13 +29,13 @@ namespace Birko.SuperFaktura
 
         public async Task<Response<ListItem>> Save(Request.Client.Client client)
         {
-            var result = await superFaktura.Post("clients/create", new { Client = client }).ConfigureAwait(false);
+            var result = await superFaktura.Post("clients/create", new ClientData { Client = client }).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<ListItem>>(result);
         }
 
         public async Task<Response<Response.Client.ContactPerson>> AddContactPerson(Request.Client.ContactPerson person)
         {
-            var result = await superFaktura.Post("/contact_people/add/api:1", new { ContactPerson = person }).ConfigureAwait(false);
+            var result = await superFaktura.Post("/contact_people/add/api:1", new ContactPersonData { ContactPerson = person }).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<Response.Client.ContactPerson>>(result);
         }
     }

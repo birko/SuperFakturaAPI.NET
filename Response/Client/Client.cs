@@ -1,8 +1,5 @@
-﻿using Birko.SuperFaktura.Converters;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Birko.SuperFaktura.Response.Client
 {

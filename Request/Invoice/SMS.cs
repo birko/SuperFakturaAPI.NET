@@ -1,11 +1,8 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Birko.SuperFaktura.Request.Invoice
 {
-    public class SMS
+    public class SMS : Data
     {
         [JsonProperty(PropertyName = "invoice_id", NullValueHandling = NullValueHandling.Ignore)]
         public int InvoiceID { get; set; }

@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace Birko.SuperFaktura.Response
@@ -14,7 +13,7 @@ namespace Birko.SuperFaktura.Response
         [JsonProperty(PropertyName = "message", NullValueHandling = NullValueHandling.Ignore)]
         public String Message { get; internal set; } = null;
         [JsonProperty(PropertyName = "data", NullValueHandling = NullValueHandling.Ignore)]
-        public T Data { get; internal set; } = default(T);
+        public T Data { get; internal set; }
 
         public override string ToString()
         {

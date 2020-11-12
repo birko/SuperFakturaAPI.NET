@@ -1,13 +1,10 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Birko.SuperFaktura.Request.Expense
 {
     public class Payment
     {
-
         [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
         public int? ID { get; internal set; } = null;
         [JsonProperty(PropertyName = "expense_id", NullValueHandling = NullValueHandling.Ignore)]
@@ -22,6 +19,5 @@ namespace Birko.SuperFaktura.Request.Expense
         public string PaymentType { get; set; } = Invoice.PaymentType.BankTransfer;
         [JsonProperty(PropertyName = "cash_register_id", NullValueHandling = NullValueHandling.Ignore)]
         public int? CashRegisterID { get; set; } = null;
-
     }
 }

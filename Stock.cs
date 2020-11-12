@@ -1,12 +1,9 @@
 ﻿using Birko.SuperFaktura.Request.Stock;
 using Birko.SuperFaktura.Response;
 using Birko.SuperFaktura.Response.Stock;
-using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Birko.SuperFaktura
@@ -61,7 +58,7 @@ namespace Birko.SuperFaktura
         {
             if (items != null)
             {
-                var result = await superFaktura.Post("stock_items/addstockmovement", new { StockLog = items.ToArray() }).ConfigureAwait(false);
+                var result = await superFaktura.Post("stock_items/addstockmovement", new StockLogData { StockLog = items.ToArray() }).ConfigureAwait(false);
                 return superFaktura.DeserializeResult<Response<LogResponse>>(result);
             }
             return await Task.FromResult<Response<LogResponse>>(null).ConfigureAwait(false);
@@ -69,7 +66,7 @@ namespace Birko.SuperFaktura
 
         public async Task<Response<LogResponse>> AddStockMovement(Request.Stock.Log item)
         {
-            return await AddStockMovement(new[] { item });
+            return await AddStockMovement(new[] { item }).ConfigureAwait(false);
         }
     }
 }

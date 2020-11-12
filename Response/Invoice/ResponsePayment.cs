@@ -1,8 +1,6 @@
 ﻿using Birko.SuperFaktura.Request.Invoice;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Birko.SuperFaktura.Response.Invoice
 {

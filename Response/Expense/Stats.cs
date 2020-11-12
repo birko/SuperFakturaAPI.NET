@@ -1,8 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Text;
 
 namespace Birko.SuperFaktura.Response.Expense
 {
@@ -16,6 +13,5 @@ namespace Birko.SuperFaktura.Response.Expense
 
         [JsonProperty(PropertyName = "total", NullValueHandling = NullValueHandling.Ignore)]
         public decimal Total { get; set; }
-
     }
 }

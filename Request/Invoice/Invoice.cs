@@ -1,8 +1,5 @@
-﻿using Birko.SuperFaktura.Converters;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Birko.SuperFaktura.Request.Invoice
 {
@@ -79,6 +76,5 @@ namespace Birko.SuperFaktura.Request.Invoice
         [JsonProperty(PropertyName = "tax_document", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.StringBooleanConverter))]
         public bool? TaxDocument { get; set; }
-
     }
 }

@@ -1,10 +1,7 @@
 ﻿using Birko.SuperFaktura.Response.Stock;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
-using System.Text;
 
 namespace Birko.SuperFaktura.Converters
 {
@@ -33,10 +30,8 @@ namespace Birko.SuperFaktura.Converters
                             item.StockItem = (Response.Stock.Item)serializer.Deserialize(reader, typeof(Response.Stock.Item));
                             break;
                         default:
-                            int index = 0;
-                            if (int.TryParse(path.LastOrDefault(), out index))
+                            if (int.TryParse(path.LastOrDefault(), out int _))
                             {
-
                             }
                             break;
                     }

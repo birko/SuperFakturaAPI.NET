@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Birko.SuperFaktura.Request.Expense
 {
@@ -41,5 +39,7 @@ namespace Birko.SuperFaktura.Request.Expense
         public int ClientID { get; internal set; }
         [JsonProperty(PropertyName = "document_number", NullValueHandling = NullValueHandling.Ignore)]
         public int DocumentNumber { get; internal set; }
+        [JsonProperty(PropertyName = "attachment", NullValueHandling = NullValueHandling.Ignore)]
+        public string Attachment { get; set; }
     }
 }

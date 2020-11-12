@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Birko.SuperFaktura.Request.Invoice
+﻿namespace Birko.SuperFaktura.Request.Invoice
 {
     public static class LanguageType
     {

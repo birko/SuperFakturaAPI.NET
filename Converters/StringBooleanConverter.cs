@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Birko.SuperFaktura.Converters
 {
@@ -9,17 +7,13 @@ namespace Birko.SuperFaktura.Converters
     {
         public override bool CanConvert(Type objectType)
         {
-            return (objectType == typeof(bool) || objectType == typeof(bool?));
+            return objectType == typeof(bool) || objectType == typeof(bool?);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             string value = reader.Value.ToString();
-            if (!string.IsNullOrEmpty(value) && !value.Trim().Equals("0"))
-            {
-                return true;
-            }
-            return false;
+            return !string.IsNullOrEmpty(value) && value.Trim().Equals("1") ? true : (object)false;
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -34,11 +28,7 @@ namespace Birko.SuperFaktura.Converters
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             string value = reader.Value.ToString();
-            if (!string.IsNullOrEmpty(value) && !value.Trim().Equals("true"))
-            {
-                return true;
-            }
-            return false;
+            return !string.IsNullOrEmpty(value) && !value.Trim().Equals("true") ? true : base.ReadJson(reader, objectType, existingValue, serializer);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

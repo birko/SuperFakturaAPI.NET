@@ -1,7 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Birko.SuperFaktura.Response
 {
@@ -27,6 +24,5 @@ namespace Birko.SuperFaktura.Response
         public string Token { get; set; }
         [JsonProperty(PropertyName = "type", NullValueHandling = NullValueHandling.Ignore)]
         public string Type { get; set; }
-
     }
 }

@@ -1,11 +1,7 @@
 ﻿using Birko.SuperFaktura.Request.Expense;
 using Birko.SuperFaktura.Response;
 using Birko.SuperFaktura.Response.Expense;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Dynamic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Birko.SuperFaktura
@@ -46,19 +42,19 @@ namespace Birko.SuperFaktura
 
         public async Task<Response<ListItem>> Save(Request.Expense.Expense expense)
         {
-            var result = await superFaktura.Post("/expenses/add", new { Expense = expense }).ConfigureAwait(false);
+            var result = await superFaktura.Post("/expenses/add", new ExpenseData { Expense = expense }).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<ListItem>>(result);
         }
 
         public async Task<Response<ListItem>> Edit(Request.Expense.Expense expense)
         {
-            var result = await superFaktura.Post("/expenses/edit", new { Expense = expense }).ConfigureAwait(false);
+            var result = await superFaktura.Post("/expenses/edit", new ExpenseData { Expense = expense }).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<ListItem>>(result);
         }
 
         public async Task<Response<ListItem>> Pay(Request.Expense.Payment payment)
         {
-            var result = await superFaktura.Post("expense_payments/add", new { ExpensePayment = payment }).ConfigureAwait(false);
+            var result = await superFaktura.Post("expense_payments/add", new ExpensePaymentData { ExpensePayment = payment }).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<ListItem>>(result);
         }
 
