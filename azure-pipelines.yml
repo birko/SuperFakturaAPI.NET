@@ -1,0 +1,69 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+
+steps:
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)'
+    Contents: '**'
+    TargetFolder: '$(Build.SourcesDirectory)\SuperFakturaAPI.NET'
+    CleanTargetFolder: true
+    OverWrite: true
+
+- task: DeleteFiles@1
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)'
+    Contents: |
+      .gitignore
+      Converters
+      Exceptions
+      Request
+      Response
+      SuperFakturaAPI.NET.projitems
+      SuperFakturaAPI.NET.shproj
+      azure-pipelines.yml
+      *.cs
+      LICENSE
+      README.md
+
+- task: CmdLine@2
+  displayName: 'SuperFaktura solution'
+  inputs:
+    script: 'git clone https://birko@dev.azure.com/birko/SuperFaktura/_git/SuperFaktura'
+    workingDirectory: '$(Build.SourcesDirectory)'
+
+- task: NuGetToolInstaller@1
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: DotNetCoreCLI@2
+  displayName: "dotnet pack"
+  inputs:
+    command: 'pack'
+    arguments: '--configuration $(buildConfiguration)'
+    packagesToPack: '**/*.csproj'
+    versioningScheme: byEnvVar
+    versionEnvVar: PackageVersion
+
+- task: NuGetCommand@2
+  displayName: "nuget push"
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+    nuGetFeedType: 'internal'
+    publishVstsFeed: '88ef312b-3327-4bc0-a145-0a6a612d5256/a5f3606c-baf3-4ccd-af8e-20f4f82bb6f6'
+    allowPackageConflicts: true
