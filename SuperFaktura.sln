@@ -3,13 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperFaktura", "SuperFaktura\SuperFaktura.csproj", "{9DB7695E-9810-4C59-B711-E5D662223D5E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperFaktura", "SuperFaktura\SuperFaktura.csproj", "{9DB7695E-9810-4C59-B711-E5D662223D5E}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SuperFakturaAPI.NET", "..\SuperFakturaAPI.NET\SuperFakturaAPI.NET.shproj", "{0E459130-2774-45EA-B4E2-56B7BEAA7B7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperFaktura.Tests", "SuperFaktura.Tests\SuperFaktura.Tests.csproj", "{77E23091-CF9C-442F-AC0C-3C3FC86E5433}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\SuperFakturaAPI.NET\SuperFakturaAPI.NET.projitems*{0e459130-2774-45ea-b4e2-56b7beaa7b7b}*SharedItemsImports = 13
+		..\SuperFakturaAPI.NET\SuperFakturaAPI.NET.projitems*{77e23091-cf9c-442f-ac0c-3c3fc86e5433}*SharedItemsImports = 5
 		..\SuperFakturaAPI.NET\SuperFakturaAPI.NET.projitems*{9db7695e-9810-4c59-b711-e5d662223d5e}*SharedItemsImports = 5
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +24,10 @@ Global
 		{9DB7695E-9810-4C59-B711-E5D662223D5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DB7695E-9810-4C59-B711-E5D662223D5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DB7695E-9810-4C59-B711-E5D662223D5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77E23091-CF9C-442F-AC0C-3C3FC86E5433}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77E23091-CF9C-442F-AC0C-3C3FC86E5433}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77E23091-CF9C-442F-AC0C-3C3FC86E5433}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77E23091-CF9C-442F-AC0C-3C3FC86E5433}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

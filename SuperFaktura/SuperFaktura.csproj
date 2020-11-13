@@ -8,6 +8,7 @@
     <PackageProjectUrl>https://github.com/birko/SuperFakturaAPI.NET</PackageProjectUrl>
     <RepositoryUrl>https://github.com/birko/SuperFakturaAPI.NET</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <Description>.NET client library for Superfaktura API</Description>
   </PropertyGroup>
 
   <Import Project="..\..\SuperFakturaAPI.NET\SuperFakturaAPI.NET.projitems" Label="Shared" />
