@@ -29,5 +29,13 @@ namespace SuperFaktura.Tests
             var clients = await this.apiClient.Clients.Get(new Birko.SuperFaktura.Request.Client.Filter());
             clients.ShouldNotBe(null);
         }
+
+        [Fact]
+        public async Task TestCountries()
+        {
+            var countries = await this.apiClient.GetCountries();
+            countries.Count.ShouldBe(251);
+            countries[191].ShouldBe("Slovensko");
+        }
     }
 }
