@@ -11,6 +11,7 @@ namespace Birko.SuperFaktura.Response.Invoice
         [JsonProperty(PropertyName = "iso", NullValueHandling = NullValueHandling.Ignore)]
         public string ISO { get; set; }
         [JsonProperty(PropertyName = "eu", NullValueHandling = NullValueHandling.Ignore)]
-        public int EU { get; set; }
+        [JsonConverter(typeof(Converters.LowerBooleanConverter))]
+        public bool EU { get; set; }
     }
 }

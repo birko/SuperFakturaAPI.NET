@@ -52,6 +52,28 @@ steps:
     restoreSolution: '$(solution)'
 
 - task: DotNetCoreCLI@2
+  displayName: "dotnet build"
+  inputs:
+    command: 'build'
+    projects: '**/*.csproj'
+    arguments: '--configuration $(buildConfiguration)'
+    workingDirectory: '$(Build.SourcesDirectory)'
+
+- task: VSTest@2
+  displayName: "Package test"
+  inputs:
+    testSelector: 'testAssemblies'
+    testAssemblyVer2: |
+      **\bin\$(BuildConfiguration)\**\*test*.dll
+      !**\obj\**
+      !**\xunit.runner.visualstudio.testadapter.dll
+      !**\xunit.runner.visualstudio.dotnetcore.testadapter.dll
+    searchFolder: '$(Build.SourcesDirectory)'
+    runTestsInIsolation: true
+    codeCoverageEnabled: true
+    otherConsoleOptions: '/InIsolation'
+
+- task: DotNetCoreCLI@2
   displayName: "dotnet pack"
   inputs:
     command: 'pack'
