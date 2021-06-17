@@ -124,11 +124,11 @@ namespace Birko.SuperFaktura.Request.Invoice
 
             if (DeliverySince.HasValue)
             {
-                paramString += "/delivery_since:" + ModifiedSince.Value.ToString("yyyy-MM-dd");
+                paramString += "/delivery_since:" + DeliverySince.Value.ToString("yyyy-MM-dd");
             }
             if (DeliveryTo.HasValue)
             {
-                paramString += "/delivery_to:" + ModifiedTo.Value.ToString("yyyy-MM-dd");
+                paramString += "/delivery_to:" + DeliveryTo.Value.ToString("yyyy-MM-dd");
             }
             if (Tag.HasValue)
             {
