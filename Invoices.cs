@@ -82,6 +82,33 @@ namespace Birko.SuperFaktura
             return result;
         }
 
+        public async Task<byte[]> Exports(int[] invoiceIds, Export export)
+        {
+            var result = await superFaktura.PostByte("/exports", new Request.DataData
+            {
+                Data = new { 
+                    Invoice = new { 
+                        ids = invoiceIds
+                    },
+                    Export = export
+                }
+            }).ConfigureAwait(false);
+            try
+            {
+                string testResult = Encoding.UTF8.GetString(result);
+                superFaktura.DeserializeResult<Response<ExpandoObject>>(testResult);
+            }
+            catch (Exceptions.ParseException) when (result != null && result.Length != 0)
+            {
+                //test deserialization failed. it is a binary file
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return result;
+        }
+
         public async Task<Response<ExpandoObject>> SetInvoiceLanguage(int ID, string language = LanguageType.Slovak)
         {
             if (!LanguageType.Languages.Contains(language))

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Birko.SuperFaktura.Request.BankAccounts;
+using Newtonsoft.Json;
 using System;
 
 namespace Birko.SuperFaktura.Request.Invoice
@@ -76,5 +77,14 @@ namespace Birko.SuperFaktura.Request.Invoice
         [JsonProperty(PropertyName = "tax_document", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.StringBooleanConverter))]
         public bool? TaxDocument { get; set; }
+
+        [JsonProperty(PropertyName = "mark_sent", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.StringBooleanConverter))]
+        public bool MarkSent { get; set; }
+        [JsonProperty(PropertyName = "mark_sent_message", NullValueHandling = NullValueHandling.Ignore)]
+        public string MarkSentMessage { get; set; }
+        [JsonProperty(PropertyName = "mark_sent_subject", NullValueHandling = NullValueHandling.Ignore)]
+        public string MarkSentSubject { get; set; }
     }
+
 }

@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace Birko.SuperFaktura.Response.Client
+namespace Birko.SuperFaktura.Response.ContactPersons
 {
-    public class ContactPerson : Birko.SuperFaktura.Request.Client.ContactPerson
+    public class ContactPerson : Birko.SuperFaktura.Request.ContactPersons.ContactPerson
     {
         [JsonProperty(PropertyName = "created", NullValueHandling = NullValueHandling.Ignore)]
         public DateTime Created { get; set; }

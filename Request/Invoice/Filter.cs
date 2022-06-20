@@ -31,7 +31,7 @@ namespace Birko.SuperFaktura.Request.Invoice
         public int? ClientId { get; set; } = null;
         [JsonProperty(PropertyName = "amount_from")]
         public decimal? AmountFrom { get; set; } = null;
-        [JsonProperty(PropertyName = "amount_since")]
+        [JsonProperty(PropertyName = "amount_to")]
         public decimal? AmountTo { get; set; } = null;
         [JsonProperty(PropertyName = "paid_since")]
         public DateTime? PaidSince { get; set; } = null;
@@ -56,6 +56,8 @@ namespace Birko.SuperFaktura.Request.Invoice
         public DateTime? DeliveryTo { get; set; } = null;
         [JsonProperty(PropertyName = "tag")]
         public int? Tag { get; set; } = null;
+        [JsonProperty(PropertyName = "variable")]
+        public string Variable { get; set; }
 
         public override string ToParameters(bool listInfo = true)
         {
@@ -133,6 +135,10 @@ namespace Birko.SuperFaktura.Request.Invoice
             if (Tag.HasValue)
             {
                 paramString += "/tag:" + Tag;
+            }
+            if (!string.IsNullOrEmpty(Variable))
+            {
+                paramString += "/variable:" + Variable;
             }
 
             return paramString;

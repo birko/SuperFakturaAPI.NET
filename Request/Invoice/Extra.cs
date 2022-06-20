@@ -16,5 +16,8 @@ namespace Birko.SuperFaktura.Request.Invoice
         public string TrackingNumber { get; set; }
         [JsonProperty(PropertyName = "weight", NullValueHandling = NullValueHandling.Ignore)]
         public float? Weight { get; set; }
+        [JsonProperty(PropertyName = "oss", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.StringBooleanConverter))]
+        public bool? OSS { get; set; }
     }
 }

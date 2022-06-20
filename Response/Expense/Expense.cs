@@ -9,18 +9,7 @@ namespace Birko.SuperFaktura.Response.Expense
     {
         [JsonProperty(PropertyName = "amount_paid", NullValueHandling = NullValueHandling.Ignore)]
         public decimal AmountPaid { get; set; }
-        [JsonProperty(PropertyName = "amount2", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal Amount2 { get; set; }
-        [JsonProperty(PropertyName = "amount3", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal Amount3 { get; set; }
-        [JsonProperty(PropertyName = "vat", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal VAT { get; set; } = 20;
-        [JsonProperty(PropertyName = "vat2", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal? VAT2 { get; set; }
-        [JsonProperty(PropertyName = "vat3", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal? VAT3 { get; set; }
-        [JsonProperty(PropertyName = "payment_type", NullValueHandling = NullValueHandling.Ignore)]
-        public string PaymentType { get; set; } = Birko.SuperFaktura.Request.Invoice.PaymentType.BankTransfer;
+       
         [JsonProperty(PropertyName = "demo", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(StringBooleanConverter))]
         public bool? Demo { get; set; } = null;

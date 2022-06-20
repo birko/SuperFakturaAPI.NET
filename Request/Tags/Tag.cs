@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Birko.SuperFaktura.Request.Invoice
+namespace Birko.SuperFaktura.Request.Tags
 {
     public class Tag: Data
     {

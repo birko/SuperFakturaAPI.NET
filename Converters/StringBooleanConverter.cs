@@ -3,6 +3,26 @@ using System;
 
 namespace Birko.SuperFaktura.Converters
 {
+
+    public class IntBooleanConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(bool) || objectType == typeof(bool?);
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            int value =(int)reader.Value;
+            return  value == 1 ? true : (object)false;
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            writer.WriteValue(value);
+        }
+    }
+
     public class StringBooleanConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)

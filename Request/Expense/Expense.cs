@@ -15,6 +15,10 @@ namespace Birko.SuperFaktura.Request.Expense
         public DateTime Created { get; set; } = DateTime.Now;
         [JsonProperty(PropertyName = "amount", NullValueHandling = NullValueHandling.Ignore)]
         public decimal Amount { get; set; }
+        [JsonProperty(PropertyName = "amount2", NullValueHandling = NullValueHandling.Ignore)]
+        public decimal Amount2 { get; set; }
+        [JsonProperty(PropertyName = "amount3", NullValueHandling = NullValueHandling.Ignore)]
+        public decimal Amount3 { get; set; }
         [JsonProperty(PropertyName = "expense_category_id", NullValueHandling = NullValueHandling.Ignore)]
         public int ExpenseCategoryID { get; internal set; }
         [JsonProperty(PropertyName = "type", NullValueHandling = NullValueHandling.Ignore)]
@@ -41,5 +45,17 @@ namespace Birko.SuperFaktura.Request.Expense
         public int DocumentNumber { get; internal set; }
         [JsonProperty(PropertyName = "attachment", NullValueHandling = NullValueHandling.Ignore)]
         public string Attachment { get; set; }
+        [JsonProperty(PropertyName = "payment_type", NullValueHandling = NullValueHandling.Ignore)]
+        public string PaymentType { get; set; } = Birko.SuperFaktura.Request.Invoice.CurrencyType.Euro;
+        [JsonProperty(PropertyName = "taxable_supply", NullValueHandling = NullValueHandling.Ignore)]
+        public DateTime? TaxableSupply { get; set; }
+
+        [JsonProperty(PropertyName = "vat", NullValueHandling = NullValueHandling.Ignore)]
+        public string VAT { get; set; }
+        [JsonProperty(PropertyName = "vat2", NullValueHandling = NullValueHandling.Ignore)]
+        public string VAT2 { get; set; }
+        [JsonProperty(PropertyName = "vat3", NullValueHandling = NullValueHandling.Ignore)]
+        public string VAT3 { get; set; }
+
     }
 }

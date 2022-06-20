@@ -11,7 +11,7 @@ namespace Birko.SuperFaktura.Request
         public string CheckSum { get; set; }
     }
 
-    public  class DataData : Data
+    public class DataData : Data
     {
         [JsonProperty(PropertyName = "data", NullValueHandling = NullValueHandling.Ignore)]
         public object Data { get; set; }

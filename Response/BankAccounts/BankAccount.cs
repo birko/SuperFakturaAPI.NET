@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace Birko.SuperFaktura.Response.Invoice
+namespace Birko.SuperFaktura.Response.BankAccounts
 {
-    public class BankAccount : Birko.SuperFaktura.Request.Invoice.BankAccount
+    public class BankAccount : Birko.SuperFaktura.Request.BankAccounts.BankAccount
     {
         [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
         public int ID { get; internal set; }

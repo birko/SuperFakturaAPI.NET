@@ -101,7 +101,7 @@ namespace Birko.SuperFaktura
                 var testResult = JsonConvert.DeserializeObject<Response<ExpandoObject>>(result);
                 if (testResult.Error != null && testResult.Error.Value > 0)
                 {
-                    var exception = new Exceptions.Exception(testResult.Error.Value, testResult.Message, testResult.ErrorMessage);
+                    var exception = new Exceptions.Exception(testResult.Error.Value, testResult.Message, testResult.ErrorMessage.ToString());
                     throw (exception);
                 }
             }
@@ -299,11 +299,41 @@ namespace Birko.SuperFaktura
             }
         }
 
+        internal async Task<byte[]> PostByte(string uri, string data, string checkSum = null)
+        {
+            RequestDelay();
+            var client = CreateClient();
+            HttpResponseMessage response = null;
+            try
+            {
+                IncreaseRequestCount(ProfileKey);
+                this.LastCheckSum = checkSum;
+                response = await client.PostAsync(uri, new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("data", data) })).ConfigureAwait(false);
+                ParseResponse(response);
+                if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+                }
+                return await Task.FromResult<byte[]>(null).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw HandleRequestException(uri, response, ex, data);
+            }
+        }
+
         internal async Task<string> Post(string uri, Request.Data data)
         {
             var checkSum = CheckSum(data);
             data.CheckSum = checkSum;
             return await Post(uri, JsonConvert.SerializeObject(data), checkSum).ConfigureAwait(false);
+        }
+
+        internal async Task<byte[]> PostByte(string uri, Request.Data data)
+        {
+            var checkSum = CheckSum(data);
+            data.CheckSum = checkSum;
+            return await PostByte(uri, JsonConvert.SerializeObject(data), checkSum).ConfigureAwait(false);
         }
 
         private string CheckSum(Request.Data data)
@@ -365,14 +395,43 @@ namespace Birko.SuperFaktura
 
     public class SuperFaktura : AbstractSuperFaktura
     {
+        private BankAccounts _bankAccounts = null;
+        private CashRegister _cashRegister = null;
         private Clients _clients = null;
+        private ContactPersons _contactPersons = null;
         private Expenses _expenses = null;
         private Invoices _invoices = null;
         private Stock _stock = null;
+        private Tags _tags = null;
+
+
+        public BankAccounts BankAccounts
+        {
+            get
+            {
+                return _bankAccounts ?? (_bankAccounts = new BankAccounts(this));
+            }
+        }
+
+        public CashRegister CashRegister
+        {
+            get
+            {
+                return _cashRegister ?? (_cashRegister = new CashRegister(this));
+            }
+        }
 
         public Clients Clients {
             get {
                 return _clients ?? (_clients = new Clients(this));
+            }
+        }
+
+        public ContactPersons ContactPersons
+        {
+            get
+            {
+                return _contactPersons ?? (_contactPersons = new ContactPersons(this));
             }
         }
 
@@ -396,6 +455,14 @@ namespace Birko.SuperFaktura
             }
         }
 
+
+        public Tags Tags
+        {
+            get
+            {
+                return _tags ?? (_tags = new Tags(this));
+            }
+        }
         public SuperFaktura(string email, string apiKey, string apptitle = null, string module = "API", int? companyId = null)
             : base(email,apiKey, apptitle, module, companyId)
         {
@@ -444,90 +511,6 @@ namespace Birko.SuperFaktura
             }
         }
 
-        public async Task<Dictionary<int, string>> GetTags()
-        {
-            var result = await Get("tags/index.json").ConfigureAwait(false);
-            try
-            {
-                return DeserializeResult<Dictionary<int, string>>(result);
-            }
-            catch (JsonSerializationException ex)
-            {
-                try
-                {
-                    var deserialized = DeserializeResult<string[]>(result);
-                    var data = new Dictionary<int, string>();
-                    int i  = 1;
-                    foreach(var tag in deserialized)
-                    {
-                        data.Add(i, tag);
-                        i++;
-                    }
-                    return data;
-                }
-                catch
-                {
-                    throw ex;
-                }
-            }
-        }
-
-        public async Task<Tag> AddTag(Request.Invoice.Tag tag)
-        {
-            var result = await Post("tags/add", tag).ConfigureAwait(false);
-            return DeserializeResult<Tag>(result);
-        }
-
-        public async Task<Tag> EditTag(int id, Request.Invoice.Tag tag)
-        {
-            var result = await Post(string.Format("tags/edit/{0}", id), tag).ConfigureAwait(false);
-            return DeserializeResult<Tag>(result);
-        }
-
-        public async Task<string> DeleteTag(int id)
-        {
-            var result = await Get(string.Format("tags/delete/{0}", id)).ConfigureAwait(false);
-            return result;
-        }
-        public async Task<Dictionary<int, BankAccount>> GetBankAccounts()
-        {
-            var result = await Get("bank_accounts/index").ConfigureAwait(false);
-            try
-            {
-                return DeserializeResult<Dictionary<int, BankAccount>>(result);
-            }
-            catch (JsonSerializationException ex)
-            {
-                try
-                {
-                    var deserialized = DeserializeResult<BankAccount[]>(result);
-                    return deserialized.ToDictionary(x => x.ID, x => x);
-                }
-                catch
-                {
-                    throw ex;
-                }
-            }
-        }
-
-        public async Task<BankAccount> AddBankAccount(Request.Invoice.BankAccount account)
-        {
-            var result = await Post("bank_accounts/add", account).ConfigureAwait(false);
-            return DeserializeResult<BankAccount>(result);
-        }
-
-        public async Task<BankAccount> EditBankAccount(int id, Request.Invoice.BankAccount account)
-        {
-            var result = await Post(string.Format("bank_accounts/update/{0}", id), account).ConfigureAwait(false);
-            return DeserializeResult<BankAccount>(result);
-        }
-
-        public async Task<string> DeleteBankAccount(int id)
-        {
-            var result = await Get(string.Format("bank_accounts/delete/{0}", id)).ConfigureAwait(false);
-            return result;
-        }
-
         public async Task<Logo[]> GetLogos()
         {
             var result = await Get("/users/logo").ConfigureAwait(false);
@@ -553,11 +536,6 @@ namespace Birko.SuperFaktura
             return DeserializeResult<Response<ExpandoObject[]>>(result);
         }
 
-        public async Task<Response<ExpandoObject>> CashRegister(int cashRegisterId, Request.PagedSearchParameters filter, bool listInfo = true)
-        {
-            var result = await Get(string.Format("/cash_register_items/index/{0}{1}", cashRegisterId, filter.ToParameters(listInfo))).ConfigureAwait(false);
-            return DeserializeResult<Response<ExpandoObject>>(result);
-        }
 
         public async Task<Response<ExpandoObject>> GetCourierData(string curierType, object data)
         {
@@ -589,7 +567,16 @@ namespace Birko.SuperFaktura
         public SuperFakturaAT(string email, string apiKey, string apptitle = null, string module = "API", int? companyId = null)
             : base(email, apiKey, apptitle, module, companyId)
         {
-            APIURL = "http://meine.superfaktura.at/";
+            APIURL = "https://meine.superfaktura.at/";
+        }
+    }
+
+    public class SuperFakturaSandbox : SuperFaktura
+    {
+        public SuperFakturaSandbox(string email, string apiKey, string apptitle = null, string module = "API", int? companyId = null)
+            : base(email, apiKey, apptitle, module, companyId)
+        {
+            APIURL = "https://sandbox.superfaktura.sk/";
         }
     }
 }

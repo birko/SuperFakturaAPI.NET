@@ -40,9 +40,9 @@ namespace Birko.SuperFaktura
             return superFaktura.DeserializeResult<Response<ExpandoObject>>(result);
         }
 
-        public async Task<Response<ListItem>> Save(Request.Expense.Expense expense)
+        public async Task<Response<ListItem>> Save(Request.Expense.Expense expense, Request.Expense.Extra extra = null)
         {
-            var result = await superFaktura.Post("/expenses/add", new ExpenseData { Expense = expense }).ConfigureAwait(false);
+            var result = await superFaktura.Post("/expenses/add", new ExpenseData { Expense = expense, ExpenseExtra = extra }).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<ListItem>>(result);
         }
 

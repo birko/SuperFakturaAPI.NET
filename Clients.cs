@@ -32,11 +32,5 @@ namespace Birko.SuperFaktura
             var result = await superFaktura.Post("clients/create", new ClientData { Client = client }).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<ListItem>>(result);
         }
-
-        public async Task<Response<Response.Client.ContactPerson>> AddContactPerson(Request.Client.ContactPerson person)
-        {
-            var result = await superFaktura.Post("/contact_people/add/api:1", new ContactPersonData { ContactPerson = person }).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Response<Response.Client.ContactPerson>>(result);
-        }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Birko.SuperFaktura.Response.Invoice
 {
-    public class Tag: Request.Invoice.Tag
+    public class Tag: Request.Tags.Tag
     {
         [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
         public int ID { get; internal set; }

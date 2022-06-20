@@ -9,6 +9,8 @@ namespace Birko.SuperFaktura.Request.Stock
         public string Description { get; set; }
         [JsonProperty(PropertyName = "hide_in_autocomplete", NullValueHandling = NullValueHandling.Ignore)]
         public bool? HideInAutoComplete { get; set; }
+        [JsonProperty(PropertyName = "internal_comment", NullValueHandling = NullValueHandling.Ignore)]
+        public string InternalComment { get; set; }
         [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
         public int? ID { get; internal set; }
         [JsonProperty(PropertyName = "name", NullValueHandling = NullValueHandling.Ignore)]

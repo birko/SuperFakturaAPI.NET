@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Dynamic;
 using System.Text;
 
 namespace Birko.SuperFaktura.Response
@@ -9,7 +10,7 @@ namespace Birko.SuperFaktura.Response
         [JsonProperty(PropertyName = "error", NullValueHandling = NullValueHandling.Ignore)]
         public int? Error { get; internal set; } = null;
         [JsonProperty(PropertyName = "error_message", NullValueHandling = NullValueHandling.Ignore)]
-        public string ErrorMessage { get; internal set; } = null;
+        public dynamic ErrorMessage { get; internal set; } = null;
         [JsonProperty(PropertyName = "message", NullValueHandling = NullValueHandling.Ignore)]
         public String Message { get; internal set; } = null;
         [JsonProperty(PropertyName = "data", NullValueHandling = NullValueHandling.Ignore)]

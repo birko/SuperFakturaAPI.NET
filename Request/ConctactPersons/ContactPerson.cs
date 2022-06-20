@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Birko.SuperFaktura.Request.Client
+namespace Birko.SuperFaktura.Request.ContactPersons
 {
     public class ContactPerson
     {
