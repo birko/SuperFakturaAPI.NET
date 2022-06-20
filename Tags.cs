@@ -23,13 +23,13 @@ namespace Birko.SuperFaktura
             var result = await superFaktura.Get("tags/index.json").ConfigureAwait(false);
             try
             {
-                return DeserializeResult<Dictionary<int, string>>(result);
+                return superFaktura.DeserializeResult<Dictionary<int, string>>(result);
             }
             catch (JsonSerializationException ex)
             {
                 try
                 {
-                    var deserialized = DeserializeResult<string[]>(result);
+                    var deserialized = superFaktura.DeserializeResult<string[]>(result);
                     var data = new Dictionary<int, string>();
                     int i = 1;
                     foreach (var tag in deserialized)
@@ -46,21 +46,16 @@ namespace Birko.SuperFaktura
             }
         }
 
-        private T DeserializeResult<T>(object result)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<Tag> AddTag(Tag tag)
         {
             var result = await superFaktura.Post("tags/add", tag).ConfigureAwait(false);
-            return DeserializeResult<Tag>(result);
+            return superFaktura.DeserializeResult<Tag>(result);
         }
 
         public async Task<Tag> EditTag(int id, Tag tag)
         {
             var result = await superFaktura.Post(string.Format("tags/edit/{0}", id), tag).ConfigureAwait(false);
-            return DeserializeResult<Tag>(result);
+            return superFaktura.DeserializeResult<Tag>(result);
         }
 
         public async Task<string> DeleteTag(int id)

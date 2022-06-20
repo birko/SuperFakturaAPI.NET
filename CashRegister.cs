@@ -1,7 +1,4 @@
 ﻿using Birko.SuperFaktura.Request;
-using Birko.SuperFaktura.Request;
-using Birko.SuperFaktura.Response;
-using Birko.SuperFaktura.Response.BankAccounts;
 using Birko.SuperFaktura.Response;
 using Newtonsoft.Json;
 using System;
