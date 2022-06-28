@@ -25,7 +25,7 @@ namespace Birko.SuperFaktura
             {
                 return superFaktura.DeserializeResult<Dictionary<int, string>>(result);
             }
-            catch (JsonSerializationException ex)
+            catch (Birko.SuperFaktura.Exceptions.ParseException ex)
             {
                 try
                 {
@@ -39,7 +39,7 @@ namespace Birko.SuperFaktura
                     }
                     return data;
                 }
-                catch
+                catch (Exception e)
                 {
                     throw ex;
                 }

@@ -89,7 +89,7 @@ namespace Birko.SuperFaktura
             }
             catch (Exception ex)
             {
-                var exception = new Exceptions.ParseException(ex.Message, string.Format("Returned Response: {0}", result));
+                var exception = new Exceptions.ParseException(ex.Message, string.Format("Returned Response: {0}", result), ex);
                 throw (exception);
             }
         }
@@ -107,8 +107,15 @@ namespace Birko.SuperFaktura
             }
             catch (Exception ex)
             {
-                var exception = new Exceptions.ParseException(ex.Message, string.Format("Returned Response: {0}", result));
-                throw (exception);
+                try
+                {
+                    var testResult = JsonConvert.DeserializeObject<string[]>(result);
+                }
+                catch
+                {
+                    var exception = new Exceptions.ParseException(ex.Message, string.Format("Returned Response: {0}", result));
+                    throw (exception);
+                }
             }
         }
 
