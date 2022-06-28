@@ -31,6 +31,15 @@ namespace SuperFaktura.Tests
             clients.ShouldNotBe(null);
         }
 
+
+
+        [Fact]
+        public async Task TestTags()
+        {
+            var tags = await this.apiClient.Tags.GetTags();
+            tags.ShouldNotBe(null);
+        }
+
         [Fact]
         public async Task TestCountries()
         {
