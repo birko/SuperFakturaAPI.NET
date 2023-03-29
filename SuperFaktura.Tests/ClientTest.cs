@@ -101,7 +101,7 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestStock()
         {
-            var response = await this.apiClient.Stock.Save(new Birko.SuperFaktura.Request.Stock.Item() { 
+            var task = await this.apiClient.Stock.Save(new Birko.SuperFaktura.Request.Stock.Item() { 
                  Description = "Test desc",
                  Name = "test",
                  SKU="test0001",
@@ -111,6 +111,7 @@ namespace SuperFaktura.Tests
                  WatchStock = true,
                  PurchaseUnitPrice = 1,
             });
+            task.Error.ShouldBe(0);
         }
     }
 }
