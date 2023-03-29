@@ -97,5 +97,20 @@ namespace SuperFaktura.Tests
             var task = await this.apiClient.Invoices.Save(sfinvoice, client, items.ToArray());
             task.Error.ShouldBe(0);
         }
+
+        [Fact]
+        public async Task TestStock()
+        {
+            var response = await this.apiClient.Stock.Save(new Birko.SuperFaktura.Request.Stock.Item() { 
+                 Description = "Test desc",
+                 Name = "test",
+                 SKU="test0001",
+                 Unit= "ks",
+                 UnitPrice = 1,
+                 VAT = 20,
+                 WatchStock = true,
+                 PurchaseUnitPrice = 1,
+            });
+        }
     }
 }
