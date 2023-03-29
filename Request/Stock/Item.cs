@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Birko.SuperFaktura.Request.Stock
 {
-    public class Item: Data
+    public class Item : Data
     {
         [JsonProperty(PropertyName = "description", NullValueHandling = NullValueHandling.Ignore)]
         public string Description { get; set; }
@@ -23,6 +23,9 @@ namespace Birko.SuperFaktura.Request.Stock
         public string Unit { get; set; }
         [JsonProperty(PropertyName = "unit_price", NullValueHandling = NullValueHandling.Ignore)]
         public decimal UnitPrice { get; set; }
+
+        [JsonProperty(PropertyName = "purchase_unit_price", NullValueHandling = NullValueHandling.Ignore)]
+        public float PurchaseUnitPrice { get; set; }
         [JsonProperty(PropertyName = "vat", NullValueHandling = NullValueHandling.Ignore)]
         public decimal VAT { get; set; }
         [JsonProperty(PropertyName = "watch_stock", NullValueHandling = NullValueHandling.Ignore)]

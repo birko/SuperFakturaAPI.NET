@@ -1,4 +1,5 @@
-﻿using Birko.SuperFaktura.Request.Stock;
+﻿using Birko.SuperFaktura.Request;
+using Birko.SuperFaktura.Request.Stock;
 using Birko.SuperFaktura.Response;
 using Birko.SuperFaktura.Response.Stock;
 using System.Collections.Generic;
@@ -38,13 +39,13 @@ namespace Birko.SuperFaktura
 
         public async Task<Response<Detail>> Save(Request.Stock.Item item)
         {
-            var result = await superFaktura.Post("stock_items/add", item).ConfigureAwait(false);
+            var result = await superFaktura.Post("stock_items/add", new StockItemData () { StockItem = item }).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<Detail>>(result);
         }
 
         public async Task<Response<Detail>> Edit(Request.Stock.Item item)
         {
-            var result = await superFaktura.Post("stock_items/edit", item).ConfigureAwait(false);
+            var result = await superFaktura.Post("stock_items/edit", new StockItemData() { StockItem = item }).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<Detail>>(result);
         }
 

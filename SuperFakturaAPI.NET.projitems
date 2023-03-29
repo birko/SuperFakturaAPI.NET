@@ -16,6 +16,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Request\Expense\Extra.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\Export.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ContactPersons.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Request\Stock\StockItemData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\CashRegister\PagedResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tags.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Clients.cs" />
