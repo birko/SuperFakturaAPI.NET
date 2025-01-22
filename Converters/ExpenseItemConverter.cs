@@ -27,16 +27,24 @@ namespace Birko.SuperFaktura.Converters
                     switch (lastPath)
                     {
                         case "Client":
-                            item.Client = (Response.Client.Client)serializer.Deserialize(reader, typeof(Response.Client.Client));
+                            item.Client = (reader.TokenType != JsonToken.StartArray)
+                                    ? (Response.Client.Client)serializer.Deserialize(reader, typeof(Response.Client.Client))
+                                    : null;
                             break;
                         case "Document":
-                            item.Document = (Document)serializer.Deserialize(reader, typeof(Document));
+                            item.Document = (reader.TokenType != JsonToken.StartArray)
+                                ? (Document)serializer.Deserialize(reader, typeof(Document))
+                                : null;
                             break;
                         case "Expense":
-                            item.Expense = (Expense)serializer.Deserialize(reader, typeof(Expense));
+                            item.Expense = (reader.TokenType != JsonToken.StartArray)
+                                ? (Expense)serializer.Deserialize(reader, typeof(Expense))
+                                : null;
                             break;
                         case "ExpenseCategory":
-                            item.ExpenseCategory = (Category)serializer.Deserialize(reader, typeof(Category));
+                            item.ExpenseCategory = (reader.TokenType != JsonToken.StartArray)
+                                ? (Category)serializer.Deserialize(reader, typeof(Category))
+                                : null;
                             break;
                         default:
                             if (int.TryParse(path.LastOrDefault(), out int _))

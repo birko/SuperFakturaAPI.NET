@@ -1,28 +1,112 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Dynamic;
+using System.Linq;
 using System.Text;
 
 namespace Birko.SuperFaktura.Response
 {
-    public class Response<T>
+    public class ErrorResponse
     {
         [JsonProperty(PropertyName = "error", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.StringIntConverter))]
         public int? Error { get; internal set; } = null;
+
+        public override string ToString()
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine($"Error: {Error}");
+
+            return builder.ToString();
+        }
+    }
+
+    public class ErrorMessageResponse: ErrorResponse
+    {
         [JsonProperty(PropertyName = "error_message", NullValueHandling = NullValueHandling.Ignore)]
-        public dynamic ErrorMessage { get; internal set; } = null;
+        public string ErrorMessage { get; internal set; } = null;
+
+        public override string ToString()
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine($"ErrorMessage: {ErrorMessage}");
+
+            return builder.ToString();
+        }
+    }
+
+    public class TagResponse : ErrorMessageResponse
+    {
+        [JsonProperty(PropertyName = "Tag", NullValueHandling = NullValueHandling.Ignore)]
+        public IEnumerable<int> Tag { get; set; }
+
+        public override string ToString()
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine(base.ToString());
+            builder.AppendLine($"Tag: {Tag?.Count()}");
+
+            return builder.ToString();
+        }
+    }
+
+    public class StringMessageResponse  : ErrorMessageResponse
+    {
         [JsonProperty(PropertyName = "message", NullValueHandling = NullValueHandling.Ignore)]
-        public String Message { get; internal set; } = null;
+        public string Message { get; internal set; } = null;
+
+        public override string ToString()
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine(base.ToString());
+            builder.AppendLine($"Message: {Message}");
+
+            return builder.ToString();
+        }
+    }
+
+    public class RedirectResponse : StringMessageResponse
+    {
+        [JsonProperty(PropertyName = "redirect_url", NullValueHandling = NullValueHandling.Ignore)]
+        public string RedirectURL { get; internal set; } = null;
+
+        public override string ToString()
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine(base.ToString());
+            builder.AppendLine($"RedirectURL: {RedirectURL}");
+
+            return builder.ToString();
+        }
+    }
+
+    public class Response<T> : StringMessageResponse
+    {
         [JsonProperty(PropertyName = "data", NullValueHandling = NullValueHandling.Ignore)]
         public T Data { get; internal set; }
 
         public override string ToString()
         {
             StringBuilder builder = new StringBuilder();
-            builder.Append("{\n");
-            builder.AppendFormat(" Error: {0}, \n ErrorMessage: {1}, \n Message: {2}, \n", Error, ErrorMessage, Message);
-            builder.AppendFormat(" Data: {0}\n ", (Data != null) ? Data.ToString() : "NULL");
-            builder.Append("}");
+            builder.AppendLine(base.ToString());
+            builder.AppendLine($"Data: {((Data != null) ? Data.ToString() : "NULL")}");
+
+            return builder.ToString();
+        }
+    }
+
+    public class StateResponse<T> : Response<T>
+    {
+        [JsonProperty(PropertyName = "state", NullValueHandling = NullValueHandling.Ignore)]
+        public string State { get; internal set; }
+
+        public override string ToString()
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine(base.ToString());
+            builder.AppendLine($"State: {State}");
 
             return builder.ToString();
         }

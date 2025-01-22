@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Birko.SuperFaktura.Request
 {
@@ -15,5 +16,10 @@ namespace Birko.SuperFaktura.Request
     {
         [JsonProperty(PropertyName = "data", NullValueHandling = NullValueHandling.Ignore)]
         public object Data { get; set; }
+    }
+
+    public class  TagData : Data
+    {
+        public IEnumerable<int> Tag { get; set; }
     }
 }

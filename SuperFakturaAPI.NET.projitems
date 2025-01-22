@@ -9,15 +9,32 @@
     <Import_RootNamespace>Birko.SuperFaktura</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)CashRegister.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\ZeroObjectConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\StringIntConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Logs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CashRegisters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BankAccounts.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\CashRegister\CashRegisterItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\CashRegister\Filter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Request\Expense\ExpenseItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Expense\Extra.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\Export.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ContactPersons.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Request\Logs\ActivityLog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Request\Logs\Constants.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Stock\StockItemData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\BankAccounts\BankAccounts.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\CashRegister\EetReceipt.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\CashRegister\Summary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\CashRegister\CashRegisterItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\CashRegister\CashRegisterItemResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\CashRegister\PagedResponse.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\Expense\Extra.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\Expense\ExpenseBasicRate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\Expense\ExpenseItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\Logs\ActivityLogItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\Logs\ActivityLog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\Logs\User.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tags.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Clients.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\ClientItemConverter.cs" />
@@ -123,7 +140,6 @@
     <Folder Include="$(MSBuildThisFileDirectory)Request\BankAccounts\" />
     <Folder Include="$(MSBuildThisFileDirectory)Request\Tags\" />
     <Folder Include="$(MSBuildThisFileDirectory)Response\ConctactPersons\" />
-    <Folder Include="$(MSBuildThisFileDirectory)Response\BankAccounts\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Response\CashRegister\CashRegister.cs" />

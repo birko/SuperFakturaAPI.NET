@@ -1,6 +1,8 @@
-﻿using Birko.SuperFaktura.Request.Expense;
+﻿using Birko.SuperFaktura.Request.Client;
+using Birko.SuperFaktura.Request.Expense;
 using Birko.SuperFaktura.Response;
 using Birko.SuperFaktura.Response.Expense;
+using System.Collections.Generic;
 using System.Dynamic;
 using System.Threading.Tasks;
 
@@ -13,12 +15,6 @@ namespace Birko.SuperFaktura
         public Expenses(AbstractSuperFaktura superFaktura)
         {
             this.superFaktura = superFaktura;
-        }
-
-        public async Task<Response<ExpandoObject>> Get(int ID)
-        {
-            var result = await superFaktura.Get(string.Format("expense/edit/{0}.json", ID)).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Response<ExpandoObject>>(result);
         }
 
         public async Task<PagedResponse> Get(Filter filter, bool listInfo = true)
@@ -34,16 +30,23 @@ namespace Birko.SuperFaktura
             }
         }
 
+        public async Task<Response<ExpandoObject>> Get(int ID)
+        {
+            var result = await superFaktura.Get(string.Format("expense/edit/{0}.json", ID)).ConfigureAwait(false);
+            return superFaktura.DeserializeResult<Response<ExpandoObject>>(result);
+        }
+
         public async Task<Response<ExpandoObject>> Delete(int ID)
         {
             var result = await superFaktura.Get(string.Format("expenses/delete/{0}", ID)).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<ExpandoObject>>(result);
         }
 
-        public async Task<Response<ListItem>> Save(Request.Expense.Expense expense, Request.Expense.Extra extra = null)
+        public async Task<ListItem> Add(Request.Expense.Expense expense, IEnumerable<Request.Expense.ExpenseItem> items = null, Client client= null, Extra extra = null, IEnumerable<int> tags = null)
         {
-            var result = await superFaktura.Post("/expenses/add", new ExpenseData { Expense = expense, ExpenseExtra = extra }).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Response<ListItem>>(result);
+            var result = await superFaktura.Post("/expenses/add", new ExpenseData { Expense = expense, ExpenseExtra = extra, Tag = tags }).ConfigureAwait(false);
+            var data = superFaktura.DeserializeResult<Response<ListItem>>(result);
+            return data.Data;
         }
 
         public async Task<Response<ListItem>> Edit(Request.Expense.Expense expense)

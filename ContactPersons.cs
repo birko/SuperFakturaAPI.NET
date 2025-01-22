@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Birko.SuperFaktura
@@ -18,22 +19,24 @@ namespace Birko.SuperFaktura
             this.superFaktura = superFaktura;
         }
 
-        public async Task<Response<Response.ContactPersons.ContactPerson>> Add(Request.ContactPersons.ContactPerson person)
-        {
-            var result = await superFaktura.Post("/contact_people/add/api:1", new ContactPersonData { ContactPerson = person }).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Response<Response.ContactPersons.ContactPerson>>(result);
-        }
-
-        public async Task<Response<Response.ContactPersons.ContactPerson[]>> List(int id)
+        public async Task<IEnumerable<Response.ContactPersons.ContactPerson>> List(int id)
         {
             var result = await superFaktura.Get("/contact_people/getContactPeople/" + id).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Response<Response.ContactPersons.ContactPerson[]>>(result);
+            var data = superFaktura.DeserializeResult<IEnumerable<Item>>(result);
+            return data.Select(x => x.ContactPerson);
         }
 
-        public async Task<Response<ExpandoObject>> Delete(int id)
+        public async Task<Response.ContactPersons.ContactPerson> Add(Request.ContactPersons.ContactPerson person)
+        {
+            var result = await superFaktura.Post("/contact_people/add/api:1", new ContactPersonData { ContactPerson = person }).ConfigureAwait(false);
+            var data = superFaktura.DeserializeResult<StateResponse<Item>>(result);
+            return data.Data.ContactPerson;
+        }
+
+        public async Task<ErrorResponse> Delete(int id)
         {
             var result = await superFaktura.Get("/contact_people/delete/" +  id).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Response<ExpandoObject>>(result);
+            return superFaktura.DeserializeResult<ErrorResponse>(result);
         }
     }
 }

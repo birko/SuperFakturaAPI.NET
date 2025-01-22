@@ -4,10 +4,17 @@ using System;
 
 namespace Birko.SuperFaktura.Request.Invoice
 {
-    public class Invoice
+    public class InvoiceBasic
     {
         [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
         public int? ID { get; internal set; }
+
+        [JsonProperty(PropertyName = "invoice_no_formatted", NullValueHandling = NullValueHandling.Ignore)]
+        public string InvoiceNoFormatted { get; set; }
+    }
+
+    public class Invoice : InvoiceBasic
+    {
         [JsonProperty(PropertyName = "already_paid", NullValueHandling = NullValueHandling.Ignore)]
         public bool? AlreadyPaid { get; set; } = null;
         [JsonProperty(PropertyName = "created", NullValueHandling = NullValueHandling.Ignore)]
@@ -38,8 +45,6 @@ namespace Birko.SuperFaktura.Request.Invoice
         public string InternalComment { get; set; }
         [JsonProperty(PropertyName = "invoice_currency", NullValueHandling = NullValueHandling.Ignore)]
         public string InvoiceCurrency { get; set; } = Birko.SuperFaktura.Request.Invoice.CurrencyType.Euro;
-        [JsonProperty(PropertyName = "invoice_no_formatted", NullValueHandling = NullValueHandling.Ignore)]
-        public string InvoiceNoFormatted { get; set; }
         [JsonProperty(PropertyName = "issued_by", NullValueHandling = NullValueHandling.Ignore)]
         public string IssuedBy { get; set; }
         [JsonProperty(PropertyName = "issued_by_phone", NullValueHandling = NullValueHandling.Ignore)]

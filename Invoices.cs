@@ -86,8 +86,8 @@ namespace Birko.SuperFaktura
         {
             var result = await superFaktura.PostByte("/exports", new Request.DataData
             {
-                Data = new { 
-                    Invoice = new { 
+                Data = new {
+                    Invoice = new {
                         ids = invoiceIds
                     },
                     Export = export

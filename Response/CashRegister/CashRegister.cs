@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace Birko.SuperFaktura.Response.CashRegister
 {
-    public class CashRegisterItem {
+    public class CashRegisterData {
         [JsonProperty(PropertyName = "CashRegister", NullValueHandling = NullValueHandling.Ignore)]
         public CashRegister CashRegister { get; internal set; }
     }
@@ -24,9 +24,6 @@ namespace Birko.SuperFaktura.Response.CashRegister
         [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
         public int? ID { get; internal set; }
 
-        [JsonProperty(PropertyName = "id_provoz", NullValueHandling = NullValueHandling.Ignore)]
-        public int? IDProvoz { get; internal set; }
-
         [JsonProperty(PropertyName = "name", NullValueHandling = NullValueHandling.Ignore)]
         public string Name { get; internal set; }
 
@@ -42,6 +39,6 @@ namespace Birko.SuperFaktura.Response.CashRegister
         public int? UserID { get; internal set; }
 
         [JsonProperty(PropertyName = "user_profile_id", NullValueHandling = NullValueHandling.Ignore)]
-        public int? user_profile_id { get; internal set; }
+        public int? UserProfileID { get; internal set; }
     }
 }

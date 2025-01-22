@@ -14,6 +14,6 @@ namespace Birko.SuperFaktura.Response.Invoice
         [JsonProperty(PropertyName = "country", NullValueHandling = NullValueHandling.Ignore)]
         public Country Country { get; set; }
         [JsonProperty(PropertyName = "BankAccount", NullValueHandling = NullValueHandling.Ignore)]
-        public Response.BankAccounts.BankAccount[] BankAccount { get; set; }
+        public BankAccounts.BankAccount[] BankAccount { get; set; }
     }
 }

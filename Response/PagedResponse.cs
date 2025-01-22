@@ -44,6 +44,9 @@ namespace Birko.SuperFaktura.Response
 
     public class DynamicResponse : PagedResponse<ExpandoObject>
     {
+        [JsonProperty(PropertyName = "error", NullValueHandling = NullValueHandling.Ignore)]
+        public string Error { get; set; }
+
         [JsonProperty(PropertyName = "items", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(ItemListConverter<ExpandoObject>))]
         public override ItemList<ExpandoObject> Items { get; set; }

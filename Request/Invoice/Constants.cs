@@ -80,13 +80,19 @@
     public static class PaymentType
     {
         public const string BankTransfer = "transfer";
+        public const string Barion = "barion";
+        public const string Besteron = "besteron";
         public const string Cash = "cash";
-        public const string PayPal = "paypal";
-        public const string TrustPay = "trustpay";
+        public const string Card = "card";
+        public const string CashOnDelivery = "cod";
         public const string CreditCard = "credit";
         public const string DebitCard = "debit";
-        public const string CashOnDelivery = "cod";
+        public const string GoPay = "gopay";
+        public const string Other = "other";
+        public const string PayPal = "paypal";
+        public const string TrustPay = "trustpay";
         public const string MutalAccreditation = "accreditation";
+        public const string Viamo = "viamo";
     }
 
     public static class StatusType

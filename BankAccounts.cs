@@ -1,4 +1,6 @@
-﻿using Birko.SuperFaktura.Response.BankAccounts;
+﻿using Birko.SuperFaktura.Request;
+using Birko.SuperFaktura.Response;
+using Birko.SuperFaktura.Response.BankAccounts;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -17,43 +19,31 @@ namespace Birko.SuperFaktura
             this.superFaktura = superFaktura;
         }
 
-        public async Task<Dictionary<int, BankAccount>> GetBankAccounts()
+        public async Task<IEnumerable<BankAccount>> List()
         {
             var result = await superFaktura.Get("bank_accounts/index").ConfigureAwait(false);
-            try
-            {
-                return superFaktura.DeserializeResult<Dictionary<int, BankAccount>>(result);
-            }
-            catch (JsonSerializationException ex)
-            {
-                try
-                {
-                    var deserialized = superFaktura.DeserializeResult<BankAccount[]>(result);
-                    return deserialized.ToDictionary(x => x.ID, x => x);
-                }
-                catch
-                {
-                    throw ex;
-                }
-            }
+            var deserialized = superFaktura.DeserializeResult<Response.BankAccounts.BankAccounts>(result);
+            return deserialized.Accounts.Select(x => x.BankAccount);
         }
 
-        public async Task<BankAccount> AddBankAccount(Request.BankAccounts.BankAccount account)
+        public async Task<BankAccount> Add(Request.BankAccounts.BankAccount account)
         {
             var result = await superFaktura.Post("bank_accounts/add", account).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<BankAccount>(result);
+            var data = superFaktura.DeserializeResult<BankAccountData>(result);
+            return data.BankAccount;
         }
 
-        public async Task<BankAccount> EditBankAccount(int id, Request.BankAccounts.BankAccount account)
+        public async Task<BankAccount> Edit(int id, Request.BankAccounts.BankAccount account)
         {
             var result = await superFaktura.Post(string.Format("bank_accounts/update/{0}", id), account).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<BankAccount>(result);
+            var data = superFaktura.DeserializeResult<EditBankAccountResponse>(result);
+            return data.Message?.BankAccount;
         }
 
-        public async Task<string> DeleteBankAccount(int id)
+        public async Task<StringMessageResponse> Delete(int id)
         {
             var result = await superFaktura.Get(string.Format("bank_accounts/delete/{0}", id)).ConfigureAwait(false);
-            return result;
+            return superFaktura.DeserializeResult<StringMessageResponse>(result);
         }
     }
 }

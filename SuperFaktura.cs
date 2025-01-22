@@ -1,5 +1,5 @@
-﻿using Birko.SuperFaktura.Response;
-using Birko.SuperFaktura.Response.Invoice;
+﻿using Birko.SuperFaktura.Request;
+using Birko.SuperFaktura.Response;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -98,23 +98,32 @@ namespace Birko.SuperFaktura
         {
             try
             {
-                var testResult = JsonConvert.DeserializeObject<Response<ExpandoObject>>(result);
+                var testResult = JsonConvert.DeserializeObject<ErrorMessageResponse>(result);
                 if (testResult.Error != null && testResult.Error.Value > 0)
                 {
-                    var exception = new Exceptions.Exception(testResult.Error.Value, testResult.Message, testResult.ErrorMessage.ToString());
+                    var testMessageResult = JsonConvert.DeserializeObject<StringMessageResponse>(result);
+                    var exception = new Exceptions.Exception(testResult.Error.Value, testMessageResult.Message, testResult.ErrorMessage.ToString());
                     throw (exception);
                 }
             }
             catch (Exception ex)
             {
+                //Test if response is not an array;
                 try
                 {
-                    var testResult = JsonConvert.DeserializeObject<string[]>(result);
+                    var testResult = JsonConvert.DeserializeObject<ExpandoObject[]>(result);
                 }
                 catch
                 {
-                    var exception = new Exceptions.ParseException(ex.Message, string.Format("Returned Response: {0}", result));
-                    throw (exception);
+                    try
+                    {
+                        var testResult = JsonConvert.DeserializeObject<string[]>(result);
+                    }
+                    catch
+                    {
+                        var exception = new Exceptions.ParseException(ex.Message, string.Format("Returned Response: {0}", result));
+                        throw (exception);
+                    }
                 }
             }
         }
@@ -329,18 +338,86 @@ namespace Birko.SuperFaktura
             }
         }
 
-        internal async Task<string> Post(string uri, Request.Data data)
+        internal async Task<string> Post(string uri, object data)
         {
-            var checkSum = CheckSum(data);
-            data.CheckSum = checkSum;
+            string checkSum = null;
+            if (data is Data dataData)
+            {
+                checkSum = CheckSum(dataData);
+                dataData.CheckSum = checkSum;
+            }
             return await Post(uri, JsonConvert.SerializeObject(data), checkSum).ConfigureAwait(false);
         }
 
-        internal async Task<byte[]> PostByte(string uri, Request.Data data)
+        internal async Task<byte[]> PostByte(string uri, object data)
         {
-            var checkSum = CheckSum(data);
-            data.CheckSum = checkSum;
+            string checkSum = null;
+            if (data is Data dataData)
+            {
+                checkSum = CheckSum(dataData);
+                dataData.CheckSum = checkSum;
+            }
             return await PostByte(uri, JsonConvert.SerializeObject(data), checkSum).ConfigureAwait(false);
+        }
+
+        internal async Task<string> Patch(string uri, string data, string checkSum = null)
+        {
+            RequestDelay();
+            var client = CreateClient();
+            HttpResponseMessage response = null;
+            try
+            {
+                IncreaseRequestCount(ProfileKey);
+                this.LastCheckSum = checkSum;
+                HttpRequestMessage request = new HttpRequestMessage(new HttpMethod("PATCH"), uri)
+                {
+                    Content = new StringContent(data, Encoding.UTF8, "application/json")
+                };
+                response = await client.SendAsync(request).ConfigureAwait(false);
+                ParseResponse(response);
+                if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                }
+                return await Task.FromResult<string>(null).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw HandleRequestException(uri, response, ex, data);
+            }
+        }
+
+        internal async Task<string> Patch(string uri, object data)
+        {
+            string checkSum = null;
+            if (data is Data dataData)
+            {
+                checkSum = CheckSum(dataData);
+                dataData.CheckSum = checkSum;
+            }
+            return await Patch(uri, JsonConvert.SerializeObject(data), checkSum).ConfigureAwait(false);
+        }
+
+        internal async Task<string> Delete(string uri)
+        {
+            RequestDelay();
+            var client = CreateClient();
+            HttpResponseMessage response = null;
+            try
+            {
+                IncreaseRequestCount(ProfileKey);
+                response = await client.DeleteAsync(uri).ConfigureAwait(false);
+                ParseResponse(response);
+                if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                }
+                return await Task.FromResult<string>(null).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw HandleRequestException(uri, response, ex);
+            }
         }
 
         private string CheckSum(Request.Data data)
@@ -403,7 +480,7 @@ namespace Birko.SuperFaktura
     public class SuperFaktura : AbstractSuperFaktura
     {
         private BankAccounts _bankAccounts = null;
-        private CashRegister _cashRegister = null;
+        private CashRegisters _cashRegisters = null;
         private Clients _clients = null;
         private ContactPersons _contactPersons = null;
         private Expenses _expenses = null;
@@ -420,11 +497,11 @@ namespace Birko.SuperFaktura
             }
         }
 
-        public CashRegister CashRegister
+        public CashRegisters CashRegisters
         {
             get
             {
-                return _cashRegister ?? (_cashRegister = new CashRegister(this));
+                return _cashRegisters ?? (_cashRegisters = new CashRegisters(this));
             }
         }
 
@@ -528,7 +605,7 @@ namespace Birko.SuperFaktura
         {
             var result = await Post("/users/create", new Request.UserData
             {
-                User = new User
+                User = new Request.User
                 {
                     Email = email,
                     SendEmail = sendEmail
