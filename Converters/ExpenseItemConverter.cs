@@ -1,6 +1,10 @@
 ﻿using Birko.SuperFaktura.Response.Expense;
+using Birko.SuperFaktura.Response.ValueLists;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 
 namespace Birko.SuperFaktura.Converters
@@ -14,7 +18,7 @@ namespace Birko.SuperFaktura.Converters
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            ListItem item = new ListItem();
+            Detail item = new Detail();
             string startPath = reader.Path;
             do
             {
@@ -46,10 +50,42 @@ namespace Birko.SuperFaktura.Converters
                                 ? (Category)serializer.Deserialize(reader, typeof(Category))
                                 : null;
                             break;
+                        case "ExpenseBasicRate":
+                            item.ExpenseBasicRate = (IEnumerable<ExpenseBasicRate>)serializer.Deserialize(reader, typeof(IEnumerable<ExpenseBasicRate>));
+                            break;
+                        case "ExpenseExtra":
+                            item.ExpenseExtra = (reader.TokenType != JsonToken.StartArray)
+                                ? (Extra)serializer.Deserialize(reader, typeof(Extra))
+                                : null;
+                            break;
+                        case "ExpenseItem":
+                            item.ExpenseItem = (IEnumerable<ExpenseItem>)serializer.Deserialize(reader, typeof(IEnumerable<ExpenseItem>));
+                            break;
+                        case "ExpensePayment":
+                            item.ExpensePayment = (IEnumerable<Payment>)serializer.Deserialize(reader, typeof(IEnumerable<Payment>));
+                            break;
+                        case "MyData":
+                            item.MyData = (reader.TokenType != JsonToken.StartArray)
+                                ? (MyData)serializer.Deserialize(reader, typeof(MyData))
+                                : null;
+                            break;
+                        case "RelatedItem":
+                            item.RelatedItem = (IEnumerable<RelatedItem>)serializer.Deserialize(reader, typeof(IEnumerable<RelatedItem>));
+                            break;
+                        case "Tag":
+                            item.Tag = (IEnumerable<int>)serializer.Deserialize(reader, typeof(IEnumerable<int>));
+                            break;
+                        case "VatSummary":
+                            item.VATSummary = (IEnumerable<VATSummary>)serializer.Deserialize(reader, typeof(IEnumerable<VATSummary>));
+                            break;
+                        case "attachments":
+                            item.Attachments = (IEnumerable<ExpandoObject>)serializer.Deserialize(reader, typeof(IEnumerable<ExpandoObject>));
+                            break;
                         default:
                             if (int.TryParse(path.LastOrDefault(), out int _))
                             {
-                                item.Add((Stats)serializer.Deserialize(reader, typeof(Stats)));
+                                throw new ArgumentException($"Path '{lastPath}'  id notdefined");
+                                //item.Add((Stats)serializer.Deserialize(reader, typeof(Stats)));
                             }
                             break;
                     }

@@ -1,6 +1,7 @@
 ﻿using Birko.SuperFaktura.Converters;
 using Newtonsoft.Json;
 using System;
+using System.Globalization;
 
 namespace Birko.SuperFaktura.Response.Invoice
 {
@@ -52,7 +53,7 @@ namespace Birko.SuperFaktura.Response.Invoice
         [JsonProperty(PropertyName = "tags", NullValueHandling = NullValueHandling.Ignore)]
         public string Tags { get; set; }
         [JsonProperty(PropertyName = "home_currency", NullValueHandling = NullValueHandling.Ignore)]
-        public string HomeCurrency { get; set; } = Birko.SuperFaktura.Request.Invoice.CurrencyType.Euro;
+        public string HomeCurrency { get; set; } = RegionInfo.CurrentRegion.ISOCurrencySymbol;
         [JsonProperty(PropertyName = "exchange_rate", NullValueHandling = NullValueHandling.Ignore)]
         public decimal ExchangeRate { get; set; } = 1;
         [JsonProperty(PropertyName = "amount", NullValueHandling = NullValueHandling.Ignore)]

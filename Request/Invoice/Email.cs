@@ -18,6 +18,6 @@ namespace Birko.SuperFaktura.Request.Invoice
         [JsonProperty(PropertyName = "body", NullValueHandling = NullValueHandling.Ignore)]
         public string Body { get; set; } = string.Empty;
         [JsonProperty(PropertyName = "pdf_language", NullValueHandling = NullValueHandling.Ignore)]
-        public string PDFLanguage { get; set; } = LanguageType.Slovak;
+        public string PDFLanguage { get; set; } = ValueLists.LanguageType.Slovak;
     }
 }

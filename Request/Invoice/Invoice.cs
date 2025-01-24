@@ -1,6 +1,7 @@
 ﻿using Birko.SuperFaktura.Request.BankAccounts;
 using Newtonsoft.Json;
 using System;
+using System.Globalization;
 
 namespace Birko.SuperFaktura.Request.Invoice
 {
@@ -44,7 +45,7 @@ namespace Birko.SuperFaktura.Request.Invoice
         [JsonProperty(PropertyName = "internal_comment", NullValueHandling = NullValueHandling.Ignore)]
         public string InternalComment { get; set; }
         [JsonProperty(PropertyName = "invoice_currency", NullValueHandling = NullValueHandling.Ignore)]
-        public string InvoiceCurrency { get; set; } = Birko.SuperFaktura.Request.Invoice.CurrencyType.Euro;
+        public string InvoiceCurrency { get; set; } = RegionInfo.CurrentRegion.ISOCurrencySymbol;
         [JsonProperty(PropertyName = "issued_by", NullValueHandling = NullValueHandling.Ignore)]
         public string IssuedBy { get; set; }
         [JsonProperty(PropertyName = "issued_by_phone", NullValueHandling = NullValueHandling.Ignore)]
@@ -58,19 +59,19 @@ namespace Birko.SuperFaktura.Request.Invoice
         [JsonProperty(PropertyName = "paydate", NullValueHandling = NullValueHandling.Ignore)]
         public DateTime? PayDate { get; set; } = null;
         [JsonProperty(PropertyName = "payment_type", NullValueHandling = NullValueHandling.Ignore)]
-        public string PaymentType { get; set; } = Birko.SuperFaktura.Request.Invoice.PaymentType.BankTransfer;
+        public string PaymentType { get; set; } = ValueLists.PaymentType.BankTransfer;
         [JsonProperty(PropertyName = "proforma_id", NullValueHandling = NullValueHandling.Ignore)]
         public int? ProformaID { get; set; } = null;
         [JsonProperty(PropertyName = "parent_id", NullValueHandling = NullValueHandling.Ignore)]
         public int? ParentID { get; set; }
         [JsonProperty(PropertyName = "rounding", NullValueHandling = NullValueHandling.Ignore)]
-        public string RoundingType { get; set; } = Birko.SuperFaktura.Request.Invoice.RoundingType.Item;
+        public string RoundingType { get; set; } = ValueLists.RoundingType.Item;
         [JsonProperty(PropertyName = "specific", NullValueHandling = NullValueHandling.Ignore)]
         public string Specific { get; set; }
         [JsonProperty(PropertyName = "sequence_id", NullValueHandling = NullValueHandling.Ignore)]
         public int? SequenceID { get; set; } = null;
         [JsonProperty(PropertyName = "type", NullValueHandling = NullValueHandling.Ignore)]
-        public string InvoiceType { get; set; } = Birko.SuperFaktura.Request.Invoice.Type.Regular;
+        public string InvoiceType { get; set; } = ValueLists.InvoiceType.Regular;
         [JsonProperty(PropertyName = "variable", NullValueHandling = NullValueHandling.Ignore)]
         public string Variable { get; set; }
         [JsonProperty(PropertyName = "bank_accounts", NullValueHandling = NullValueHandling.Ignore)]

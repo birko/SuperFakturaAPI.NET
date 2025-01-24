@@ -484,9 +484,12 @@ namespace Birko.SuperFaktura
         private Clients _clients = null;
         private ContactPersons _contactPersons = null;
         private Expenses _expenses = null;
+        private Exports _exports = null;
         private Invoices _invoices = null;
+        private Other _other = null;
         private Stock _stock = null;
         private Tags _tags = null;
+        private ValueLists _valueList = null;
 
 
         public BankAccounts BankAccounts
@@ -505,8 +508,10 @@ namespace Birko.SuperFaktura
             }
         }
 
-        public Clients Clients {
-            get {
+        public Clients Clients
+        {
+            get
+            {
                 return _clients ?? (_clients = new Clients(this));
             }
         }
@@ -519,20 +524,40 @@ namespace Birko.SuperFaktura
             }
         }
 
-        public Expenses Expenses {
+        public Expenses Expenses
+        {
             get
             {
                 return _expenses ?? (_expenses = new Expenses(this));
             }
         }
-        public Invoices Invoices {
+
+        public Exports Exports
+        {
+            get
+            {
+                return _exports ?? (_exports = new Exports(this));
+            }
+        }
+
+        public Invoices Invoices
+        {
             get
             {
                 return _invoices ?? (_invoices = new Invoices(this));
             }
         }
 
-        public Stock Stock {
+        public Other Other
+        {
+            get
+            {
+                return _other ?? (_other = new Other(this));
+            }
+        }
+
+        public Stock Stock
+        {
             get
             {
                 return _stock ?? (_stock = new Stock(this));
@@ -547,58 +572,19 @@ namespace Birko.SuperFaktura
                 return _tags ?? (_tags = new Tags(this));
             }
         }
+
+        public ValueLists ValueLists
+        {
+            get
+            {
+                return _valueList ?? (_valueList = new ValueLists(this));
+            }
+        }
+
         public SuperFaktura(string email, string apiKey, string apptitle = null, string module = "API", int? companyId = null)
             : base(email,apiKey, apptitle, module, companyId)
         {
             APIURL = "https://moja.superfaktura.sk/";
-        }
-
-        public async Task<Dictionary<int, string>> GetCountries()
-        {
-            var result = await Get("countries").ConfigureAwait(false);
-            try
-            {
-                return DeserializeResult<Dictionary<int, string>>(result);
-            }
-            catch (JsonSerializationException ex)
-            {
-                try
-                {
-                    DeserializeResult<string[]>(result);
-                    return null;
-                }
-                catch
-                {
-                    throw ex;
-                }
-            }
-        }
-
-        public async Task<Dictionary<string, Sequence[]>> GetSequences()
-        {
-            var result = await Get("sequences/index.json").ConfigureAwait(false);
-            try
-            {
-                return DeserializeResult<Dictionary<string, Sequence[]>>(result);
-            }
-            catch (JsonSerializationException ex)
-            {
-                try
-                {
-                    DeserializeResult<Sequence[][]>(result);
-                    return null;
-                }
-                catch
-                {
-                    throw ex;
-                }
-            }
-        }
-
-        public async Task<Logo[]> GetLogos()
-        {
-            var result = await Get("/users/logo").ConfigureAwait(false);
-            return DeserializeResult<Logo[]>(result);
         }
 
         public async Task<Response<Register>> Register(string email, bool sendEmail = true)
@@ -612,12 +598,6 @@ namespace Birko.SuperFaktura
                 }
             }).ConfigureAwait(false);
             return DeserializeResult<Response<Register>>(result);
-        }
-
-        public async Task<Response<ExpandoObject[]>> GetUserCompaniesDatar(bool allCompanies = true)
-        {
-            var result = await Get(string.Format("/users/getUserCompaniesData/{0}", allCompanies)).ConfigureAwait(false);
-            return DeserializeResult<Response<ExpandoObject[]>>(result);
         }
 
 

@@ -16,13 +16,13 @@ namespace Birko.SuperFaktura.Converters
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            if (objectType == typeof(ItemList<T>))
+            if (objectType == typeof(ItemList<T>) || objectType.BaseType == typeof(ItemList<T>))
             {
                 string startPath = reader.Path;
-                ItemList<T> items = new ItemList<T>();
+                ItemList<T> items = (ItemList<T>)Activator.CreateInstance(objectType);
                 if (reader.TokenType == JsonToken.StartArray)
                 {
-                    items = (ItemList<T>)serializer.Deserialize(reader, typeof(ItemList<T>));
+                    items = (ItemList<T>)serializer.Deserialize(reader, objectType);
                 }
                 else if (reader.TokenType == JsonToken.StartObject)
                 {
@@ -37,9 +37,6 @@ namespace Birko.SuperFaktura.Converters
                             string lastPath = path.LastOrDefault();
                             switch (lastPath)
                             {
-                                case "_InvoiceSettings":
-                                    items.InvoiceSettings = (ExpandoObject)serializer.Deserialize(reader, typeof(ExpandoObject));
-                                    break;
                                 default:
                                     string inputData = path.LastOrDefault();
                                     var pathtest = int.TryParse(inputData, out int _);

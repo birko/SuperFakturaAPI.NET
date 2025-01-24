@@ -6,6 +6,7 @@ namespace Birko.SuperFaktura.Request.Stock
     {
         [JsonProperty(PropertyName = "price_from")]
         public decimal? PriceFrom { get; set; }
+
         [JsonProperty(PropertyName = "price_to")]
         public decimal? PriceTo { get; set; }
 

@@ -2,10 +2,10 @@
 
 namespace Birko.SuperFaktura.Response.Expense
 {
-    public class PagedResponse : PagedResponse<ListItem>
+    public class PagedResponse : PagedResponse<Detail>
     {
         [JsonProperty(PropertyName = "items", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonConverter(typeof(Converters.ItemListConverter<ListItem>))]
-        public override ItemList<ListItem> Items { get; set; }
+        [JsonConverter(typeof(Converters.ItemListConverter<Detail>))]
+        public override ItemList<Detail> Items { get; set; }
     }
 }

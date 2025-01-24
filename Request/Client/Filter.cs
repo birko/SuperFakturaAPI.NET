@@ -7,9 +7,9 @@ namespace Birko.SuperFaktura.Request.Client
     public class Filter: PagedSearchParameters
     {
         [JsonProperty(PropertyName = "created")]
-        public int Created { get; set; } = DateType.All;
+        public int Created { get; set; } = ValueLists.TimeFilterConstants.All;
         [JsonProperty(PropertyName = "modified")]
-        public int Modified { get; set; } = DateType.All;
+        public int Modified { get; set; } = ValueLists.TimeFilterConstants.All;
 
         [JsonProperty(PropertyName = "created_since")]
         public DateTime? CreatedSince { get; set; } = null;

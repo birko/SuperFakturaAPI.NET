@@ -12,7 +12,6 @@ namespace Birko.SuperFaktura.Request
         [JsonProperty(PropertyName = "direction")]
         public string Direction { get; set; } = Direction_DESC;
 
-
         [JsonProperty(PropertyName = "sort")]
         public string Sort { get; set; }
         public virtual string ToParameters(bool listInfo = true)
@@ -38,10 +37,12 @@ namespace Birko.SuperFaktura.Request
     {
         [JsonProperty(PropertyName = "search")]
         public string Search { get; set; } = string.Empty;
-        [JsonProperty(PropertyName = "sku")]
 
+
+        [JsonProperty(PropertyName = "sku")]
         //nepotrebuje clients
         public string SKU { get; set; } = string.Empty;
+
         public override string ToParameters(bool listInfo = true)
         {
             string paramString = base.ToParameters(listInfo);
@@ -52,6 +53,29 @@ namespace Birko.SuperFaktura.Request
             if (!string.IsNullOrEmpty(SKU))
             {
                 paramString += "/sku:" + Convert.ToBase64String(Encoding.UTF8.GetBytes(SKU))?.Replace("+", "-")?.Replace("/", "_")?.Replace("=", ",");
+            }
+
+            return paramString;
+        }
+    }
+
+    public class PagedParameters : Parameters
+    {
+        [JsonProperty(PropertyName = "page")]
+        public int Page { get; set; } = 1;
+        [JsonProperty(PropertyName = "per_page")]
+        public int PerPage { get; set; } = 10;
+
+        public override string ToParameters(bool listInfo = true)
+        {
+            string paramString = base.ToParameters(listInfo);
+            if (Page > 0)
+            {
+                paramString += "/page:" + Page;
+            }
+            if (PerPage > 0)
+            {
+                paramString += "/per_page:" + PerPage;
             }
 
             return paramString;

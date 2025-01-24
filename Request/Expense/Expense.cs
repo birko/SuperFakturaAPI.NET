@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Globalization;
 
 namespace Birko.SuperFaktura.Request.Expense
 {
@@ -42,7 +43,7 @@ namespace Birko.SuperFaktura.Request.Expense
         public DateTime Created { get; set; } = DateTime.Now;
 
         [JsonProperty(PropertyName = "currency", NullValueHandling = NullValueHandling.Ignore)]
-        public string Currency { get; set; } = Invoice.CurrencyType.Euro;
+        public string Currency { get; set; } = RegionInfo.CurrentRegion.ISOCurrencySymbol;
 
         [JsonProperty(PropertyName = "delivery", NullValueHandling = NullValueHandling.Ignore)]
         public DateTime Delivery { get; set; } = DateTime.Now;

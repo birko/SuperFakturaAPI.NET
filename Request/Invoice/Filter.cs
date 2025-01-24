@@ -7,14 +7,14 @@ namespace Birko.SuperFaktura.Request.Invoice
     {
         //Invoce.Date const
         [JsonProperty(PropertyName = "created")]
-        public int Created { get; set; } = DateType.All;
+        public int Created { get; set; } = ValueLists.TimeFilterConstants.All;
         [JsonProperty(PropertyName = "modified")]
-        public int Modified { get; set; } = DateType.All;
+        public int Modified { get; set; } = ValueLists.TimeFilterConstants.All;
         //Invoce.Date const
         [JsonProperty(PropertyName = "delivery")]
-        public int Delivery { get; set; } = DateType.All;
+        public int Delivery { get; set; } = ValueLists.TimeFilterConstants.All;
         [JsonProperty(PropertyName = "paid")]
-        public int Paid { get; set; } = DateType.All;
+        public int Paid { get; set; } = ValueLists.TimeFilterConstants.All;
         //Invoce.Type const
         [JsonProperty(PropertyName = "type")]
         public string Type { get; set; }
@@ -26,7 +26,7 @@ namespace Birko.SuperFaktura.Request.Invoice
         public string PaymentType { get; set; }
         //Invoce.status const
         [JsonProperty(PropertyName = "status")]
-        public int Status { get; set; } = StatusType.All;
+        public int Status { get; set; } = ValueLists.StatusType.All;
         [JsonProperty(PropertyName = "client_id")]
         public int? ClientId { get; set; } = null;
         [JsonProperty(PropertyName = "amount_from")]

@@ -58,11 +58,11 @@ namespace Birko.SuperFaktura
             return superFaktura.DeserializeResult<Response<DetailBasic>>(result);
         }
 
-        public async Task<byte[]> GetPdf(int invoiceId, string token, string language = LanguageType.Slovak)
+        public async Task<byte[]> GetPdf(int invoiceId, string token, string language = Request.ValueLists.LanguageType.Slovak)
         {
-            if (!LanguageType.Languages.Contains(language))
+            if (!Request.ValueLists.LanguageType.Languages.Contains(language))
             {
-                language = LanguageType.Slovak;
+                language = Request.ValueLists.LanguageType.Slovak;
             }
             var result = await superFaktura.GetByte(string.Format("{0}/invoices/pdf/{1}/token:{2}", language, invoiceId, token)).ConfigureAwait(false);
             //Code below tests if response is a SuperFaktura error response or PDF File
@@ -109,11 +109,11 @@ namespace Birko.SuperFaktura
             return result;
         }
 
-        public async Task<Response<ExpandoObject>> SetInvoiceLanguage(int ID, string language = LanguageType.Slovak)
+        public async Task<Response<ExpandoObject>> SetInvoiceLanguage(int ID, string language = Request.ValueLists.LanguageType.Slovak)
         {
-            if (!LanguageType.Languages.Contains(language))
+            if (!Request.ValueLists.LanguageType.Languages.Contains(language))
             {
-                language = LanguageType.Slovak;
+                language = Request.ValueLists.LanguageType.Slovak;
             }
             // error response fix
             var result = await superFaktura.Get(string.Format("invoices/setinvoicelanguage/{0}/lang:{1}", ID, language)).ConfigureAwait(false);

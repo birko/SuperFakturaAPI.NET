@@ -5,7 +5,7 @@ namespace Birko.SuperFaktura.Request.Invoice
     public class Setting
     {
         [JsonProperty(PropertyName = "language", NullValueHandling = NullValueHandling.Ignore)]
-        public string Language { get; set; } = LanguageType.Slovak;
+        public string Language { get; set; } = ValueLists.LanguageType.Slovak;
         [JsonProperty(PropertyName = "signature", NullValueHandling = NullValueHandling.Ignore)]
         public bool Signature { get; set; } = true;
         [JsonProperty(PropertyName = "payment_info", NullValueHandling = NullValueHandling.Ignore)]

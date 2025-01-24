@@ -34,25 +34,35 @@ namespace Birko.SuperFaktura.Response.Invoice
     {
         [JsonProperty(PropertyName = "Client", NullValueHandling = NullValueHandling.Ignore)]
         public Client.Client Client { get; set; } = null;
+
         [JsonProperty(PropertyName = "InvoicePayment", NullValueHandling = NullValueHandling.Ignore)]
         public Payment[] InvoicePayment { get; set; } = null;
+
         [JsonProperty(PropertyName = "InvoiceEmail", NullValueHandling = NullValueHandling.Ignore)]
         public Email[] InvoiceEmail { get; set; } = null;
+
         [JsonProperty(PropertyName = "PostStamp", NullValueHandling = NullValueHandling.Ignore)]
         public PostStamp[] PostStamp { get; set; } = null;
+
         [JsonProperty(PropertyName = "Summary", NullValueHandling = NullValueHandling.Ignore)]
         public Summary Summary { get; set; } = null;
+
         [JsonProperty(PropertyName = "SummaryInvoice", NullValueHandling = NullValueHandling.Ignore)]
         public SummaryInvoice SummaryInvoice { get; set; } = null;
+
         [JsonProperty(PropertyName = "UnitCount", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(DictionaryConverter<string, decimal?>))]
         public Dictionary<string, decimal?> UnitCount { get; set; } = null;
+
         [JsonProperty(PropertyName = "PaymentLink", NullValueHandling = NullValueHandling.Ignore)]
         public string PaymentLink { get; set; }
+
         [JsonProperty(PropertyName = "Paypal", NullValueHandling = NullValueHandling.Ignore)]
         public string PayPal { get; set; }
+
         [JsonProperty(PropertyName = "Logo", NullValueHandling = NullValueHandling.Ignore)]
-        public Logo[] Logo { get; set; } = null;
+        public ValueLists.Logo[] Logo { get; set; } = null;
+
         [JsonProperty(PropertyName = "Signature", NullValueHandling = NullValueHandling.Ignore)]
         public Signature Signature { get; set; } = null;
     }

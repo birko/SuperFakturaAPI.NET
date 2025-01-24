@@ -18,14 +18,14 @@ namespace Birko.SuperFaktura
             this.superFaktura = superFaktura;
         }
 
-        public async Task<Dictionary<int, string>> GetTags()
+        public async Task<Dictionary<int, string>> Get()
         {
             var result = await superFaktura.Get("tags/index.json").ConfigureAwait(false);
             try
             {
                 return superFaktura.DeserializeResult<Dictionary<int, string>>(result);
             }
-            catch (Birko.SuperFaktura.Exceptions.ParseException ex)
+            catch (Exceptions.ParseException ex)
             {
                 try
                 {
@@ -39,29 +39,29 @@ namespace Birko.SuperFaktura
                     }
                     return data;
                 }
-                catch (Exception e)
+                catch
                 {
                     throw ex;
                 }
             }
         }
 
-        public async Task<Tag> AddTag(Tag tag)
+        public async Task<Response.Tag.Tag> Add(Tag tag)
         {
             var result = await superFaktura.Post("tags/add", tag).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Tag>(result);
+            return superFaktura.DeserializeResult<Response.Tag.Tag>(result);
         }
 
-        public async Task<Tag> EditTag(int id, Tag tag)
+        public async Task<Response.Tag.Tag> Edit(int id, Tag tag)
         {
             var result = await superFaktura.Post(string.Format("tags/edit/{0}", id), tag).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Tag>(result);
+            return superFaktura.DeserializeResult<Response.Tag.Tag>(result);
         }
 
-        public async Task<string> DeleteTag(int id)
+        public async Task<ErrorMessageResponse> Delete(int id)
         {
             var result = await superFaktura.Get(string.Format("tags/delete/{0}", id)).ConfigureAwait(false);
-            return result;
+            return superFaktura.DeserializeResult<ErrorMessageResponse>(result);
         }
     }
 }

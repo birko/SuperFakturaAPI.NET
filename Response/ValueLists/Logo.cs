@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using System;
 
-namespace Birko.SuperFaktura.Response
+namespace Birko.SuperFaktura.Response.ValueLists
 {
     public class Logo
     {

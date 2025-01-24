@@ -2,8 +2,14 @@
 
 namespace Birko.SuperFaktura.Request.Stock
 {
-    public class StockLogData: Data
+    public class StockLogsData: Data
     {
         public IEnumerable<Log> StockLog { get; set; }
+    }
+
+
+    public class LogData : Data
+    {
+        public Log StockLog { get; set; }
     }
 }

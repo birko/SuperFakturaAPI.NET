@@ -1,5 +1,4 @@
-﻿using Birko.SuperFaktura.Request.Client;
-using Birko.SuperFaktura.Request.Expense;
+﻿using Birko.SuperFaktura.Request.Expense;
 using Birko.SuperFaktura.Response;
 using Birko.SuperFaktura.Response.Expense;
 using System.Collections.Generic;
@@ -26,51 +25,57 @@ namespace Birko.SuperFaktura
             }
             else
             {
-                return new PagedResponse { Items = superFaktura.DeserializeResult<ItemList<ListItem>>(result) };
+                return new PagedResponse { Items = superFaktura.DeserializeResult<ItemList<Detail>>(result) };
             }
         }
 
-        public async Task<Response<ExpandoObject>> Get(int ID)
+        public async Task<ErrorMessageResponse> Delete(int ID)
         {
-            var result = await superFaktura.Get(string.Format("expense/edit/{0}.json", ID)).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Response<ExpandoObject>>(result);
+            var result = await superFaktura.Get($"expenses/delete/{ID}").ConfigureAwait(false);
+            return superFaktura.DeserializeResult<ErrorMessageResponse>(result);
         }
 
-        public async Task<Response<ExpandoObject>> Delete(int ID)
+        public async Task<Detail> Add(Request.Expense.Expense expense, IEnumerable<Request.Expense.ExpenseItem> items = null, Request.Client.Client client= null, Request.Expense.Extra extra = null, IEnumerable<int> tags = null)
         {
-            var result = await superFaktura.Get(string.Format("expenses/delete/{0}", ID)).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Response<ExpandoObject>>(result);
-        }
-
-        public async Task<ListItem> Add(Request.Expense.Expense expense, IEnumerable<Request.Expense.ExpenseItem> items = null, Client client= null, Extra extra = null, IEnumerable<int> tags = null)
-        {
-            var result = await superFaktura.Post("/expenses/add", new ExpenseData { Expense = expense, ExpenseExtra = extra, Tag = tags }).ConfigureAwait(false);
-            var data = superFaktura.DeserializeResult<Response<ListItem>>(result);
+            var result = await superFaktura.Post("/expenses/add", new ExpenseData { Expense = expense, ExpenseExtra = extra, Tag = tags, Client = client }).ConfigureAwait(false);
+            var data = superFaktura.DeserializeResult<Response<Detail>>(result);
             return data.Data;
         }
 
-        public async Task<Response<ListItem>> Edit(Request.Expense.Expense expense)
+        public async Task<Response<Detail>> Edit(Request.Expense.Expense expense, Request.Client.Client client = null, Request.Expense.Extra extra = null, IEnumerable<int> tags = null)
         {
-            var result = await superFaktura.Post("/expenses/edit", new ExpenseData { Expense = expense }).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Response<ListItem>>(result);
+            var result = await superFaktura.Post("/expenses/edit", new ExpenseData { Expense = expense, ExpenseExtra = extra, Tag = tags, Client = client }).ConfigureAwait(false);
+            return superFaktura.DeserializeResult<Response<Detail>>(result);
         }
 
-        public async Task<Response<ListItem>> Pay(Request.Expense.Payment payment)
+        public async Task<Response<Detail>> Show(int id)
+        {
+            var result = await superFaktura.Get($"/expense/view/{id}.json").ConfigureAwait(false);
+            return superFaktura.DeserializeResult<Response<Detail>>(result);
+        }
+
+        public async Task<Response<Detail>> AddPayment(Request.Expense.Payment payment)
         {
             var result = await superFaktura.Post("expense_payments/add", new ExpensePaymentData { ExpensePayment = payment }).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Response<ListItem>>(result);
+            return superFaktura.DeserializeResult<Response<Detail>>(result);
         }
 
-        public async Task<CategoryItem[]> GetExpenseCategories()
+        public async Task<ErrorMessageResponse> DeletePayment(int expensePaymentID)
         {
-            var result = await superFaktura.Get("expenses/expense_categories").ConfigureAwait(false);
-            return superFaktura.DeserializeResult<CategoryItem[]>(result);
+            var result = await superFaktura.Get($"/expense_payments/delete/{expensePaymentID}").ConfigureAwait(false);
+            return superFaktura.DeserializeResult<ErrorMessageResponse>(result);
         }
 
-        public async Task<Response<ExpandoObject>> DeletePayment(int expensePaymentID)
+        public async Task<Response<RelatedItemResponse>> AddRelatedItem(Request.Expense.RelatedItem relatedItem)
         {
-            var result = await superFaktura.Get(string.Format("/expense_payments/delete/{0}", expensePaymentID)).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Response<ExpandoObject>>(result);
+            var result = await superFaktura.Post("/expenses/addRelatedItem", relatedItem).ConfigureAwait(false);
+            return superFaktura.DeserializeResult<Response<RelatedItemResponse>>(result);
+        }
+
+        public async Task<ErrorMessageResponse> DeleteRelatedItem(int relationID)
+        {
+            var result = await superFaktura.Get($"/expenses/deleteRelatedItem/{relationID}").ConfigureAwait(false);
+            return superFaktura.DeserializeResult<ErrorMessageResponse>(result);
         }
     }
 }

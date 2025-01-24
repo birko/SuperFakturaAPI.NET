@@ -18,10 +18,11 @@ namespace Birko.SuperFaktura
             this.superFaktura = superFaktura;
         }
 
-        public async Task<Response<ExpandoObject>> Get(int ID)
+        public async Task<Response.Stock.Item> Get(int ID)
         {
             var result = await superFaktura.Get(string.Format("stock_items/edit/{0}.json", ID)).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Response<ExpandoObject>>(result);
+            var data =  superFaktura.DeserializeResult<Response<Detail>>(result);
+            return data.Data.StockItem;
         }
 
         public async Task<PagedResponse> Get(Filter filter, bool listInfo = true)
@@ -37,37 +38,54 @@ namespace Birko.SuperFaktura
             }
         }
 
-        public async Task<Response<Detail>> Save(Request.Stock.Item item)
+        public async Task<Detail> Add(Request.Stock.Item item)
         {
             var result = await superFaktura.Post("stock_items/add", new StockItemData () { StockItem = item }).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Response<Detail>>(result);
+            var data = superFaktura.DeserializeResult<Response<Detail>>(result);
+            return data.Data;
         }
 
-        public async Task<Response<Detail>> Edit(Request.Stock.Item item)
+        public async Task<Detail> Edit(int id, Request.Stock.Item item)
         {
-            var result = await superFaktura.Post("stock_items/edit", new StockItemData() { StockItem = item }).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Response<Detail>>(result);
+            var result = await superFaktura.Patch($"stock_items/edit/{id}", new StockItemData() { StockItem = item }).ConfigureAwait(false);
+            var data = superFaktura.DeserializeResult<Response<Detail>>(result);
+            return data.Data;
         }
 
-        public async Task<Response<Detail>> Delete(int ID)
+        public async Task<Detail> Delete(int ID)
         {
-            var result = await superFaktura.Get(string.Format("stock_items/delete/{0}", ID)).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Response<Detail>>(result);
+            var result = await superFaktura.Delete(string.Format("stock_items/delete/{0}", ID)).ConfigureAwait(false);
+            var data = superFaktura.DeserializeResult<Response<Detail>>(result);
+            return data.Data;
         }
 
-        public async Task<Response<LogResponse>> AddStockMovement(IEnumerable<Request.Stock.Log> items)
+        public async Task<IEnumerable<Response.Stock.Log>> AddStockMovement(IEnumerable<Request.Stock.Log> items)
         {
-            if (items != null)
+            if (!(items?.Any() ?? false))
             {
-                var result = await superFaktura.Post("stock_items/addstockmovement", new StockLogData { StockLog = items.ToArray() }).ConfigureAwait(false);
-                return superFaktura.DeserializeResult<Response<LogResponse>>(result);
+                return null;
             }
-            return await Task.FromResult<Response<LogResponse>>(null).ConfigureAwait(false);
+            var result = await superFaktura.Post("stock_items/addstockmovement", new StockLogsData { StockLog = items.ToArray() }).ConfigureAwait(false);
+            var data = superFaktura.DeserializeResult<Response<LogResponse>>(result);
+            return data.Data.StockLog;
         }
 
-        public async Task<Response<LogResponse>> AddStockMovement(Request.Stock.Log item)
+        public async Task<IEnumerable<Response.Stock.Log>> AddStockMovement(Request.Stock.Log item)
         {
             return await AddStockMovement(new[] { item }).ConfigureAwait(false);
+        }
+
+        public async Task<PagedLogsResponse> GetStockMovement(int id, PagedParameters filter, bool listInfo = true)
+        {
+            var result = await superFaktura.Get(string.Format($"stock_items/movements/{id}", filter.ToParameters(listInfo))).ConfigureAwait(false);
+            if (listInfo)
+            {
+                return superFaktura.DeserializeResult<PagedLogsResponse>(result);
+            }
+            else
+            {
+                return new PagedLogsResponse { Items = superFaktura.DeserializeResult<ItemList<LogData>>(result) };
+            }
         }
     }
 }

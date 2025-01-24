@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Globalization;
 
 namespace Birko.SuperFaktura.Request.Client
 {
@@ -30,7 +31,7 @@ namespace Birko.SuperFaktura.Request.Client
         public int? CountryID { get; set; } = null;
 
         [JsonProperty(PropertyName = "currency", NullValueHandling = NullValueHandling.Ignore)]
-        public string Currency { get; set; } = Invoice.CurrencyType.Euro;
+        public string Currency { get; set; } = RegionInfo.CurrentRegion.ISOCurrencySymbol;
 
         [JsonProperty(PropertyName = "default_variable", NullValueHandling = NullValueHandling.Ignore)]
         public string DefaultVariable { get; set; }
