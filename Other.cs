@@ -20,7 +20,6 @@ namespace Birko.SuperFaktura
             this.superFaktura = superFaktura;
         }
 
-
         public async Task<ExpandoObject> ListAccounts()
         {
             var result = await superFaktura.Get($"users/company_switcher").ConfigureAwait(false);

@@ -16,7 +16,7 @@ namespace Birko.SuperFaktura
             this.superFaktura = superFaktura;
         }
 
-        public async Task<PagedResponse> Get(Filter filter, bool listInfo = true)
+        public async Task<PagedResponse> List(Filter filter, bool listInfo = true)
         {
             var result = await superFaktura.Get(string.Format("expenses/index.json{0}", filter.ToParameters(listInfo))).ConfigureAwait(false);
             if (listInfo)
@@ -48,7 +48,7 @@ namespace Birko.SuperFaktura
             return superFaktura.DeserializeResult<Response<Detail>>(result);
         }
 
-        public async Task<Response<Detail>> Show(int id)
+        public async Task<Response<Detail>> View(int id)
         {
             var result = await superFaktura.Get($"/expense/view/{id}.json").ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<Detail>>(result);

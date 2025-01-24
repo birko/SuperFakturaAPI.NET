@@ -18,14 +18,7 @@ namespace Birko.SuperFaktura
             this.superFaktura = superFaktura;
         }
 
-        public async Task<Response.Stock.Item> Get(int ID)
-        {
-            var result = await superFaktura.Get(string.Format("stock_items/edit/{0}.json", ID)).ConfigureAwait(false);
-            var data =  superFaktura.DeserializeResult<Response<Detail>>(result);
-            return data.Data.StockItem;
-        }
-
-        public async Task<PagedResponse> Get(Filter filter, bool listInfo = true)
+        public async Task<PagedResponse> List(Filter filter, bool listInfo = true)
         {
             var result = await superFaktura.Get(string.Format("stock_items/index.json{0}", filter.ToParameters(listInfo))).ConfigureAwait(false);
             if (listInfo)
@@ -36,6 +29,13 @@ namespace Birko.SuperFaktura
             {
                 return new PagedResponse { Items = superFaktura.DeserializeResult<ItemList<ListItem>>(result) };
             }
+        }
+
+        public async Task<Response.Stock.Item> View(int ID)
+        {
+            var result = await superFaktura.Get($"/stock_items/view/{ID}").ConfigureAwait(false);
+            var data = superFaktura.DeserializeResult<Response<Detail>>(result);
+            return data.Data.StockItem;
         }
 
         public async Task<Detail> Add(Request.Stock.Item item)
@@ -75,7 +75,7 @@ namespace Birko.SuperFaktura
             return await AddStockMovement(new[] { item }).ConfigureAwait(false);
         }
 
-        public async Task<PagedLogsResponse> GetStockMovement(int id, PagedParameters filter, bool listInfo = true)
+        public async Task<PagedLogsResponse> ListStockMovements(int id, PagedParameters filter, bool listInfo = true)
         {
             var result = await superFaktura.Get(string.Format($"stock_items/movements/{id}", filter.ToParameters(listInfo))).ConfigureAwait(false);
             if (listInfo)

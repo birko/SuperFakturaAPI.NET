@@ -18,7 +18,7 @@ namespace Birko.SuperFaktura
             this.superFaktura = superFaktura;
         }
 
-        public async Task<Dictionary<int, string>> Get()
+        public async Task<Dictionary<int, string>> List()
         {
             var result = await superFaktura.Get("tags/index.json").ConfigureAwait(false);
             try

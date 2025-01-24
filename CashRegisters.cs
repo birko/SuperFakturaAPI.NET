@@ -27,14 +27,14 @@ namespace Birko.SuperFaktura
             return data.Select(x => x.CashRegister);
         }
 
-        public async Task<CashRegister> Get(int id)
+        public async Task<CashRegister> View(int id)
         {
             var result = await superFaktura.Get($"/cash_registers/view/{id}").ConfigureAwait(false);
             var data = superFaktura.DeserializeResult<CashRegisterData>(result);
             return data.CashRegister;
         }
 
-        public async Task<PagedResponse> GetItems(Filter filter)
+        public async Task<PagedResponse> ListItems(Filter filter)
         {
             var result = await superFaktura.Get($"/cash_register_items/index/{filter.ToParameters()}").ConfigureAwait(false);
             return superFaktura.DeserializeResult<PagedResponse>(result);
