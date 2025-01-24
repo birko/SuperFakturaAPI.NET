@@ -11,9 +11,9 @@ namespace SuperFaktura.Tests
     public class ExpensesTest : SuperFakturaTest
     {
         [Fact]
-        public async Task TestGet()
+        public async Task TestList()
         {
-            var expenses = await apiClient.Expenses.Get(new Birko.SuperFaktura.Request.Expense.Filter() { });
+            var expenses = await apiClient.Expenses.List(new Birko.SuperFaktura.Request.Expense.Filter() { });
             expenses.ShouldNotBe(null);
             expenses.Items.ShouldNotBeEmpty();
         }
@@ -44,9 +44,9 @@ namespace SuperFaktura.Tests
         }
 
         [Fact]
-        public async Task TestShow()
+        public async Task TestView()
         {
-            var expense = await apiClient.Expenses.Show(1363);
+            var expense = await apiClient.Expenses.View(1363);
             expense.ShouldNotBe(null);
         }
 

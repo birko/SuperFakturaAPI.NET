@@ -19,7 +19,7 @@ namespace SuperFaktura.Tests
         }
 
         [Fact]
-        public async Task TestGet()
+        public async Task TestView()
         {
             var cashRegisters = await apiClient.CashRegisters.List();
             if (!(cashRegisters?.Any() ?? false))
@@ -27,7 +27,7 @@ namespace SuperFaktura.Tests
                 return;
             }
 
-            var cashRegister = await apiClient.CashRegisters.Get(cashRegisters.First().ID.Value);
+            var cashRegister = await apiClient.CashRegisters.View(cashRegisters.First().ID.Value);
             cashRegister.ShouldNotBe(null);
         }
 
@@ -40,7 +40,7 @@ namespace SuperFaktura.Tests
                 return;
             }
 
-            var items = await apiClient.CashRegisters.GetItems(new Birko.SuperFaktura.Request.CashRegister.Filter()
+            var items = await apiClient.CashRegisters.ListItems(new Birko.SuperFaktura.Request.CashRegister.Filter()
             {
                 ID = cashRegisters.First().ID.Value
             });
@@ -76,7 +76,7 @@ namespace SuperFaktura.Tests
             {
                 return;
             }
-            var items = await apiClient.CashRegisters.GetItems(new Birko.SuperFaktura.Request.CashRegister.Filter()
+            var items = await apiClient.CashRegisters.ListItems(new Birko.SuperFaktura.Request.CashRegister.Filter()
             {
                 ID = cashRegisters.First().ID.Value
             });
@@ -97,7 +97,7 @@ namespace SuperFaktura.Tests
             {
                 return;
             }
-            var items = await apiClient.CashRegisters.GetItems(new Birko.SuperFaktura.Request.CashRegister.Filter()
+            var items = await apiClient.CashRegisters.ListItems(new Birko.SuperFaktura.Request.CashRegister.Filter()
             {
                 ID = cashRegisters.First().ID.Value
             });

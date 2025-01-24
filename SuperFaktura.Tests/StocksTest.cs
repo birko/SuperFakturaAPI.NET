@@ -13,7 +13,7 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestList()
         {
-            var list = await apiClient.Stock.Get(new Birko.SuperFaktura.Request.Stock.Filter() { });
+            var list = await apiClient.Stock.List(new Birko.SuperFaktura.Request.Stock.Filter() { });
             list.ShouldNotBeNull();
             list.Items.ShouldNotBeNull();
             list.Items.Count.Equals(0);
@@ -39,9 +39,21 @@ namespace SuperFaktura.Tests
 
 
         [Fact]
+        public async Task TestView()
+        {
+            var list = await apiClient.Stock.List(new Birko.SuperFaktura.Request.Stock.Filter() { });
+            if (!(list?.Items?.Any() ?? false))
+            {
+                return;
+            }
+            var task = await apiClient.Stock.View(list.Items.First().StockItem.ID.Value);
+            task.ShouldNotBeNull();
+        }
+
+        [Fact]
         public async Task TestEdit()
         {
-            var list = await apiClient.Stock.Get(new Birko.SuperFaktura.Request.Stock.Filter() { });
+            var list = await apiClient.Stock.List(new Birko.SuperFaktura.Request.Stock.Filter() { });
             if (!(list?.Items?.Any() ?? false))
             {
                 return;
@@ -63,7 +75,7 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestAddStockMovement()
         {
-            var list = await apiClient.Stock.Get(new Birko.SuperFaktura.Request.Stock.Filter() { });
+            var list = await apiClient.Stock.List(new Birko.SuperFaktura.Request.Stock.Filter() { });
             if (!(list?.Items?.Any() ?? false))
             {
                 return;
@@ -78,14 +90,14 @@ namespace SuperFaktura.Tests
         }
 
         [Fact]
-        public async Task TestGetStockMovement()
+        public async Task TestListStockMovements()
         {
-            var list = await apiClient.Stock.Get(new Birko.SuperFaktura.Request.Stock.Filter() { });
+            var list = await apiClient.Stock.List(new Birko.SuperFaktura.Request.Stock.Filter() { });
             if (!(list?.Items?.Any() ?? false))
             {
                 return;
             }
-            var task = await apiClient.Stock.GetStockMovement(list.Items.First().StockItem.ID.Value, new Birko.SuperFaktura.Request.PagedParameters());
+            var task = await apiClient.Stock.ListStockMovements(list.Items.First().StockItem.ID.Value, new Birko.SuperFaktura.Request.PagedParameters());
             task.ShouldNotBeNull();
             task.Items.ShouldNotBeNull();
             task.Items.Count.ShouldBeGreaterThan(0);
@@ -95,7 +107,7 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestDelete()
         {
-            var list = await apiClient.Stock.Get(new Birko.SuperFaktura.Request.Stock.Filter() { });
+            var list = await apiClient.Stock.List(new Birko.SuperFaktura.Request.Stock.Filter() { });
             if (!(list?.Items?.Any() ?? false))
             {
                 return;

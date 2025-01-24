@@ -11,9 +11,9 @@ namespace SuperFaktura.Tests
     public class ClientsTest: SuperFakturaTest
     {
         [Fact]
-        public async Task TestGet()
+        public async Task TestList()
         {
-            var clients = await apiClient.Clients.Get(new Birko.SuperFaktura.Request.Client.Filter());
+            var clients = await apiClient.Clients.List(new Birko.SuperFaktura.Request.Client.Filter());
             clients.ShouldNotBe(null);
         }
 
@@ -27,9 +27,9 @@ namespace SuperFaktura.Tests
         }
 
         [Fact]
-        public async Task TestShow()
+        public async Task TestView()
         {
-            var clients = await apiClient.Clients.Get(new Birko.SuperFaktura.Request.Client.Filter()
+            var clients = await apiClient.Clients.List(new Birko.SuperFaktura.Request.Client.Filter()
             {
                 PerPage = 50
             });
@@ -37,7 +37,7 @@ namespace SuperFaktura.Tests
             {
                 return;
             }
-            var client = await apiClient.Clients.Show(clients.Items.Last().Client.ID.Value);
+            var client = await apiClient.Clients.View(clients.Items.Last().Client.ID.Value);
             client.ShouldNotBe(null);
             client.Client.Name.Equals("ClienTest Client");
         }
@@ -45,7 +45,7 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestEdit()
         {
-            var clients = await apiClient.Clients.Get(new Birko.SuperFaktura.Request.Client.Filter() {
+            var clients = await apiClient.Clients.List(new Birko.SuperFaktura.Request.Client.Filter() {
                 PerPage = 50
             });
             if (!(clients.Items?.Any() ?? false))
@@ -63,7 +63,7 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestDelete()
         {
-            var clients = await apiClient.Clients.Get(new Birko.SuperFaktura.Request.Client.Filter()
+            var clients = await apiClient.Clients.List(new Birko.SuperFaktura.Request.Client.Filter()
             {
                 PerPage = 50
             });

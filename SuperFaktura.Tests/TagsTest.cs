@@ -12,9 +12,9 @@ namespace SuperFaktura.Tests
     {
 
         [Fact]
-        public async Task TestTags()
+        public async Task TestList()
         {
-            var tags = await apiClient.Tags.Get();
+            var tags = await apiClient.Tags.List();
             tags.ShouldNotBe(null);
         }
 
@@ -32,7 +32,7 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestEdit()
         {
-            var tags = await apiClient.Tags.Get();
+            var tags = await apiClient.Tags.List();
             if (!(tags?.Any() ?? false))
             {
                 return;
@@ -47,7 +47,7 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestDelete()
         {
-            var tags = await apiClient.Tags.Get();
+            var tags = await apiClient.Tags.List();
             if (!(tags?.Any() ?? false))
             {
                 return;
