@@ -67,7 +67,7 @@ namespace Birko.SuperFaktura.Request.Expense
         public DateTime? TaxableSupply { get; set; }
 
         [JsonProperty(PropertyName = "type", NullValueHandling = NullValueHandling.Ignore)]
-        public string ExpenseType { get; set; } = Type.Invoice;
+        public string ExpenseType { get; set; } = ValueLists.ExpenseType.Invoice;
 
         [JsonProperty(PropertyName = "variable", NullValueHandling = NullValueHandling.Ignore)]
         public string Variable { get; set; }
@@ -82,13 +82,6 @@ namespace Birko.SuperFaktura.Request.Expense
         public decimal VAT3 { get; set; }
 
         [JsonProperty(PropertyName = "version", NullValueHandling = NullValueHandling.Ignore)]
-        public string Version { get; set; } = ExpenseVersion.Basic;
-    }
-
-
-    public static class ExpenseVersion
-    {
-        public const string Basic = "basic";
-        public const string Items = "items";
+        public string Version { get; set; } = ValueLists.ExpenseVersion.Basic;
     }
 }

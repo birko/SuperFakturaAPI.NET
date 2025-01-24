@@ -1,10 +1,4 @@
-﻿using Birko.SuperFaktura.Request.Client;
-using Birko.SuperFaktura.Request.Tags;
-using Birko.SuperFaktura.Response;
-using Birko.SuperFaktura.Response.Client;
-using Birko.SuperFaktura.Response.ValueLists;
-using Newtonsoft.Json;
-using System;
+﻿using Birko.SuperFaktura.Response.ValueLists;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,16 +27,16 @@ namespace Birko.SuperFaktura
             return data.Select(x => x.Country);
         }
 
-        public async Task<Category[]> ListExpenseCategories()
+        public async Task<IEnumerable<Category>> ListExpenseCategories()
         {
             var result = await superFaktura.Get("expenses/expense_categories").ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Category[]>(result);
+            return superFaktura.DeserializeResult<IEnumerable<Category>>(result);
         }
 
-        public async Task<Logo[]> ListLogos()
+        public async Task<IEnumerable<Logo>> ListLogos()
         {
             var result = await superFaktura.Get("/users/logo").ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Logo[]>(result);
+            return superFaktura.DeserializeResult<IEnumerable<Logo>>(result);
         }
 
         public async Task<Dictionary<string, IEnumerable<Sequence>>> ListSequences()

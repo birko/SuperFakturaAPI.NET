@@ -14,6 +14,7 @@ namespace Birko.SuperFaktura.Request
 
         [JsonProperty(PropertyName = "sort")]
         public string Sort { get; set; }
+
         public virtual string ToParameters(bool listInfo = true)
         {
             string paramString = string.Empty;
@@ -38,7 +39,6 @@ namespace Birko.SuperFaktura.Request
         [JsonProperty(PropertyName = "search")]
         public string Search { get; set; } = string.Empty;
 
-
         [JsonProperty(PropertyName = "sku")]
         //nepotrebuje clients
         public string SKU { get; set; } = string.Empty;
@@ -50,6 +50,7 @@ namespace Birko.SuperFaktura.Request
             {
                 paramString += "/search:" + Convert.ToBase64String(Encoding.UTF8.GetBytes(Search))?.Replace("+", "-")?.Replace("/", "_")?.Replace("=", ",");
             }
+
             if (!string.IsNullOrEmpty(SKU))
             {
                 paramString += "/sku:" + Convert.ToBase64String(Encoding.UTF8.GetBytes(SKU))?.Replace("+", "-")?.Replace("/", "_")?.Replace("=", ",");
@@ -63,6 +64,7 @@ namespace Birko.SuperFaktura.Request
     {
         [JsonProperty(PropertyName = "page")]
         public int Page { get; set; } = 1;
+
         [JsonProperty(PropertyName = "per_page")]
         public int PerPage { get; set; } = 10;
 
@@ -86,6 +88,7 @@ namespace Birko.SuperFaktura.Request
     {
         [JsonProperty(PropertyName = "page")]
         public int Page { get; set; } = 1;
+
         [JsonProperty(PropertyName = "per_page")]
         public int PerPage { get; set; } = 10;
 

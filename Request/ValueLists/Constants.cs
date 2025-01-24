@@ -2,6 +2,14 @@
 
 namespace Birko.SuperFaktura.Request.ValueLists
 {
+    public static class AccountingDetailType
+    {
+        public const string Item = "item";
+        public const string Service = "service";
+
+        public static string[] Types = new[] { Item, Service };
+    }
+
     public static class DeliveryType
     {
         public const string Courier = "courier";
@@ -21,6 +29,14 @@ namespace Birko.SuperFaktura.Request.ValueLists
         public const int Overdue = 99;
 
         public static int[] Statuses = new[] { New, PartiallyPaid, Paid, Overdue };
+    }
+
+    public static class ExpenseVersion
+    {
+        public const string Basic = "basic";
+        public const string Items = "items";
+
+        public static string[] ExpenseVersions = new[] { Basic, Items };
     }
 
     public static class ExpenseType
@@ -193,12 +209,6 @@ namespace Birko.SuperFaktura.Request.ValueLists
         public const int PartiallyPaid = 2;
         public const int Paid = 3;
         public const int Overdue = 99;
-    }
-
-    public static class AccountingDetailType
-    {
-        public const string Item = "item";
-        public const string Service = "service";
     }
 
     public static class EstimateStatus

@@ -87,20 +87,17 @@ namespace Birko.SuperFaktura.Request.Client
         [JsonProperty(PropertyName = "phone", NullValueHandling = NullValueHandling.Ignore)]
         public string Phone { get; set; } = string.Empty;
 
-
         [JsonProperty(PropertyName = "swift", NullValueHandling = NullValueHandling.Ignore)]
         public string SWIFT { get; set; }
 
         [JsonProperty(PropertyName = "tags", NullValueHandling = NullValueHandling.Ignore)]
         public string Tags { get; set; }
 
-
         [JsonProperty(PropertyName = "uuid", NullValueHandling = NullValueHandling.Ignore)]
         public string UUID { get; set; }
 
         [JsonProperty(PropertyName = "zip", NullValueHandling = NullValueHandling.Ignore)]
         public string ZIP { get; set; } = string.Empty;
-
 
         [JsonProperty(PropertyName = "update", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.StringBooleanConverter))]

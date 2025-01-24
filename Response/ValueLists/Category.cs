@@ -1,11 +1,12 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Birko.SuperFaktura.Response.ValueLists
 {
     public class Category
     {
         [JsonProperty(PropertyName = "children", NullValueHandling = NullValueHandling.Ignore)]
-        public Category[] Children { get; set; }
+        public IEnumerable<Category> Children { get; set; }
 
         [JsonProperty(PropertyName = "icon", NullValueHandling = NullValueHandling.Ignore)]
         public string Icon { get; set; }

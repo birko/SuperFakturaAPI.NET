@@ -1,9 +1,5 @@
-﻿using Birko.SuperFaktura.Request.Client;
-using Birko.SuperFaktura.Request.Tags;
+﻿using Birko.SuperFaktura.Request.Tags;
 using Birko.SuperFaktura.Response;
-using Birko.SuperFaktura.Response.Client;
-using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
