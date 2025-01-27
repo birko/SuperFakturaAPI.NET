@@ -75,7 +75,7 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestAddRelatedItem()
         {
-            var related = await apiClient.Expenses.AddRelatedItem(new Birko.SuperFaktura.Request.Expense.RelatedItem()
+            var related = await apiClient.Expenses.AddRelatedItem(new Birko.SuperFaktura.Request.RelatedItem()
             {
             });
             related.ShouldNotBe(null);

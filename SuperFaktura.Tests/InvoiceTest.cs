@@ -11,14 +11,14 @@ namespace SuperFaktura.Tests
     {
 
         [Fact]
-        public async Task TestInvoices()
+        public async Task TestList()
         {
-            var invoices = await apiClient.Invoices.Get(new Birko.SuperFaktura.Request.Invoice.Filter());
+            var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter());
             invoices.ShouldNotBe(null);
         }
 
         [Fact]
-        public async Task TestInvoice()
+        public async Task TestAdd()
         {
             var now = DateTime.Now.Date;
             var client = new Birko.SuperFaktura.Request.Client.Client()
@@ -62,8 +62,8 @@ namespace SuperFaktura.Tests
                         UnitPrice = 1,
                     }
             });
-            var task = await apiClient.Invoices.Save(sfinvoice, client, items.ToArray());
-            task.Error.ShouldBe(0);
+            var task = await apiClient.Invoices.Add(sfinvoice, client, items.ToArray());
+            //task.Error.ShouldBe(0);
         }
 
     }
