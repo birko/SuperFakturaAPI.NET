@@ -16,7 +16,6 @@ namespace SuperFaktura.Tests
         {
             var task = await apiClient.Other.ListAccounts();
             task.ShouldNotBe(null);
-            throw new NotImplementedException("Usage of ExpandoObject");
         }
 
         [Fact]
