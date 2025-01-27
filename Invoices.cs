@@ -204,13 +204,6 @@ namespace Birko.SuperFaktura
         }
 
         [Obsolete("Not found in API documentation")]
-        public async Task<Response<ExpandoObject>> SendSMS(SMS data)
-        {
-            var result = await superFaktura.Post(string.Format("sms/send"), data).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Response<ExpandoObject>>(result);
-        }
-
-        [Obsolete("Not found in API documentation")]
         public async Task<Response<Detail>> CreateFromProforma(int proformaID)
         {
             var proforma = await superFaktura.Get(string.Format("invoices/regular.json/{0}", proformaID)).ConfigureAwait(false);

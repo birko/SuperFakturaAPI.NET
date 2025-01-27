@@ -9,6 +9,9 @@ namespace Birko.SuperFaktura.Response.Invoice
 {
     public class DetailBasic
     {
+        [JsonProperty(PropertyName = "0", NullValueHandling = NullValueHandling.Ignore)]
+        public PayInfo PayInfo { get; set; } = null;
+
         [JsonProperty(PropertyName = "Invoice", NullValueHandling = NullValueHandling.Ignore)]
         public Invoice Invoice { get; set; } = null;
 
@@ -67,7 +70,7 @@ namespace Birko.SuperFaktura.Response.Invoice
         [JsonProperty(PropertyName = "RelatedItems", NullValueHandling = NullValueHandling.Ignore)]
         public IEnumerable<RelatedItem> RelatedItems { get; set; } = null;
 
-        [JsonProperty(PropertyName = "qr", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(PropertyName = "Qr", NullValueHandling = NullValueHandling.Ignore)]
         public QR QR { get; set; } = null;
 
         [JsonProperty(PropertyName = "Signature", NullValueHandling = NullValueHandling.Ignore)]

@@ -5,8 +5,7 @@ using System.Dynamic;
 
 namespace Birko.SuperFaktura.Response.Stock
 {
-    [JsonConverter(typeof(StockItemConverter))]
-    public class ListItem : List<ExpandoObject>
+    public class ListItem
     {
         [JsonProperty(PropertyName = "StockItem", NullValueHandling = NullValueHandling.Ignore)]
         public Item StockItem { get; set; } = null;

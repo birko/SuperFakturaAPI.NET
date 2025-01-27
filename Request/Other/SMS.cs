@@ -11,7 +11,7 @@ namespace Birko.SuperFaktura.Request.Other
         [JsonProperty(PropertyName = "text", NullValueHandling = NullValueHandling.Ignore)]
         public string Text { get; set; }
 
-        [JsonProperty(PropertyName = "name", NullValueHandling = NullValueHandling.Ignore)]
-        public string Name { get; set; }
+        [JsonProperty(PropertyName = "phone", NullValueHandling = NullValueHandling.Ignore)]
+        public string Phone { get; set; }
     }
 }

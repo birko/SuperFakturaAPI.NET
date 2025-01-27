@@ -6,10 +6,10 @@ namespace Birko.SuperFaktura.Response.Invoice
     public class ClientData
     {
         [JsonProperty(PropertyName = "Country", NullValueHandling = NullValueHandling.Ignore)]
-        public string Country { get; set; }
+        public Country Country { get; set; }
 
         [JsonProperty(PropertyName = "DeliveryCountry", NullValueHandling = NullValueHandling.Ignore)]
-        public string DeliveryCountry { get; set; }
+        public Country DeliveryCountry { get; set; }
 
         [JsonProperty(PropertyName = "account", NullValueHandling = NullValueHandling.Ignore)]
         public string Account { get; set; }
@@ -57,7 +57,7 @@ namespace Birko.SuperFaktura.Response.Invoice
         public string DeliveryCity { get; set; }
 
         [JsonProperty(PropertyName = "delivery_country", NullValueHandling = NullValueHandling.Ignore)]
-        public int? DeliveryCountryName { get; set; }
+        public string DeliveryCountryName { get; set; }
 
         [JsonProperty(PropertyName = "delivery_country_id", NullValueHandling = NullValueHandling.Ignore)]
         public int? DeliveryCountryID { get; set; }
@@ -115,6 +115,7 @@ namespace Birko.SuperFaktura.Response.Invoice
         public string Name { get; set; }
 
         [JsonProperty(PropertyName = "notices", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.StringBooleanConverter))]
         public bool? Notices { get; set; }
 
         [JsonProperty(PropertyName = "phone", NullValueHandling = NullValueHandling.Ignore)]

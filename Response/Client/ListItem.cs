@@ -5,8 +5,7 @@ using System.Dynamic;
 
 namespace Birko.SuperFaktura.Response.Client
 {
-    [JsonConverter(typeof(ClientItemConverter))]
-    public class ListItem : List<Stats>
+    public class ListItem
     {
         [JsonProperty(PropertyName = "Client", NullValueHandling = NullValueHandling.Ignore)]
         public Client Client { get; set; } = null;
