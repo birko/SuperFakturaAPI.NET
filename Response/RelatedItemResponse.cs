@@ -3,12 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Birko.SuperFaktura.Response.Expense
+namespace Birko.SuperFaktura.Response
 {
     public class RelatedItemResponse
     {
         [JsonProperty(PropertyName = "Expense", NullValueHandling = NullValueHandling.Ignore)]
-        public Expense Expense { get; set; }
+        public Expense.Expense Expense { get; set; }
 
 
         [JsonProperty(PropertyName = "RelatedItem", NullValueHandling = NullValueHandling.Ignore)]

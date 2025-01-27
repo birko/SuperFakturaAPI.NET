@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Dynamic;
 
-namespace Birko.SuperFaktura.Request.Expense
+namespace Birko.SuperFaktura.Request
 {
     public class RelatedItem
     {

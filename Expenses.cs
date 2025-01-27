@@ -66,7 +66,7 @@ namespace Birko.SuperFaktura
             return superFaktura.DeserializeResult<ErrorMessageResponse>(result);
         }
 
-        public async Task<Response<RelatedItemResponse>> AddRelatedItem(Request.Expense.RelatedItem relatedItem)
+        public async Task<Response<RelatedItemResponse>> AddRelatedItem(Request.RelatedItem relatedItem)
         {
             var result = await superFaktura.Post("/expenses/addRelatedItem", relatedItem).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<RelatedItemResponse>>(result);

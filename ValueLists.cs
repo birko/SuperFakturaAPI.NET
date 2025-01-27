@@ -1,4 +1,5 @@
-﻿using Birko.SuperFaktura.Response.ValueLists;
+﻿using Birko.SuperFaktura.Response;
+using Birko.SuperFaktura.Response.ValueLists;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

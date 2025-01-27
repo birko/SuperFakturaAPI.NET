@@ -52,7 +52,7 @@ namespace Birko.SuperFaktura.Response
         }
     }
 
-    public class StringMessageResponse  : ErrorMessageResponse
+    public class StringMessageResponse : ErrorMessageResponse
     {
         [JsonProperty(PropertyName = "message", NullValueHandling = NullValueHandling.Ignore)]
         public string Message { get; internal set; } = null;
@@ -92,6 +92,21 @@ namespace Birko.SuperFaktura.Response
             StringBuilder builder = new StringBuilder();
             builder.AppendLine(base.ToString());
             builder.AppendLine($"Data: {((Data != null) ? Data.ToString() : "NULL")}");
+
+            return builder.ToString();
+        }
+    }
+
+    public class StatusResponse<T> : Response<T>
+    {
+        [JsonProperty(PropertyName = "status", NullValueHandling = NullValueHandling.Ignore)]
+        public bool Status { get; internal set; }
+
+        public override string ToString()
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine(base.ToString());
+            builder.AppendLine($"Status: {Status}");
 
             return builder.ToString();
         }

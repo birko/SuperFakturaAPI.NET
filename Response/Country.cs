@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Birko.SuperFaktura.Response.ValueLists
+namespace Birko.SuperFaktura.Response
 {
     public class Country
     {
@@ -19,11 +19,5 @@ namespace Birko.SuperFaktura.Response.ValueLists
 
         [JsonProperty(PropertyName = "name", NullValueHandling = NullValueHandling.Ignore)]
         public string Name { get; set; }
-    }
-
-    public class CountryData
-    {
-        [JsonProperty(PropertyName = "Country", NullValueHandling = NullValueHandling.Ignore)]
-        public Country Country { get; set; }
     }
 }

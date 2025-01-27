@@ -18,9 +18,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Request\CashRegister\Filter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Expense\ExpenseItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Expense\Extra.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Request\Expense\RelatedItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Request\RelatedItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Export\Filter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\Export.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ContactPersons.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Other\Constants.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Other\BankMovementFilter.cs" />
@@ -35,11 +34,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)Response\Expense\Extra.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Expense\ExpenseBasicRate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Expense\ExpenseItem.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Response\Expense\RelatedItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\EmailResponse.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\Mark.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\RelatedItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Expense\MyData.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Response\Expense\RelatedItemResponse.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\RelatedItemResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)response\expense\VATSummary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Export\Export.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\QR.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Other\CompanyDataList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Other\UserProfile.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Other\CompanyData.cs" />
@@ -51,7 +53,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Response\Tag\Tag.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Other.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\UserProfile.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Response\ValueLists\Country.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\Country.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\ValueLists\CountryData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ValueLists.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tags.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Clients.cs" />
@@ -95,7 +98,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\MyData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\Payment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\Post.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\Setting.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\InvoiceSetting.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\SMS.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Parameters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Stock\Filter.cs" />
@@ -118,7 +121,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Response\Expense\Payment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\BankAccounts\BankAccount.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\ClientData.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\Country.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\Detail.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\Email.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\Invoice.cs" />

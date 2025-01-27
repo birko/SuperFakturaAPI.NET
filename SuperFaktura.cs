@@ -643,4 +643,13 @@ namespace Birko.SuperFaktura
             APIURL = "https://sandbox.superfaktura.sk/";
         }
     }
+
+    public class SuperFakturaSandboxCZ : SuperFaktura
+    {
+        public SuperFakturaSandboxCZ(string email, string apiKey, string apptitle = null, string module = "API", int? companyId = null)
+            : base(email, apiKey, apptitle, module, companyId)
+        {
+            APIURL = "https://sandbox.superfaktura.cz/";
+        }
+    }
 }

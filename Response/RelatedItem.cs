@@ -3,9 +3,9 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Dynamic;
 
-namespace Birko.SuperFaktura.Response.Expense
+namespace Birko.SuperFaktura.Response
 {
-    public class RelatedItem : Request.Expense.RelatedItem
+    public class RelatedItem : Request.RelatedItem
     {
     }
 }

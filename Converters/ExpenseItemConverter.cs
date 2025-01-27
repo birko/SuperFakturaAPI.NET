@@ -1,4 +1,5 @@
-﻿using Birko.SuperFaktura.Response.Expense;
+﻿using Birko.SuperFaktura.Response;
+using Birko.SuperFaktura.Response.Expense;
 using Birko.SuperFaktura.Response.ValueLists;
 using Newtonsoft.Json;
 using System;

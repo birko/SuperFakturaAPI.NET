@@ -34,10 +34,13 @@ namespace Birko.SuperFaktura.Response
     {
         [JsonProperty(PropertyName = "itemCount", NullValueHandling = NullValueHandling.Ignore)]
         public int ItemCount { get; set; } = 0;
+
         [JsonProperty(PropertyName = "pageCount", NullValueHandling = NullValueHandling.Ignore)]
         public int PageCount { get; set; } = 0;
+
         [JsonProperty(PropertyName = "perPage", NullValueHandling = NullValueHandling.Ignore)]
         public int PerPage { get; set; } = 0;
+
         [JsonProperty(PropertyName = "page", NullValueHandling = NullValueHandling.Ignore)]
         public int Page { get; set; } = 0;
 
