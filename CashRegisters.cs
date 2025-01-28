@@ -29,27 +29,27 @@ namespace Birko.SuperFaktura
 
         public async Task<CashRegister> View(int id)
         {
-            var result = await superFaktura.Get($"/cash_registers/view/{id}").ConfigureAwait(false);
+            var result = await superFaktura.Get($"cash_registers/view/{id}").ConfigureAwait(false);
             var data = superFaktura.DeserializeResult<CashRegisterData>(result);
             return data.CashRegister;
         }
 
-        public async Task<PagedResponse> ListItems(Filter filter)
+        public async Task<PagedResponse<Item>> ListItems(Filter filter)
         {
-            var result = await superFaktura.Get($"/cash_register_items/index/{filter.ToParameters()}").ConfigureAwait(false);
-            return superFaktura.DeserializeResult<PagedResponse>(result);
+            var result = await superFaktura.Get($"cash_register_items/index/{filter.ToParameters()}").ConfigureAwait(false);
+            return superFaktura.DeserializeResult<PagedResponse<Item>>(result);
         }
 
         public async Task<CashRegisterItemResponse> AddItem(Request.CashRegister.CashRegisterItem item)
         {
-            var result = await superFaktura.Post("/cash_register_items/add", new CashRegisterItemData { CashRegisterItem = item}).ConfigureAwait(false);
+            var result = await superFaktura.Post("cash_register_items/add", new CashRegisterItemData { CashRegisterItem = item}).ConfigureAwait(false);
             return superFaktura.DeserializeResult<CashRegisterItemResponse>(result);
         }
 
 
         public async Task<CashRegisterSummaryResponse> DeleteItem(int id)
         {
-            var result = await superFaktura.Get("/cash_register_items/delete/" + id).ConfigureAwait(false);
+            var result = await superFaktura.Get("cash_register_items/delete/" + id).ConfigureAwait(false);
             return superFaktura.DeserializeResult<CashRegisterSummaryResponse>(result);
         }
 

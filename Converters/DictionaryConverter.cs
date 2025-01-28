@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Birko.SuperFaktura.Converters
 {
@@ -15,8 +16,8 @@ namespace Birko.SuperFaktura.Converters
         {
             if (reader.TokenType == JsonToken.StartArray)
             {
-                var val = (T2[])serializer.Deserialize(reader, typeof(T2[]));
-                if (typeof(T1) == typeof(T2) && val?.Length > 0)
+                IEnumerable<T2> val = (IEnumerable<T2>)serializer.Deserialize(reader, typeof(IEnumerable<T2>));
+                if (typeof(T1) == typeof(T2) && val?.Count() > 0)
                 {
                     var dictionary = new Dictionary<T2, T2>();
                     foreach (var item in val)
@@ -25,7 +26,7 @@ namespace Birko.SuperFaktura.Converters
                     }
                     return dictionary;
                 }
-                else if (typeof(T1) == typeof(string) && val?.Length > 0)
+                else if (typeof(T1) == typeof(string) && val?.Count() > 0)
                 {
                     var dictionary = new Dictionary<string, T2>();
                     foreach (var item in val)
@@ -38,7 +39,7 @@ namespace Birko.SuperFaktura.Converters
             }
             else if (reader.TokenType == JsonToken.StartObject)
             {
-                return (Dictionary<T1, T2>)serializer.Deserialize(reader, typeof(Dictionary<T1, T2>));
+                return (IDictionary<T1, T2>)serializer.Deserialize(reader, typeof(Dictionary<T1, T2>));
             }
             else
             {

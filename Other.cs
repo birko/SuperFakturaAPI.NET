@@ -30,7 +30,7 @@ namespace Birko.SuperFaktura
         public async Task<IEnumerable<CompanyData>> ListUserCompanies(bool all = false)
         {
             var result = await superFaktura.Get($"users/getUserCompaniesData/{ (all? 1: 0)}]").ConfigureAwait(false);
-            var data = superFaktura.DeserializeResult<Response<CompanyDataList>>(result);
+            var data = superFaktura.DeserializeResult<ListResponse<CompanyData>>(result);
             return data.Data;
         }
 
@@ -41,10 +41,10 @@ namespace Birko.SuperFaktura
             return data.Data;
         }
 
-        public async Task<PagedBankAccountMovement> ListBankAccountMovements(Request.Other.BankMovementFilter filter)
+        public async Task<PagedResponse<BankAccountMovement>> ListBankAccountMovements(Request.Other.BankMovementFilter filter)
         {
             var result = await superFaktura.Get($"accounts/index.json{filter.ToParameters()}").ConfigureAwait(false);
-            return superFaktura.DeserializeResult<PagedBankAccountMovement>(result);
+            return superFaktura.DeserializeResult<PagedResponse<BankAccountMovement>>(result);
         }
 
         public async Task<IEnumerable<ActivityLogItem>> ListActivityLogs(string documentType, int documentID, int limit = 10)

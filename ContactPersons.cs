@@ -21,21 +21,21 @@ namespace Birko.SuperFaktura
 
         public async Task<IEnumerable<Response.ContactPersons.ContactPerson>> List(int id)
         {
-            var result = await superFaktura.Get("/contact_people/getContactPeople/" + id).ConfigureAwait(false);
+            var result = await superFaktura.Get("contact_people/getContactPeople/" + id).ConfigureAwait(false);
             var data = superFaktura.DeserializeResult<IEnumerable<Item>>(result);
             return data.Select(x => x.ContactPerson);
         }
 
         public async Task<Response.ContactPersons.ContactPerson> Add(Request.ContactPersons.ContactPerson person)
         {
-            var result = await superFaktura.Post("/contact_people/add/api:1", new ContactPersonData { ContactPerson = person }).ConfigureAwait(false);
+            var result = await superFaktura.Post("contact_people/add/api:1", new ContactPersonData { ContactPerson = person }).ConfigureAwait(false);
             var data = superFaktura.DeserializeResult<StateResponse<Item>>(result);
             return data.Data.ContactPerson;
         }
 
         public async Task<ErrorResponse> Delete(int id)
         {
-            var result = await superFaktura.Get("/contact_people/delete/" +  id).ConfigureAwait(false);
+            var result = await superFaktura.Get("contact_people/delete/" +  id).ConfigureAwait(false);
             return superFaktura.DeserializeResult<ErrorResponse>(result);
         }
     }

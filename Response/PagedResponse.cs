@@ -7,9 +7,11 @@ using System.Text;
 namespace Birko.SuperFaktura.Response
 {
 
-    public abstract class ItemListResponse<T>
+    public class ItemListResponse<T>
     {
-        public abstract ItemList<T> Items { get; set; }
+        [JsonProperty(PropertyName = "items", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.ListConverter))]
+        public virtual IEnumerable<T> Items { get; set; }
 
         public override string ToString()
         {
@@ -30,7 +32,8 @@ namespace Birko.SuperFaktura.Response
             return builder.ToString();
         }
     }
-    public abstract class PagedResponse<T>: ItemListResponse<T>
+
+    public class PagedResponse<T>: ItemListResponse<T>
     {
         [JsonProperty(PropertyName = "itemCount", NullValueHandling = NullValueHandling.Ignore)]
         public int ItemCount { get; set; } = 0;
@@ -60,9 +63,5 @@ namespace Birko.SuperFaktura.Response
     {
         [JsonProperty(PropertyName = "error", NullValueHandling = NullValueHandling.Ignore)]
         public string Error { get; set; }
-
-        [JsonProperty(PropertyName = "items", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonConverter(typeof(ItemListConverter<ExpandoObject>))]
-        public override ItemList<ExpandoObject> Items { get; set; }
     }
 }

@@ -25,7 +25,7 @@ namespace Birko.SuperFaktura.Response.Expense
         public decimal AmountPaidVAT { get; set; }
 
         [JsonProperty(PropertyName = "client_data", NullValueHandling = NullValueHandling.Ignore)]
-        public ExpandoObject ClientData { get; set; }
+        public string ClientData { get; set; }
 
         [JsonProperty(PropertyName = "country_exchange_rate", NullValueHandling = NullValueHandling.Ignore)]
         public decimal CountryExchangeRate { get; set; }
@@ -86,7 +86,8 @@ namespace Birko.SuperFaktura.Response.Expense
         public string QRURLMAx { get; set; }
 
         [JsonProperty(PropertyName = "rates", NullValueHandling = NullValueHandling.Ignore)]
-        public IEnumerable<decimal> Rates { get; set; }
+        [JsonConverter(typeof(Converters.DictionaryConverter<decimal, Rate>))]
+        public IDictionary<decimal, Rate> Rates { get; set; }
 
         [JsonProperty(PropertyName = "recuring", NullValueHandling = NullValueHandling.Ignore)]
         public string Recuring { get; set; }

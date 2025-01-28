@@ -2,13 +2,14 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 
 namespace Birko.SuperFaktura.Converters
 {
-    public class ListConverter<T> : JsonConverter
+    public class ListConverter: JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
@@ -17,30 +18,31 @@ namespace Birko.SuperFaktura.Converters
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            if (objectType.GetInterfaces().Contains(typeof(IEnumerable<T>)))
+            if (objectType.GetInterfaces().Contains(typeof(IEnumerable)))
             {
                 string startPath = reader.Path;
-                var items = Activator.CreateInstance(objectType);
+                Type type = objectType.GenericTypeArguments?.FirstOrDefault();
+
                 if (reader.TokenType == JsonToken.StartArray)
                 {
-                    foreach (var i in (IEnumerable<T>)serializer.Deserialize(reader, typeof(IEnumerable<T>)))
-                    {
-                        (items as IList<T>).Add(i);
-                    }
+                    return (IEnumerable<object>)serializer.Deserialize(reader, objectType);
                 }
                 else if (reader.TokenType == JsonToken.StartObject)
                 {
+                    var items = (objectType.GetInterfaces().Contains(typeof(IList)))
+                        ? Activator.CreateInstance(objectType)
+                        : Activator.CreateInstance(typeof(List<>).MakeGenericType(type));
                     do
                     {
                         reader.Read(); // read next json token
                         if (reader.TokenType == JsonToken.PropertyName)
                         {
-                            reader.Read();// read property value
                             string[] path = reader.Path.Split(new[] { '.' });
                             string lastPath = path.LastOrDefault();
+                            reader.Read();// read property value
                             if (int.TryParse(lastPath, out int _))
                             {
-                                (items as IList<T>).Add((T)serializer.Deserialize(reader, typeof(T)));
+                                (items as IList).Add(serializer.Deserialize(reader, type));
                             }
                             else
                             {
@@ -55,8 +57,8 @@ namespace Birko.SuperFaktura.Converters
                         }
                     }
                     while (startPath != reader.Path);
+                    return items;
                 }
-                return items;
             }
             return serializer.Deserialize(reader, objectType);
         }

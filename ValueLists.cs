@@ -36,7 +36,7 @@ namespace Birko.SuperFaktura
 
         public async Task<IEnumerable<Logo>> ListLogos()
         {
-            var result = await superFaktura.Get("/users/logo").ConfigureAwait(false);
+            var result = await superFaktura.Get("users/logo").ConfigureAwait(false);
             return superFaktura.DeserializeResult<IEnumerable<Logo>>(result);
         }
 

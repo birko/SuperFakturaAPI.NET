@@ -8,6 +8,9 @@ namespace Birko.SuperFaktura.Response.Client
 {
     public class Client: Request.Client.Client
     {
+        [JsonProperty(PropertyName = "Country", NullValueHandling = NullValueHandling.Ignore)]
+        public Country Country { get; set; }
+
         [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
         public int? ID { get; internal set; }
 

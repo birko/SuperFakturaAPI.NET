@@ -5,12 +5,14 @@ using System.Dynamic;
 
 namespace Birko.SuperFaktura.Response.Expense
 {
-    public class Detail
+    public class Detail : ExpensePaymentData
     {
         [JsonProperty(PropertyName = "Client", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(ArrayObjectConverter))]
         public Client.Client Client { get; set; } = null;
 
         [JsonProperty(PropertyName = "Document", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(ArrayObjectConverter))]
         public Document Document { get; set; } = null;
 
         [JsonProperty(PropertyName = "Expense", NullValueHandling = NullValueHandling.Ignore)]
@@ -23,13 +25,11 @@ namespace Birko.SuperFaktura.Response.Expense
         public ValueLists.Category ExpenseCategory { get; set; } = null;
 
         [JsonProperty(PropertyName = "ExpenseExtra", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(ArrayObjectConverter))]
         public Extra ExpenseExtra { get; set; } = null;
 
         [JsonProperty(PropertyName = "ExpenseItem", NullValueHandling = NullValueHandling.Ignore)]
         public IEnumerable<ExpenseItem> ExpenseItem { get; set; } = null;
-
-        [JsonProperty(PropertyName = "ExpensePayment", NullValueHandling = NullValueHandling.Ignore)]
-        public IEnumerable<Payment> ExpensePayment { get; set; } = null;
 
         [JsonProperty(PropertyName = "MyData", NullValueHandling = NullValueHandling.Ignore)]
         public MyData MyData { get; set; } = null;

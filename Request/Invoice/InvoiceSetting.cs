@@ -5,6 +5,7 @@ namespace Birko.SuperFaktura.Request.Invoice
     public class InvoiceSettings
     {
         [JsonProperty(PropertyName = "bysquare", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.StringBooleanConverter))]
         public bool BySquare { get; set; } = true;
 
         [JsonProperty(PropertyName = "callback_payment", NullValueHandling = NullValueHandling.Ignore)]
@@ -29,7 +30,6 @@ namespace Birko.SuperFaktura.Request.Invoice
         public bool Signature { get; set; } = true;
 
         [JsonProperty(PropertyName = "summary_bg_color", NullValueHandling = NullValueHandling.Ignore)]
-        public bool SummaryBackgroundColor { get; set; } = true;
-
+        public string SummaryBackgroundColor { get; set; }
     }
 }

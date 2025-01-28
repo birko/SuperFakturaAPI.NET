@@ -13,14 +13,14 @@ namespace Birko.SuperFaktura.Response.Invoice
 
         [JsonProperty(PropertyName = "vat_base_separate", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.DictionaryConverter<string, decimal?>))]
-        public Dictionary<string, decimal?> VATBaseSeparate { get; set; }
+        public IDictionary<string, decimal?> VATBaseSeparate { get; set; }
 
         [JsonProperty(PropertyName = "vat_base_total", NullValueHandling = NullValueHandling.Ignore)]
         public decimal VATBaseTotal { get; set; }
 
         [JsonProperty(PropertyName = "vat_separate", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.DictionaryConverter<string, decimal?>))]
-        public Dictionary<string, decimal?> VATSeparate { get; set; }
+        public IDictionary<string, decimal?> VATSeparate { get; set; }
 
         [JsonProperty(PropertyName = "vat_total", NullValueHandling = NullValueHandling.Ignore)]
         public decimal VATTotal { get; set; }

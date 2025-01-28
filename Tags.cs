@@ -50,13 +50,13 @@ namespace Birko.SuperFaktura
 
         public async Task<Response.Tag.Tag> Edit(int id, Tag tag)
         {
-            var result = await superFaktura.Post(string.Format("tags/edit/{0}", id), tag).ConfigureAwait(false);
+            var result = await superFaktura.Post($"tags/edit/{id}", tag).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response.Tag.Tag>(result);
         }
 
         public async Task<ErrorMessageResponse> Delete(int id)
         {
-            var result = await superFaktura.Get(string.Format("tags/delete/{0}", id)).ConfigureAwait(false);
+            var result = await superFaktura.Get($"tags/delete/{id}").ConfigureAwait(false);
             return superFaktura.DeserializeResult<ErrorMessageResponse>(result);
         }
     }

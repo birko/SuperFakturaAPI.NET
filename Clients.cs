@@ -15,16 +15,16 @@ namespace Birko.SuperFaktura
             this.superFaktura = superFaktura;
         }
 
-        public async Task<PagedResponse> List(Filter filter, bool listInfo = true)
+        public async Task<PagedResponse<Item>> List(Filter filter, bool listInfo = true)
         {
             var result = await superFaktura.Get(string.Format("clients/index.json{0}", filter.ToParameters(listInfo))).ConfigureAwait(false);
             if (listInfo)
             {
-                return superFaktura.DeserializeResult<PagedResponse>(result);
+                return superFaktura.DeserializeResult<PagedResponse<Item>>(result);
             }
             else
             {
-                return new PagedResponse { Items = superFaktura.DeserializeResult<ItemList<ListItem>>(result) };
+                return new PagedResponse<Item> { Items = superFaktura.DeserializeResult<IEnumerable<Item>>(result) };
             }
         }
 
@@ -43,13 +43,13 @@ namespace Birko.SuperFaktura
 
         public async Task<DetailClient> View(int id)
         {
-            var result = await superFaktura.Get($"/clients/view/{id}").ConfigureAwait(false);
+            var result = await superFaktura.Get($"clients/view/{id}").ConfigureAwait(false);
             return superFaktura.DeserializeResult<DetailClient>(result);
         }
 
         public async Task<RedirectResponse> Delete(int id)
         {
-            var result = await superFaktura.Delete($"/clients/delete/{id}").ConfigureAwait(false);
+            var result = await superFaktura.Delete($"clients/delete/{id}").ConfigureAwait(false);
             return superFaktura.DeserializeResult<RedirectResponse>(result);
         }
     }

@@ -25,7 +25,7 @@ namespace Birko.SuperFaktura.Request.Client
         public string Comment { get; set; } = string.Empty;
 
         [JsonProperty(PropertyName = "country", NullValueHandling = NullValueHandling.Ignore)]
-        public string Country { get; set; } = string.Empty;
+        public string CountryName { get; set; } = string.Empty;
 
         [JsonProperty(PropertyName = "country_id", NullValueHandling = NullValueHandling.Ignore)]
         public int? CountryID { get; set; } = null;

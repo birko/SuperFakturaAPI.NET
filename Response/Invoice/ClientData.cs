@@ -88,7 +88,7 @@ namespace Birko.SuperFaktura.Response.Invoice
         public bool? DontTravel { get; set; }
 
         [JsonProperty(PropertyName = "due_date", NullValueHandling = NullValueHandling.Ignore)]
-        public DateTime? DueDate { get; set; }
+        public string DueDate { get; set; }
 
         [JsonProperty(PropertyName = "email", NullValueHandling = NullValueHandling.Ignore)]
         public string Email { get; set; }

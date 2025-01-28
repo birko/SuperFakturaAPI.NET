@@ -102,7 +102,7 @@ namespace Birko.SuperFaktura
                 if (testResult.Error != null && testResult.Error.Value > 0)
                 {
                     var testMessageResult = JsonConvert.DeserializeObject<StringMessageResponse>(result);
-                    var exception = new Exceptions.Exception(testResult.Error.Value, testMessageResult.Message, testResult.ErrorMessage.ToString());
+                    var exception = new Exceptions.Exception(testResult.Error.Value, testMessageResult.Message, testResult.ErrorMessage);
                     throw (exception);
                 }
             }
@@ -346,6 +346,9 @@ namespace Birko.SuperFaktura
                 checkSum = CheckSum(dataData);
                 dataData.CheckSum = checkSum;
             }
+#if DEBUG
+            Console.WriteLine(JsonConvert.SerializeObject(data));
+#endif
             return await Post(uri, JsonConvert.SerializeObject(data), checkSum).ConfigureAwait(false);
         }
 
@@ -357,6 +360,9 @@ namespace Birko.SuperFaktura
                 checkSum = CheckSum(dataData);
                 dataData.CheckSum = checkSum;
             }
+#if DEBUG
+            Console.WriteLine(JsonConvert.SerializeObject(data));
+#endif
             return await PostByte(uri, JsonConvert.SerializeObject(data), checkSum).ConfigureAwait(false);
         }
 
@@ -395,6 +401,9 @@ namespace Birko.SuperFaktura
                 checkSum = CheckSum(dataData);
                 dataData.CheckSum = checkSum;
             }
+#if DEBUG
+            Console.WriteLine(JsonConvert.SerializeObject(data));
+#endif
             return await Patch(uri, JsonConvert.SerializeObject(data), checkSum).ConfigureAwait(false);
         }
 
@@ -458,7 +467,6 @@ namespace Birko.SuperFaktura
 
         private Exceptions.Exception HandleRequestException(string uri, HttpResponseMessage response, Exception ex, string data = null)
         {
-            //CreateClient(true);
             string content = null;
             if (response != null)
             {
@@ -605,7 +613,7 @@ namespace Birko.SuperFaktura
         {
             if (new[] { "slp", "csp" }.Contains(curierType))
             {
-                var result = await Post(string.Format("/{0}_exports/export", curierType), new Request.DataData { Data = data }).ConfigureAwait(false);
+                var result = await Post($"{curierType}_exports/export", new Request.DataData { Data = data }).ConfigureAwait(false);
                 return DeserializeResult<Response<ExpandoObject>>(result);
             }
             return null;
@@ -613,7 +621,7 @@ namespace Birko.SuperFaktura
 
         public async Task<string> ResponseByChecksum(string checksum)
         {
-            return await Get(string.Format("/api_logs/getResponseByChecksum/{0}", checksum)).ConfigureAwait(false);
+            return await Get($"api_logs/getResponseByChecksum/{checksum}").ConfigureAwait(false);
         }
     }
 

@@ -18,24 +18,24 @@ namespace Birko.SuperFaktura
             this.superFaktura = superFaktura;
         }
 
-        public async Task<PagedResponse> List(Filter filter, bool listInfo = true)
+        public async Task<PagedResponse<ListItem>> List(Filter filter, bool listInfo = true)
         {
             var result = await superFaktura.Get(string.Format("stock_items/index.json{0}", filter.ToParameters(listInfo))).ConfigureAwait(false);
             if (listInfo)
             {
-                return superFaktura.DeserializeResult<PagedResponse>(result);
+                return superFaktura.DeserializeResult<PagedResponse<ListItem>>(result);
             }
             else
             {
-                return new PagedResponse { Items = superFaktura.DeserializeResult<ItemList<ListItem>>(result) };
+                return new PagedResponse<ListItem> { Items = superFaktura.DeserializeResult<IEnumerable<ListItem>>(result) };
             }
         }
 
         public async Task<Response.Stock.Item> View(int ID)
         {
-            var result = await superFaktura.Get($"/stock_items/view/{ID}").ConfigureAwait(false);
-            var data = superFaktura.DeserializeResult<Response<Detail>>(result);
-            return data.Data.StockItem;
+            var result = await superFaktura.Get($"stock_items/view/{ID}").ConfigureAwait(false);
+            var data = superFaktura.DeserializeResult<Detail>(result);
+            return data.StockItem;
         }
 
         public async Task<Detail> Add(Request.Stock.Item item)
@@ -75,16 +75,16 @@ namespace Birko.SuperFaktura
             return await AddStockMovement(new[] { item }).ConfigureAwait(false);
         }
 
-        public async Task<PagedLogsResponse> ListStockMovements(int id, PagedParameters filter, bool listInfo = true)
+        public async Task<PagedResponse<LogData>> ListStockMovements(int id, PagedParameters filter, bool listInfo = true)
         {
             var result = await superFaktura.Get(string.Format($"stock_items/movements/{id}", filter.ToParameters(listInfo))).ConfigureAwait(false);
             if (listInfo)
             {
-                return superFaktura.DeserializeResult<PagedLogsResponse>(result);
+                return superFaktura.DeserializeResult<PagedResponse<LogData>>(result);
             }
             else
             {
-                return new PagedLogsResponse { Items = superFaktura.DeserializeResult<ItemList<LogData>>(result) };
+                return new PagedResponse<LogData> { Items = superFaktura.DeserializeResult<IEnumerable<LogData>>(result) };
             }
         }
     }

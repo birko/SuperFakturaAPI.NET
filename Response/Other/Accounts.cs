@@ -11,8 +11,8 @@ namespace Birko.SuperFaktura.Response.Other
         public string APIKey { get; set; }
 
         [JsonProperty(PropertyName = "companies", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonConverter(typeof(Converters.ListConverter<Company>))]
-        public List<Company> Companies { get; set; }
+        [JsonConverter(typeof(Converters.ListConverter))]
+        public IEnumerable<Company> Companies { get; set; }
 
         [JsonProperty(PropertyName = "email", NullValueHandling = NullValueHandling.Ignore)]
         public string Email { get; set; }

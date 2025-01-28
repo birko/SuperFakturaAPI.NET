@@ -84,6 +84,6 @@ namespace Birko.SuperFaktura.Response.Invoice
 
         [JsonProperty(PropertyName = "UnitCount", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(DictionaryConverter<string, decimal?>))]
-        public Dictionary<string, decimal?> UnitCount { get; set; } = null;
+        public IDictionary<string, decimal?> UnitCount { get; set; } = null;
     }
 }

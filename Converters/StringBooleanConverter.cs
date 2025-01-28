@@ -32,8 +32,8 @@ namespace Birko.SuperFaktura.Converters
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            string value = reader.Value.ToString();
-            return !string.IsNullOrEmpty(value) && value.Trim().Equals("1") ? true : (object)false;
+            string value = reader.Value.ToString().ToLower();
+            return !string.IsNullOrEmpty(value) && (value.Trim().Equals("1") || value.Trim().Equals("true")) ? true : (object)false;
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

@@ -85,7 +85,7 @@ namespace Birko.SuperFaktura.Response
     public class Response<T> : StringMessageResponse
     {
         [JsonProperty(PropertyName = "data", NullValueHandling = NullValueHandling.Ignore)]
-        public T Data { get; internal set; }
+        public virtual T Data { get; set; }
 
         public override string ToString()
         {
@@ -93,6 +93,32 @@ namespace Birko.SuperFaktura.Response
             builder.AppendLine(base.ToString());
             builder.AppendLine($"Data: {((Data != null) ? Data.ToString() : "NULL")}");
 
+            return builder.ToString();
+        }
+    }
+
+    public class ListResponse<T> : Response<IEnumerable<T>>
+    {
+        [JsonProperty(PropertyName = "data", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.ListConverter))]
+        public override IEnumerable<T> Data { get; set; }
+
+        public override string ToString()
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.Append(" Data: { \n");
+            if (Data != null)
+            {
+                foreach (var item in Data)
+                {
+                    builder.AppendFormat("\t {0} \n", item.ToString());
+                }
+            }
+            else
+            {
+                builder.AppendFormat("\t {0} \n", "NULL");
+            }
+            builder.Append("},");
             return builder.ToString();
         }
     }

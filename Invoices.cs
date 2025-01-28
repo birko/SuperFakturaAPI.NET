@@ -29,7 +29,7 @@ namespace Birko.SuperFaktura
             }
             else
             {
-                return new PagedResponse { Items = superFaktura.DeserializeResult<ItemList<Detail>>(result) };
+                return new PagedResponse { Items = superFaktura.DeserializeResult<IEnumerable<Detail>>(result) };
             }
         }
 
@@ -46,7 +46,7 @@ namespace Birko.SuperFaktura
                 MyData = myData
             };
 
-            var result = await superFaktura.Post("/invoices/create", data).ConfigureAwait(false);
+            var result = await superFaktura.Post("invoices/create", data).ConfigureAwait(false);
             var response = superFaktura.DeserializeResult<StatusResponse<Detail>>(result);
             return response.Data;
         }
@@ -76,7 +76,7 @@ namespace Birko.SuperFaktura
                 MyData = myData
             };
 
-            var result = await superFaktura.Post("/invoices/edit", data).ConfigureAwait(false);
+            var result = await superFaktura.Post("invoices/edit", data).ConfigureAwait(false);
             var response = superFaktura.DeserializeResult<Response<DetailData>>(result);
             return response.Data;
         }
@@ -136,11 +136,10 @@ namespace Birko.SuperFaktura
             return data.Data.Invoice;
         }
 
-        public async Task<Response.Invoice.Email> MarkAsSentViaMail(MarkEmail email)
+        public async Task<ErrorMessageResponse> MarkAsSentViaMail(MarkEmail email)
         {
             var result = await superFaktura.Post("invoices/mark_as_sent", new MarkEmailData { InvoiceEmail = email }).ConfigureAwait(false);
-            var data = superFaktura.DeserializeResult<EmailResponse>(result);
-            return data.InvoiceEmail;
+            return superFaktura.DeserializeResult<ErrorMessageResponse>(result);
         }
 
         public async Task<DetailBasic> SendPost(Post post)
@@ -180,43 +179,45 @@ namespace Birko.SuperFaktura
 
         public async Task<DeletePayment> DeletePayment(int invoicePaymentID)
         {
-            var result = await superFaktura.Get(string.Format("/invoice_payments/delete/{0}", invoicePaymentID)).ConfigureAwait(false);
+            var result = await superFaktura.Get(string.Format("invoice_payments/delete/{0}", invoicePaymentID)).ConfigureAwait(false);
             return superFaktura.DeserializeResult<DeletePayment>(result);
         }
 
-        public async Task<Detail> AddRelatedItem(Request.RelatedItem related)
+        public async Task<RelatedItemResponse> AddRelatedItem(Request.RelatedItem related)
         {
-            var result = await superFaktura.Post("/invoices/addRelatedItem", related).ConfigureAwait(false);
-            var data = superFaktura.DeserializeResult<Response<Detail>>(result);
+            var result = await superFaktura.Post("invoices/addRelatedItem", related).ConfigureAwait(false);
+            var data = superFaktura.DeserializeResult<Response<RelatedItemResponse>>(result);
             return data.Data;
         }
 
         public async Task<StringMessageResponse> DeleteRelatedItem(int relationID)
         {
-            var result = await superFaktura.Get(string.Format("/invoices/deleteRelatedItem/{0}}", relationID)).ConfigureAwait(false);
+            var result = await superFaktura.Get(string.Format("invoices/deleteRelatedItem/{0}", relationID)).ConfigureAwait(false);
             return superFaktura.DeserializeResult<StringMessageResponse>(result);
         }
 
         public async Task<byte[]> GetReceipt(int invoiceID)
         {
-            var result = await superFaktura.GetByte(string.Format("/invoices/receipt/{0}", invoiceID)).ConfigureAwait(false);
+            var result = await superFaktura.GetByte(string.Format("invoices/receipt/{0}", invoiceID)).ConfigureAwait(false);
             return result;
         }
 
         [Obsolete("Not found in API documentation")]
-        public async Task<Response<Detail>> CreateFromProforma(int proformaID)
+        public async Task<Detail> CreateFromProforma(int proformaID)
         {
             var proforma = await superFaktura.Get(string.Format("invoices/regular.json/{0}", proformaID)).ConfigureAwait(false);
             var data =  superFaktura.DeserializeResult<ExpandoObject>(proforma);
             var result = await superFaktura.Post("/invoices/create", new Request.DataData { Data =  data}).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Response<Detail>>(result);
+            var resultdata = superFaktura.DeserializeResult<Response<Detail>>(result);
+            return resultdata.Data;
         }
 
         [Obsolete("Not found in API documentation")]
-        public async Task<Response<ExpandoObject>> SetEstimateStatus(int estimateID, int status)
+        public async Task<ExpandoObject> SetEstimateStatus(int estimateID, int status)
         {
             var result = await superFaktura.Get(string.Format("invoices/set_estimate_status/{0}/{1}/ajax:1", estimateID, status)).ConfigureAwait(false);
-            return superFaktura.DeserializeResult<Response<ExpandoObject>>(result);
+            var data = superFaktura.DeserializeResult<Response<ExpandoObject>>(result);
+            return data.Data;
         }
     }
 }

@@ -14,7 +14,21 @@ namespace Birko.SuperFaktura.Request.Invoice
         public string InvoiceNumberFormatted { get; set; }
     }
 
-    public class Invoice : InvoiceBasic
+    public class InvoiceInfo : InvoiceBasic
+    {
+        [JsonProperty(PropertyName = "type", NullValueHandling = NullValueHandling.Ignore)]
+        public string Type{ get; internal set; }
+
+        [JsonProperty(PropertyName = "name", NullValueHandling = NullValueHandling.Ignore)]
+        public string Name { get; set; }
+
+        [JsonProperty(PropertyName = "tax_document", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.StringBooleanConverter))]
+        public bool? TaxDocument { get; set; }
+
+    }
+
+    public class Invoice : InvoiceInfo
     {
         [JsonProperty(PropertyName = "add_rounding_item", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.StringBooleanConverter))]
@@ -90,8 +104,6 @@ namespace Birko.SuperFaktura.Request.Invoice
         [JsonProperty(PropertyName = "mark_sent_subject", NullValueHandling = NullValueHandling.Ignore)]
         public string MarkSentSubject { get; set; }
 
-        [JsonProperty(PropertyName = "name", NullValueHandling = NullValueHandling.Ignore)]
-        public string Name { get; set; }
 
         [JsonProperty(PropertyName = "order_no", NullValueHandling = NullValueHandling.Ignore)]
         public string OrderNumber { get; set; }
@@ -116,10 +128,6 @@ namespace Birko.SuperFaktura.Request.Invoice
 
         [JsonProperty(PropertyName = "specific", NullValueHandling = NullValueHandling.Ignore)]
         public string Specific { get; set; }
-
-        [JsonProperty(PropertyName = "tax_document", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonConverter(typeof(Converters.StringBooleanConverter))]
-        public bool? TaxDocument { get; set; }
 
         [JsonProperty(PropertyName = "type", NullValueHandling = NullValueHandling.Ignore)]
         public string InvoiceType { get; set; } = ValueLists.InvoiceType.Regular;

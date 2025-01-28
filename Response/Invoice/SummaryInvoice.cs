@@ -7,19 +7,19 @@ namespace Birko.SuperFaktura.Response.Invoice
     {
         [JsonProperty(PropertyName = "vat_base_separate_negative", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.DictionaryConverter<string, decimal?>))]
-        public Dictionary<string, decimal?>  VATBaseSeparateNegative { get; set; }
+        public IDictionary<string, decimal?>  VATBaseSeparateNegative { get; set; }
 
         [JsonProperty(PropertyName = "vat_base_separate_positive", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.DictionaryConverter<string, decimal?>))]
 
-        public Dictionary<string, decimal?> VATBaseSeparatePositive { get; set; }
+        public IDictionary<string, decimal?> VATBaseSeparatePositive { get; set; }
 
         [JsonProperty(PropertyName = "vat_separate_negative", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.DictionaryConverter<string, decimal?>))]
-        public Dictionary<string, decimal?> VATSeparateNegative { get; set; }
+        public IDictionary<string, decimal?> VATSeparateNegative { get; set; }
 
         [JsonProperty(PropertyName = "vat_separate_positive", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.DictionaryConverter<string, decimal?>))]
-        public Dictionary<string, decimal?> VATSeparatePositive { get; set; }
+        public IDictionary<string, decimal?> VATSeparatePositive { get; set; }
     }
 }

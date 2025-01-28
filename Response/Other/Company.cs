@@ -13,13 +13,13 @@ namespace Birko.SuperFaktura.Response.Other
 
         [JsonProperty(PropertyName = "size", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.DictionaryConverter<string, string>))]
-        public Dictionary<string, string> Size { get; set; }
+        public IDictionary<string, string> Size { get; set; }
     }
 
     public class Company
     {
         [JsonProperty(PropertyName = "Logo", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonConverter(typeof(Converters.ListConverter<Logo>))]
+        [JsonConverter(typeof(Converters.ListConverter))]
         public Logos Logo { get; set; }
 
         [JsonProperty(PropertyName = "Multiaccount", NullValueHandling = NullValueHandling.Ignore)]
