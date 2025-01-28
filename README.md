@@ -17,7 +17,7 @@ It ensures that the delay between api calls is more than 1 second.
 #### 1.1. Public Properties
 * **EnsureSuccessStatusCode** - boolean, default true. Switches the behaviour if System.Net.Http.HttpClient should raise exception for not succesfull response
 * **BankAccounts** - instance of [BankAccounts](#2-bankaccounts) class, description bellow
-* **CashRegisters** - instance of [CashRegisters][#3-cashregisters] class, description bellow
+* **CashRegisters** - instance of [CashRegisters](#3-cashregisters) class, description bellow
 * **Clients** - instance of [Clients](#4-clients) class, description bellow
 * **ContactPersons** - instance of [ContactPersons](#5-contactpersons) class, description bellow
 * **Expenses** - instance of [Expenses](#6-expenses) class, description bellow
