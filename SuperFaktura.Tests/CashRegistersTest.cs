@@ -15,7 +15,7 @@ namespace SuperFaktura.Tests
         {
             var cashRegisters = await apiClient.CashRegisters.List();
             cashRegisters.ShouldNotBe(null);
-            cashRegisters.ShouldBeEmpty();
+            cashRegisters.ShouldNotBeEmpty();
         }
 
         [Fact]

@@ -16,8 +16,8 @@ namespace SuperFaktura.Tests
             var list = await apiClient.Stock.List(new Birko.SuperFaktura.Request.Stock.Filter() { });
             list.ShouldNotBeNull();
             list.Items.ShouldNotBeNull();
-            list.Items.Count.Equals(0);
-            list.ItemCount.Equals(0);
+            list.Items.Count().ShouldBe(0);
+            list.ItemCount.ShouldBe(0);
         }
 
         [Fact]
@@ -100,7 +100,7 @@ namespace SuperFaktura.Tests
             var task = await apiClient.Stock.ListStockMovements(list.Items.First().StockItem.ID.Value, new Birko.SuperFaktura.Request.PagedParameters());
             task.ShouldNotBeNull();
             task.Items.ShouldNotBeNull();
-            task.Items.Count.ShouldBeGreaterThan(0);
+            task.Items.Count().ShouldBeGreaterThan(0);
             task.ItemCount.ShouldBeGreaterThan(0);
         }
 

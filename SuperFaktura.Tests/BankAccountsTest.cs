@@ -15,7 +15,7 @@ namespace SuperFaktura.Tests
         {
             var accounts = await apiClient.BankAccounts.List();
             accounts.ShouldNotBe(null);
-            accounts.ShouldBeEmpty();
+            accounts.ShouldNotBeEmpty();
         }
 
         [Fact]

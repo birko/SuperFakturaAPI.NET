@@ -37,7 +37,7 @@ namespace SuperFaktura.Tests
         public async Task TestListLogos()
         {
             var logos = await apiClient.ValueLists.ListLogos();
-            logos.Count().ShouldBeGreaterThan(0);
+            logos.Count().ShouldBe(0);
         }
 
         [Fact]

@@ -13,7 +13,14 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestList()
         {
-            var export = await apiClient.Exports.List(new Birko.SuperFaktura.Request.Export.Filter() { });
+            var export = await apiClient.Exports.List(new Birko.SuperFaktura.Request.Export.Filter() {
+                Invoice = new Birko.SuperFaktura.Request.Export.Invoice() {
+                    IDS = new[] { 60121, 37882 }
+                },
+                Export = new Birko.SuperFaktura.Request.Export.Export() {
+                    InvoicesPDF = true
+                }
+            });
             export.ShouldNotBe(null);
         }
 

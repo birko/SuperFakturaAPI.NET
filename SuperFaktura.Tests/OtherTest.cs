@@ -21,7 +21,7 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestListUserCompanies()
         {
-            var task = await apiClient.Other.ListUserCompanies();
+            var task = await apiClient.Other.ListUserCompanies(true);
             task.ShouldNotBe(null);
         }
 
