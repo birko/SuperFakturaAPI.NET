@@ -6,6 +6,7 @@ namespace Birko.SuperFaktura.Request.ContactPersons
     {
         [JsonProperty(PropertyName = "client_id", NullValueHandling = NullValueHandling.Ignore)]
         public int? ClientID { get; set; }
+
         [JsonProperty(PropertyName = "name", NullValueHandling = NullValueHandling.Ignore)]
         public string Name { get; set; }
 

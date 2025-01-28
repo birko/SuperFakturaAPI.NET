@@ -16,9 +16,9 @@ namespace Birko.SuperFaktura
             this.superFaktura = superFaktura;
         }
 
-        public async Task<Response.Export.Export> List(Request.Export.Filter filter)
+        public async Task<Response.Export.Export> Export(Request.Export.ExportData export)
         {
-            var result = await superFaktura.Post("exports", filter).ConfigureAwait(false);
+            var result = await superFaktura.Post("exports", export).ConfigureAwait(false);
             var data = superFaktura.DeserializeResult<Response<Response.Export.Export>>(result);
             return data.Data;
         }

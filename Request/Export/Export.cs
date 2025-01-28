@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Birko.SuperFaktura.Request.Export
 {
-    public class Filter: Data
+    public class ExportData : Data
     {
         [JsonProperty(PropertyName = "Invoice", NullValueHandling = NullValueHandling.Ignore)]
         public Invoice Invoice { get; set; }

@@ -21,6 +21,12 @@ namespace Birko.SuperFaktura.Request.ValueLists
         public static string[] Types = new[] { Courier, Haulage, Mail, Personal, PickupPoint };
     }
 
+    public static class DocumenType
+    {
+        public const string Invoice = "invocie";
+        public const string Expense = "expense";
+    }
+
     public static class ExpenseStatus
     {
         public const int New = 1;
@@ -201,7 +207,6 @@ namespace Birko.SuperFaktura.Request.ValueLists
         }
     }
 
-
     public static class StatusType
     {
         public const int All = 0;
@@ -210,6 +215,7 @@ namespace Birko.SuperFaktura.Request.ValueLists
         public const int Paid = 3;
         public const int Overdue = 99;
     }
+
 
     public static class EstimateStatus
     {

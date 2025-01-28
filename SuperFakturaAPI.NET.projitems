@@ -22,9 +22,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Request\Expense\ExpenseItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Expense\Extra.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\RelatedItem.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Request\Export\Filter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Request\Export\Export.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ContactPersons.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Request\Other\Constants.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Other\BankMovementFilter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Other\SMS.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Stock\StockItemData.cs" />
