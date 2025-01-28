@@ -11,9 +11,9 @@ namespace SuperFaktura.Tests
     public class XportsTest : SuperFakturaTest
     {
         [Fact]
-        public async Task TestList()
+        public async Task TestExport()
         {
-            var export = await apiClient.Exports.List(new Birko.SuperFaktura.Request.Export.Filter() {
+            var export = await apiClient.Exports.Export(new Birko.SuperFaktura.Request.Export.ExportData() {
                 Invoice = new Birko.SuperFaktura.Request.Export.Invoice() {
                     IDS = new[] { 60121, 37882 }
                 },

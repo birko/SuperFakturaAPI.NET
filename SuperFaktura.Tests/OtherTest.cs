@@ -46,7 +46,7 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task ListActivityLogs()
         {
-            var task = await apiClient.Other.ListActivityLogs(Birko.SuperFaktura.Request.Other.DocumenType.Expense, 1363);
+            var task = await apiClient.Other.ListActivityLogs(Birko.SuperFaktura.Request.ValueLists.DocumenType.Expense, 1363);
             task.ShouldNotBe(null);
         }
     }
