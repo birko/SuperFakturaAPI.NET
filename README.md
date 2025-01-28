@@ -16,17 +16,17 @@ It ensures that the delay between api calls is more than 1 second.
 
 #### 1.1. Public Properties
 * **EnsureSuccessStatusCode** - boolean, default true. Switches the behaviour if System.Net.Http.HttpClient should raise exception for not succesfull response
-* **BankAccounts** - instance of BankAccounts class, description bellow
-* **CashRegisters** - instance of CashRegisters class, description bellow
-* **Clients** - instance of Clients class, description bellow
-* **ContactPersons** - instance of ContactPersons class, description bellow
-* **Expenses** - instance of Expenses class, description bellow
-* **Exports** - instance of Exports class, description bellow
-* **Invoices** - instance of Invoices class, description bellow
-* **Other** - instance of Other class, description bellow
-* **Stock** - instance of Stock class, description bellow
-* **Tags** - instance of Tags class, description bellow
-* **ValueLists** - instance of ValueLists class, description bellow
+* **BankAccounts** - instance of [BankAccounts](#2-bankaccounts) class, description bellow
+* **CashRegisters** - instance of [CashRegisters][#3-cashregisters] class, description bellow
+* **Clients** - instance of [Clients](#4-clients) class, description bellow
+* **ContactPersons** - instance of [ContactPersons](#5-contactpersons) class, description bellow
+* **Expenses** - instance of [Expenses](#6-expenses) class, description bellow
+* **Exports** - instance of [Exports](#7-exports) class, description bellow
+* **Invoices** - instance of [Invoices](#8-invoices) class, description bellow
+* **Other** - instance of [Other](#9-other) class, description bellow
+* **Stock** - instance of [Stock](#10-stock) class, description bellow
+* **Tags** - instance of [Tags](#11-tags) class, description bellow
+* **ValueLists** - instance of [ValueLists](#11-valuelists) class, description bellow
 
 #### 1.2. Public Methods
 * **SuperFaktura(string email, string apiKey, string apptitle = null, string module = "API", int? companyId = null)** - constructor. email and apiKey are mandatory parameters. Given from SuperFaktura.
@@ -158,6 +158,7 @@ Class that wrappes lits API calls
 * **Delete(int id)** - gets available sequences as dictionary
 
 #### 11.2. Constant Lists
+List are stored in `Birko.SuperFaktura.Request.ValueLists` namespace
 * **AccountingDetailType** - list of accounting types for invocies
 * **DeliveryType** - list of deliveries types
 * **DocumenType** - list of document types for related items and logs
