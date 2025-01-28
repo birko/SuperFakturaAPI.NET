@@ -167,6 +167,7 @@ List are stored in `Birko.SuperFaktura.Request.ValueLists` namespace
 * **ExpenseType** - list of expense types
 * **ExportStatus** - list of export statuses
 * **InvoiceType** - list of invoice types
+* **InvoiceStatus** - list of invoice statuses
 * **LanguageType** - list of supported languages
 * **PaymentType** - list of payment types
 * **PeriodTypes** - list of period types
