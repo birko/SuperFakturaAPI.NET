@@ -6,12 +6,23 @@
     <Company>Birko</Company>
     <PackageId>SuperFaktura</PackageId>
     <PackageProjectUrl>https://github.com/birko/SuperFakturaAPI.NET</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/birko/SuperFakturaAPI.NET</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Description>.NET client library for Superfaktura API</Description>
+    <Title>SuperFaktura API Client</Title>
+    <Copyright>Birko</Copyright>
+    <PackageTags>superfaktura;api;.net</PackageTags>
   </PropertyGroup>
 
   <Import Project="..\..\SuperFakturaAPI.NET\SuperFakturaAPI.NET.projitems" Label="Shared" />
+
+  <ItemGroup>
+    <None Include="..\..\SuperFakturaAPI.NET\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
