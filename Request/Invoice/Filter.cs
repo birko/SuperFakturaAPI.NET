@@ -70,7 +70,7 @@ namespace Birko.SuperFaktura.Request.Invoice
 
         //Invoce.status const
         [JsonProperty(PropertyName = "status")]
-        public int Status { get; set; } = ValueLists.StatusType.All;
+        public int? Status { get; set; } = null;
 
         [JsonProperty(PropertyName = "tag")]
         public int? Tag { get; set; } = null;
@@ -100,7 +100,10 @@ namespace Birko.SuperFaktura.Request.Invoice
             {
                 paramString += "/payment_type:" + PaymentType;
             }
-            paramString += "/status:" + Status;
+            if (Status.HasValue)
+            {
+                paramString += "/status:" + Status;
+            }
             if (ClientId.HasValue)
             {
                 paramString += "/client_id:" + ClientId;

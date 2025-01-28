@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 
 namespace Birko.SuperFaktura.Request.ValueLists
 {
@@ -80,6 +81,17 @@ namespace Birko.SuperFaktura.Request.ValueLists
 
         public static string[] Types = new[] { Cancel, Delivery, Draft, Estimate, Order, ProForma, Regular, ReverseOrder };
     }
+
+    public static class InvoceStatus
+    {
+        public const int Issued = 1;
+        public const int PartiallyPaid = 2;
+        public const int Paid = 3;
+        public const int Overdue = 99;
+
+        public static int[] Statuses = new[] { Issued, PartiallyPaid, Paid, Overdue };
+    }
+
     public static class LanguageType
     {
         public const string Czech = "cze";
@@ -207,16 +219,7 @@ namespace Birko.SuperFaktura.Request.ValueLists
         }
     }
 
-    public static class StatusType
-    {
-        public const int All = 0;
-        public const int WaitingForPayment = 1;
-        public const int PartiallyPaid = 2;
-        public const int Paid = 3;
-        public const int Overdue = 99;
-    }
-
-
+    [Obsolete("Not found in API documentation")]
     public static class EstimateStatus
     {
         public const int NotApproved = 1;
