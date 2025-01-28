@@ -82,7 +82,7 @@ namespace Birko.SuperFaktura.Request.ValueLists
         public static string[] Types = new[] { Cancel, Delivery, Draft, Estimate, Order, ProForma, Regular, ReverseOrder };
     }
 
-    public static class InvoceStatus
+    public static class InvoiceStatus
     {
         public const int Issued = 1;
         public const int PartiallyPaid = 2;
