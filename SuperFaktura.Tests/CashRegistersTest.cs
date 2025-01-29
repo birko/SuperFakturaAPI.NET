@@ -108,5 +108,26 @@ namespace SuperFaktura.Tests
             }
             var summary = await apiClient.CashRegisters.DeleteItems(items.Items.Select(x => x.CashRegisterItem.ID));
         }
+
+        [Fact]
+        public async Task TestDownload()
+        {
+            var cashRegisters = await apiClient.CashRegisters.List();
+            if (!(cashRegisters?.Any() ?? false))
+            {
+                return;
+            }
+            var items = await apiClient.CashRegisters.ListItems(new Birko.SuperFaktura.Request.CashRegister.Filter()
+            {
+                ID = cashRegisters.First().ID.Value
+            });
+
+            if (!(items.Items?.Any() ?? false))
+            {
+                return;
+            }
+            var bytes = await apiClient.CashRegisters.Download(items.Items.FirstOrDefault().CashRegisterItem.ID);
+            bytes.ShouldNotBeEmpty();
+        }
     }
 }

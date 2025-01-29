@@ -336,5 +336,31 @@ namespace SuperFaktura.Tests
             var task = await apiClient.Invoices.Delete(detail.Invoice.ID.Value);
             task.ShouldNotBeNull();
         }
+
+        [Fact]
+        public async Task TestDownload()
+        {
+            var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter() { PerPage = 200 });
+            if (!(invoices?.Items?.Any() ?? false))
+            {
+                return;
+            }
+            var detail = invoices?.Items?.First();
+            var bytes = await apiClient.Invoices.Download(detail.Invoice.ID.Value, detail.Invoice.Token);
+            bytes.ShouldNotBeEmpty();
+        }
+
+        [Fact]
+        public async Task TestDownloadReceipt()
+        {
+            var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter() { PerPage = 200 });
+            if (!(invoices?.Items?.Any() ?? false))
+            {
+                return;
+            }
+            var detail = invoices?.Items?.First();
+            var bytes = await apiClient.Invoices.DownloadReceipt(detail.Invoice.ID.Value);
+            bytes.ShouldNotBeEmpty();
+        }
     }
 }

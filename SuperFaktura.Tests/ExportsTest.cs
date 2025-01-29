@@ -31,5 +31,12 @@ namespace SuperFaktura.Tests
             var export = await apiClient.Exports.Status(132);
             export.ShouldNotBe(null);
         }
+
+        [Fact]
+        public async Task TestDownload()
+        {
+            var bytes = await apiClient.Exports.Download(132);
+            bytes.ShouldNotBeEmpty();
+        }
     }
 }
