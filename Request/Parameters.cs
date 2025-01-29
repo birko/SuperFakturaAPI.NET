@@ -77,6 +77,11 @@ namespace Birko.SuperFaktura.Request
             }
             if (PerPage > 0)
             {
+                //Limit
+                if (PerPage > 200)
+                {
+                    PerPage = 200;
+                }
                 paramString += "/per_page:" + PerPage;
             }
 
@@ -101,6 +106,11 @@ namespace Birko.SuperFaktura.Request
             }
             if (PerPage > 0)
             {
+                //Limit
+                if (PerPage > 200)
+                {
+                    PerPage = 200;
+                }
                 paramString += "/per_page:" + PerPage;
             }
 

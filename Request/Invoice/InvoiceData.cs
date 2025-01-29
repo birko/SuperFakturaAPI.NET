@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Birko.SuperFaktura.Converters;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace Birko.SuperFaktura.Request.Invoice
@@ -13,6 +14,7 @@ namespace Birko.SuperFaktura.Request.Invoice
 
         public Client.Client Client { get; set; }
 
+        [JsonConverter(typeof(ZeroObjectConverter))]
         public InvoiceSettings InvoiceSetting { get; set; }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]

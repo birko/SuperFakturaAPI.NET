@@ -59,15 +59,19 @@ namespace Birko.SuperFaktura.Response.Invoice
         public string Errors { get; set; }
 
         [JsonProperty(PropertyName = "created", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(DateTimeConverter))]
         public DateTime? Created { get; set; }
 
         [JsonProperty(PropertyName = "modified", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(DateTimeConverter))]
         public DateTime? Modified { get; set; }
 
         [JsonProperty(PropertyName = "requested", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(DateTimeConverter))]
         public DateTime? Requested { get; set; }
 
         [JsonProperty(PropertyName = "sent", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(DateTimeConverter))]
         public DateTime? Send { get; set; }
     }
 }

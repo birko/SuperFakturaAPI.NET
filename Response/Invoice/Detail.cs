@@ -53,6 +53,7 @@ namespace Birko.SuperFaktura.Response.Invoice
         public IEnumerable<Payment> InvoicePayment { get; set; } = null;
 
         [JsonProperty(PropertyName = "InvoiceSetting", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(ZeroObjectConverter))]
         public InvoiceSettings InvoiceSetting { get; set; } = null;
 
         [JsonProperty(PropertyName = "Logo", NullValueHandling = NullValueHandling.Ignore)]

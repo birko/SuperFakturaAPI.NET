@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Converters\ListConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\ArrayObjectConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\DateTimeConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\ZeroObjectConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\StringIntConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exports.cs" />

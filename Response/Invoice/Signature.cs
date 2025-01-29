@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Birko.SuperFaktura.Converters;
+using Newtonsoft.Json;
 using System;
 
 namespace Birko.SuperFaktura.Response.Invoice
@@ -18,9 +19,11 @@ namespace Birko.SuperFaktura.Response.Invoice
         public DateTime Created { get; set; }
 
         [JsonProperty(PropertyName = "default", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(StringBooleanConverter))]
         public bool Default { get; set; }
 
         [JsonProperty(PropertyName = "default_flag", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(StringBooleanConverter))]
         public bool DefaultFlag { get; set; }
 
         [JsonProperty(PropertyName = "dirname", NullValueHandling = NullValueHandling.Ignore)]

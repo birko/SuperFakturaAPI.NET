@@ -85,7 +85,7 @@ namespace Birko.SuperFaktura.Response.Invoice
         public int SummaryInvoice { get; set; }
 
         [JsonProperty(PropertyName = "tags", NullValueHandling = NullValueHandling.Ignore)]
-        public IEnumerable<int> Tags { get; set; }
+        public string Tags { get; set; }
 
         [JsonProperty(PropertyName = "taxdate", NullValueHandling = NullValueHandling.Ignore)]
         public DateTime? TaxDate { get; set; }

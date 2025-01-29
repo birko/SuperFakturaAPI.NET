@@ -17,8 +17,10 @@ namespace Birko.SuperFaktura.Converters
             {
                 return null;
             }
-            string value = reader.Value?.ToString();
-            return value == "0" ? null : serializer.Deserialize(reader, objectType);
+            string value = reader.Value?.ToString()?.ToLower();
+            return (value == "0" || value == "false")
+                ? null
+                : serializer.Deserialize(reader, objectType);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
