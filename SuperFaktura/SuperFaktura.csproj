@@ -13,6 +13,8 @@
     <Title>SuperFaktura API Client</Title>
     <Copyright>Birko</Copyright>
     <PackageTags>superfaktura;api;.net</PackageTags>
+    <AssemblyVersion>1.1.32</AssemblyVersion>
+    <FileVersion>1.1.32</FileVersion>
   </PropertyGroup>
 
   <Import Project="..\..\SuperFakturaAPI.NET\SuperFakturaAPI.NET.projitems" Label="Shared" />
