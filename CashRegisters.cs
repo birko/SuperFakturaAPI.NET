@@ -63,7 +63,7 @@ namespace Birko.SuperFaktura
             return superFaktura.DeserializeResult<CashRegisterSummaryResponse>(result);
         }
 
-        public async Task<byte[]> GetReceipt(int id)
+        public async Task<byte[]> Download(int id)
         {
             return await superFaktura.GetByte($"cash_register_items/receipt/{id}").ConfigureAwait(false);
         }

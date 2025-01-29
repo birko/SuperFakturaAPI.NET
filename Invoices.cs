@@ -92,7 +92,7 @@ namespace Birko.SuperFaktura
             return superFaktura.DeserializeResult<StringMessageResponse>(result);
         }
 
-        public async Task<byte[]> GetPdf(int invoiceId, string token, string language = Request.ValueLists.LanguageType.Slovak)
+        public async Task<byte[]> Download(int invoiceId, string token, string language = Request.ValueLists.LanguageType.Slovak)
         {
             if (!Request.ValueLists.LanguageType.Languages.Contains(language))
             {
@@ -122,7 +122,7 @@ namespace Birko.SuperFaktura
             return superFaktura.DeserializeResult<StringMessageResponse>(result);
         }
 
-        public async Task<DetailBasic> WillNotBePid(int id)
+        public async Task<DetailBasic> WillNotBePaid(int id)
         {
             var result = await superFaktura.Get(string.Format("invoices/will_not_be_paid/{0}", id)).ConfigureAwait(false);
             var detail = superFaktura.DeserializeResult<Response<DetailBasic>>(result);
@@ -196,7 +196,7 @@ namespace Birko.SuperFaktura
             return superFaktura.DeserializeResult<StringMessageResponse>(result);
         }
 
-        public async Task<byte[]> GetReceipt(int invoiceID)
+        public async Task<byte[]> DownloadReceipt(int invoiceID)
         {
             var result = await superFaktura.GetByte(string.Format("invoices/receipt/{0}", invoiceID)).ConfigureAwait(false);
             return result;

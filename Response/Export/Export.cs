@@ -6,6 +6,11 @@ using System.Text;
 namespace Birko.SuperFaktura.Response.Export
 {
 
+    public class ExporData
+    {
+        public Export Export { get; set; }
+    }
+
     public class Export
     {
         [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]

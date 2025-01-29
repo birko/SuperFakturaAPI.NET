@@ -595,9 +595,10 @@ namespace Birko.SuperFaktura
             APIURL = "https://moja.superfaktura.sk/";
         }
 
+        [Obsolete("Not fount in API documentation")]
         public async Task<Response<Register>> Register(string email, bool sendEmail = true)
         {
-            var result = await Post("/users/create", new Request.UserData
+            var result = await Post("users/create", new Request.UserData
             {
                 User = new Request.User
                 {
@@ -608,7 +609,7 @@ namespace Birko.SuperFaktura
             return DeserializeResult<Response<Register>>(result);
         }
 
-
+        [Obsolete("Not fount in API documentation")]
         public async Task<Response<ExpandoObject>> GetCourierData(string curierType, object data)
         {
             if (new[] { "slp", "csp" }.Contains(curierType))
@@ -619,6 +620,7 @@ namespace Birko.SuperFaktura
             return null;
         }
 
+        [Obsolete("Not fount in API documentation")]
         public async Task<string> ResponseByChecksum(string checksum)
         {
             return await Get($"api_logs/getResponseByChecksum/{checksum}").ConfigureAwait(false);

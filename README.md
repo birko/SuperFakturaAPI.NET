@@ -6,72 +6,71 @@ Library uses System.Net.Http.HttpClient as communication layer and Newtonsoft.Js
 Implementation used by [FinStat.sk](http://www.finstat.sk)
 
 ## Client structure
-The main api client has this hierarchy. Most of used classes is from **Birko.SuperFaktura** namespace
+The main api client class [`SuperFaktura`](#superfaktura) has this hierarchy. Most of used classes is from `Birko.SuperFaktura` namespace
  
-### 1. SuperFaktura
-Also: **SuperFakturaCZ** and **SuperFakturaAT**
+### SuperFaktura
 Main class. Ensures the propper API calling, serialization of request parameters and deserialization of response from SuperFaktura servers.
 It ensures that the delay between api calls is more than 1 second.
-> Includes **SuperFakturaSandbox** and **SuperFakturaSandboxCZ** for testing purposes
+> Localized classes `SuperFakturaCZ` and `SuperFakturaAT` for country specific endpoints
 
-#### 1.1. Public Properties
+> Sandbox classes `SuperFakturaSandbox` and `SuperFakturaSandboxCZ` for testing endpoints
+
+#### Public Properties
 * **EnsureSuccessStatusCode** - boolean, default true. Switches the behaviour if System.Net.Http.HttpClient should raise exception for not succesfull response
-* **BankAccounts** - instance of [BankAccounts](#2-bankaccounts) class, description bellow
-* **CashRegisters** - instance of [CashRegisters](#3-cashregisters) class, description bellow
-* **Clients** - instance of [Clients](#4-clients) class, description bellow
-* **ContactPersons** - instance of [ContactPersons](#5-contactpersons) class, description bellow
-* **Expenses** - instance of [Expenses](#6-expenses) class, description bellow
-* **Exports** - instance of [Exports](#7-exports) class, description bellow
-* **Invoices** - instance of [Invoices](#8-invoices) class, description bellow
-* **Other** - instance of [Other](#9-other) class, description bellow
-* **Stock** - instance of [Stock](#10-stock) class, description bellow
-* **Tags** - instance of [Tags](#11-tags) class, description bellow
-* **ValueLists** - instance of [ValueLists](#11-valuelists) class, description bellow
+* **BankAccounts** - instance of [`BankAccounts`](#bankaccounts) class, description bellow
+* **CashRegisters** - instance of [`CashRegisters`](#cashregisters) class, description bellow
+* **Clients** - instance of [`Clients`](#clients) class, description bellow
+* **ContactPersons** - instance of [`ContactPersons`](#contactpersons) class, description bellow
+* **Expenses** - instance of [`Expenses`](#expenses) class, description bellow
+* **Exports** - instance of [`Exports`](#exports) class, description bellow
+* **Invoices** - instance of [`Invoices`](#invoices) class, description bellow
+* **Other** - instance of [`Other`](#other) class, description bellow
+* **Stock** - instance of [`Stock`](#stock) class, description bellow
+* **Tags** - instance of [`Tags`](#tags) class, description bellow
+* **ValueLists** - instance of [`ValueLists`](#valuelists) class, description bellow
 
-#### 1.2. Public Methods
+#### Public Methods
 * **SuperFaktura(string email, string apiKey, string apptitle = null, string module = "API", int? companyId = null)** - constructor. email and apiKey are mandatory parameters. Given from SuperFaktura.
 
-* **Register(string email, bool sendEmail)** - registers new user to your SuperFaktura account.
-
-### 2. BankAccounts
+### BankAccounts
 Class that wrappes bank accounts API
-#### 2.1. Public Methods
+#### Public Methods
 * **List** - returns lists of bank accounts
 * **Add(Request.BankAccounts.BankAccount account)** - adds new bank account 
 * **Edit(int id, Request.BankAccounts.BankAccoun account)** - edits bank account with given `id`
 * **Delete(int id)** - deletes bank account with given `id`
 
-### 3. CashRegisters
+### CashRegisters
 Class that wrappes cash registers API calls
-#### 3.1. Public Methods
+#### Public Methods
 * **List** - returns lists of cash registers
 * **View(int id)** - get cash register detail according given `id`
 * **ListItems(Request.CashRegister.Filter filter)** - gets all items in cash register according `filter`
 * **AddItem(Request.CashRegister.CashRegisterItem item)** - adds cash register item
 * **DeleteItem(int id)** - deletes cash register item with given `id`
 * **DeleteItem(int[] ids)** - deletes cash register item with given list of `id`
-* **GetReceipt(int id)** - get PDF receipt according cash register item with given `id` as byte array
+* **Download(int id)** - get PDF receipt according cash register item with given `id` as byte array
 
-### 4. Clients
+### Clients
 Class that wrappes clients API calls
-#### 4.1. Public Methods
+#### Public Methods
 * **List(Request.Client.Filter filter, bool listInfo = true)** - returns lists of clients according `filter`
 * **Add(Request.Client.Client client, int[] tags = null)** - add new client, optional 'tags'
 * **Edit(int id, Request.Client.Client client, int[] tags = null)** - add client according given `id`. Optional `tags` can be specified
 * **View(int id)** - get client detail according given `id`
 * **Delete(int id)** - deletes client with given `id`
 
-### 5. ContactPersons
+### ContactPersons
 Class that wrappes contact people API calls
-#### 5.1. Public Methods
+#### Public Methods
 * **List(int id)** - returns list of contacts according given client `id`
 * **Add(Request.ContactPersons.ContactPerson)** - add new contact person
 * **Delete(int id)** - deletes contact person with given `id`
 
-### 6. Expenses
+### Expenses
 Class that wrappes all API calls for expenses handling in SuperFaktura.
 
-#### 6.1. Public Methods
+#### Public Methods
 * **List(Request.Expense.Filter filter, bool listInfo)** - gets list of expenses according `filter`
 * **Add(Request.Expense.Expense expense, Request.Expense.ExpenseItem[] items = null, Request.Client.Client client = null, Request.Expense.Extra extra = null, int[] tags = null)** - adds new expense entry. Optional  `items`, `client`, `extra` and `tags` can be specified
 * **Edit(Request.Expense.Expense expense, Request.Expense.ExpenseItem[] items = null, Request.Client.Client client = null, Request.Expense.Extra extra = null, int[] tags = null)** - edits expense entry. Optional  `items`, `client`, `extra` and `tags` can be specified
@@ -82,27 +81,27 @@ Class that wrappes all API calls for expenses handling in SuperFaktura.
 * **AddRelatedItem(Request.RelatedItem relatedItem)** - adds related item to expense
 * **DeleteRelatedItem(int id)** - deletes related item with given relation `id`
 
-### 7. Exports
+### Exports
 Class that wrappes exports API calls
 
-#### 7.1. Public Methods
+#### Public Methods
 * **Export(Request.Export.ExportData export)** - creates an export request with given `export` data
 * **Status(int id)** - show export status according given `id`
 * **Download(int id)** - downloads export according given `id` as byte array
 
-### 8. Invoices
+### Invoices
 Class that wrappes invoce API calls
 
-#### 8.1. Public Methods
+#### Public Methods
 * **List(Request.Invoice.Filter filter, bool listInfo = true)** - gets list of invoices according `filter`
 * **Add(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Request.Invoice.InvoiceSettings setting = null, Request.Invoice.Extra extra = null, Request.Invoice.MyData myData = null)** - creates new invoice. Optional  `tags`, `setting`, `extra` and `myData` can be specified
 * **Edit(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Request.Invoice.InvoiceSettings setting = null, Request.Invoice.Extra extra = null, Request.Invoice.MyData myData = null)** - updates invoice. Optional  `tags`, `setting`, `extra` and `myData` can be specified
 * **View(int id)** - gets invoice detail according `id`
 * **ListDetails(int[] ids)** - gets invoice details according given list of invoice `id`
 * **SetInvoiceLanguage(int id, string language)** - sets the default language for given invoice `id`
-* **GetPdf(int id, string token, string language)** - gets the PDF for given invoice `id` as byte array
+* **Download(int id, string token, string language)** - gets the PDF for given invoice `id` as byte array
 * **Delete(int id)** - deletes invoice with given `id`
-* **WillNotBePid(int id)** - sets invoice with given `id` asn wil not be paid
+* **WillNotBePaid(int id)** - sets invoice with given `id` asn wil not be paid
 * **SendEmail(Request.Invoice.Email email)** - sends Email with invoice
 * **MarkAsSentViaMail(Request.Invoice.MarkEmail email)** - marks sended email with invoice
 * **SendPost(Post post)** - send invoice throw regular post
@@ -113,22 +112,22 @@ Class that wrappes invoce API calls
 * **DeletePayment(int id)** - deletes invoice payment  with given payment `id`
 * **AddRelatedItem(Request.RelatedItem relatedItem)** - adds related item to expense
 * **DeleteRelatedItem(int id)** - deletes related item with given relation `id`
-* **GetReceipt(int id)** - downloads receipt according given invoice `id` as  byte array
+* **DownloadReceipt(int id)** - downloads receipt according given invoice `id` as  byte array
 
-### 9. Other
+### Other
 Class that wrappes all other API calls
 
-#### 9.1. Public Methods
+#### Public Methods
 * **ListAccounts()** - gets list of user accounts
 * **ListUserCompanies(bool all = false)** - gets list of user copmanies. Oprional `all` switch parameter
 * **SendSMS(Request.Other.SMS sms)** - sends and SMS
 * **ListBankAccountMovements(Request.Other.BankMovementFilter filter)** - returns all bank account movements according given `filter`
 * **ListActivityLogs(string documentType, int documentId, int limit = 10)** - returns all log for given `documentType` and `documentId`. Optional list `limit` parameter can be specified
 
-### 10. Stock
+### Stock
 Class that wrappes stock API calls
 
-#### 10.1. Public Methods
+#### Public Methods
 * **List(Filter filter, bool listInfo = true)** - gets list of stock items according filter
 * **Add(Request.Stock.Item item)** - adds new stock item
 * **Edit(int id, Request.Stock.Item item)** - edits stock item according `id`
@@ -138,30 +137,30 @@ Class that wrappes stock API calls
 * **AddStockMovement(Request.Stock.Log item)** - adds stock movement log  to stock item
 * **ListStockMovements(int id, Request.PagedParameters filter, bool listInfo = true)** - gets stock movements for items item detail according `id` and given `filter`
 
-### 11. Tags
+### Tags
 Class that wrappes tags API calls
 
-#### 11.1. Public Methods
+#### Public Methods
 * **List()** - gets list of stored tags
 * **Add(Request.Tags.Tag tag)** - adds new tag
 * **Edit(int id, equest.Tags.Tag tag)** - edits tag with `id`
 * **Delete(int id)** - deletes tag with `id`
 
-### 11. ValueLists
-Class that wrappes lits API calls
+### ValueLists
+Class that wrappes lists API calls
 
-#### 11.1. Public Methods
-* **ListCountries()** - gets list country names and and iso ids as dictionary
+#### Public Methods
+* **ListCountries()** - gets country names and and ids as dictionary
 * **ListCountriesFull()** - gets full Country list
 * **ListExpenseCategories** - gets list of ExpenseCategories
-* **ListSequences()** - gets list of uploaded logos
-* **Delete(int id)** - gets available sequences as dictionary
+* **ListLogos()** - gets list of uploaded logos
+* **ListSequences()** - gets available sequences as dictionary
 
-#### 11.2. Constant Lists
+#### Constant Lists
 List are stored in `Birko.SuperFaktura.Request.ValueLists` namespace
 * **AccountingDetailType** - list of accounting types for invocies
 * **DeliveryType** - list of deliveries types
-* **DocumenType** - list of document types for related items and logs
+* **DocumentType** - list of document types for related items and logs
 * **ExpenseStatus** - list of expense statuses
 * **ExpenseVersion** - list of expense type versions
 * **ExpenseType** - list of expense types
@@ -174,4 +173,3 @@ List are stored in `Birko.SuperFaktura.Request.ValueLists` namespace
 * **RoundingType** - list of invoce or expense rounding types
 * **TimeFilterConstants** - list of time numeric constants used in some filters
 * **TimeFilter** - list of time string constants used in some filters
-* **StatusType** - list invoce payment status types for used in some  filter

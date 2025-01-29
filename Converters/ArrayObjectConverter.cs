@@ -29,7 +29,7 @@ namespace Birko.SuperFaktura.Converters
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            JObject.FromObject(value, serializer).WriteTo(writer);
+            serializer.Serialize(writer, value);
         }
     }
 }

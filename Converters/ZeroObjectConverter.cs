@@ -18,12 +18,12 @@ namespace Birko.SuperFaktura.Converters
                 return null;
             }
             string value = reader.Value?.ToString();
-            return value == "0" ? null : JObject.Load(reader).ToObject(objectType, serializer);
+            return value == "0" ? null : serializer.Deserialize(reader, objectType);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            JObject.FromObject(value, serializer).WriteTo(writer);
+            serializer.Serialize(writer, value);
         }
     }
 }

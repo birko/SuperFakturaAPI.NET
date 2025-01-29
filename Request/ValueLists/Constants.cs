@@ -22,7 +22,7 @@ namespace Birko.SuperFaktura.Request.ValueLists
         public static string[] Types = new[] { Courier, Haulage, Mail, Personal, PickupPoint };
     }
 
-    public static class DocumenType
+    public static class DocumentType
     {
         public const string Invoice = "invocie";
         public const string Expense = "expense";
