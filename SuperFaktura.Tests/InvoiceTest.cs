@@ -75,7 +75,19 @@ namespace SuperFaktura.Tests
                         UnitPrice = 1,
                     }
             });
-            var task = await apiClient.Invoices.Add(sfinvoice, client, items.ToArray());
+            var settings = new Birko.SuperFaktura.Request.Invoice.InvoiceSettings()
+            {
+                BySquare = true,
+                PayPal = true,
+                OnlinePayment = true,
+                CallbackPayment = "www.finstat.sk",
+            };
+
+            var extra = new Birko.SuperFaktura.Request.Invoice.Extra()
+            {
+
+            };
+            var task = await apiClient.Invoices.Add(sfinvoice, client, items.ToArray(), null, settings, extra);
             task.ShouldNotBeNull();
         }
 
@@ -128,7 +140,7 @@ namespace SuperFaktura.Tests
                 return;
             }
             var detail = invoices?.Items?.First();
-            var task = await apiClient.Invoices.WillNotBePid(detail.Invoice.ID.Value);
+            var task = await apiClient.Invoices.WillNotBePaid(detail.Invoice.ID.Value);
             task.ShouldNotBeNull();
         }
 

@@ -26,9 +26,9 @@ namespace SuperFaktura.Tests
 
 
         [Fact]
-        public async Task TestShow()
+        public async Task TestStatus()
         {
-            var export = await apiClient.Exports.Status(1363);
+            var export = await apiClient.Exports.Status(132);
             export.ShouldNotBe(null);
         }
     }
