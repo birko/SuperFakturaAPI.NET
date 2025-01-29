@@ -61,8 +61,15 @@ namespace Birko.SuperFaktura.Response.Invoice
         [JsonProperty(PropertyName = "PaymentLink", NullValueHandling = NullValueHandling.Ignore)]
         public string PaymentLink { get; set; }
 
+        [JsonProperty(PropertyName = "OnlinePayment", NullValueHandling = NullValueHandling.Ignore)]
+        public string OnlinePayment { get; set; }
+
+        [JsonProperty(PropertyName = "OnlinePaymentLinks", NullValueHandling = NullValueHandling.Ignore)]
+        public string OnlinePaymentLinks { get; set; }
+
         [JsonProperty(PropertyName = "Paypal", NullValueHandling = NullValueHandling.Ignore)]
-        public bool PayPal { get; set; }
+        [JsonConverter(typeof(StringBooleanConverter))]
+        public string PayPal { get; set; }
 
         [JsonProperty(PropertyName = "PostStamp", NullValueHandling = NullValueHandling.Ignore)]
         public IEnumerable<PostStamp> PostStamp { get; set; } = null;
