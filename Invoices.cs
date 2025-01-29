@@ -149,7 +149,7 @@ namespace Birko.SuperFaktura
             return data.Data;
         }
 
-        public async Task<Mark> MarkAsSend(int invoiceID)
+        public async Task<Mark> MarkAsSent(int invoiceID)
         {
             var result = await superFaktura.Get(string.Format("invoices/mark_sent/{0}", invoiceID)).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Mark>(result);
