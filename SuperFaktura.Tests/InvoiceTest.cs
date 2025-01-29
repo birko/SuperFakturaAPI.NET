@@ -221,7 +221,7 @@ namespace SuperFaktura.Tests
         }
 
         [Fact]
-        public async Task TestMarkAsSend()
+        public async Task TestMarkAsSent()
         {
             var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter() { PerPage = 200 });
             if (!(invoices?.Items?.Any() ?? false))
@@ -229,7 +229,7 @@ namespace SuperFaktura.Tests
                 return;
             }
             var detail = invoices?.Items?.First();
-            var task = await apiClient.Invoices.MarkAsSend(detail.Invoice.ID.Value);
+            var task = await apiClient.Invoices.MarkAsSent(detail.Invoice.ID.Value);
             task.ShouldNotBeNull();
         }
 

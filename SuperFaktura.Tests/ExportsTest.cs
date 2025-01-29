@@ -8,7 +8,7 @@ using Xunit;
 
 namespace SuperFaktura.Tests
 {
-    public class XportsTest : SuperFakturaTest
+    public class ExportsTest : SuperFakturaTest
     {
         [Fact]
         public async Task TestExport()
