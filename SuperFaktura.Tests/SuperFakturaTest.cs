@@ -15,7 +15,12 @@ namespace SuperFaktura.Tests
             LaunchSettingsFixture.Load();
             var superFakturaApiEmail = System.Environment.GetEnvironmentVariable("SuperFakturaApiEmail");
             var superFakturaApiKey = System.Environment.GetEnvironmentVariable("SuperFakturaApiKey");
+#if DEBUG
             apiClient = new Birko.SuperFaktura.SuperFakturaSandbox(superFakturaApiEmail, superFakturaApiKey);
+#endif
+#if !DEBUG
+            apiClient = new Birko.SuperFaktura.SuperFaktura(superFakturaApiEmail, superFakturaApiKey);
+#endif
         }
     }
 }

@@ -19,6 +19,31 @@ namespace SuperFaktura.Tests
         }
 
         [Fact]
+        public async Task TestListAll()
+        {
+            bool end = false;
+            int page = 1;
+            while (!end)
+            {
+#if DEBUG
+                Console.WriteLine($"Getting Page: {page}");
+#endif
+                var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter()
+                {
+                    Page = page,
+                    PerPage = 200,
+                    Type = String.Join("|", Birko.SuperFaktura.Request.ValueLists.InvoiceType.Types),
+                });
+#if DEBUG
+                Console.WriteLine($"Response Page: {invoices.Page}/{invoices.PageCount}");
+#endif
+                page++;
+                invoices.ShouldNotBe(null);
+                end = invoices.Page == invoices.PageCount;
+            }
+        }
+
+        [Fact]
         public async Task TestListDetails()
         {
             var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter(), false);
