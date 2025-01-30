@@ -2,7 +2,7 @@
 .NET client library for SuperFaktura API.
 > Codes are wrapped as .net Shared Library. So you can [download](https://github.com/birko/SuperFakturaAPI.NET/releases) them and include into your programs or .dll libraries.
 
-> You can also use [![NuGet version (SoftCircuits.Silk)](https://img.shields.io/nuget/v/SuperFaktura.svg?style=flat-square)](https://www.nuget.org/packages/SuperFaktura/)
+> You can also use [![NuGet version (SuperFaktura)](https://img.shields.io/nuget/v/SuperFaktura.svg?style=flat-square)](https://www.nuget.org/packages/SuperFaktura/)
 
 Library uses System.Net.Http.HttpClient as communication layer and Newtonsoft.Json for serialization and deserialization
 
