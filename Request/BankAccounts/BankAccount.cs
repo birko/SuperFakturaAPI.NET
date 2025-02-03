@@ -17,7 +17,7 @@ namespace Birko.SuperFaktura.Request.BankAccounts
         [JsonProperty(PropertyName = "bank_code", NullValueHandling = NullValueHandling.Ignore)]
         public string BankCode { get; set; }
 
-        [JsonProperty(PropertyName = "bank_account", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(PropertyName = "account", NullValueHandling = NullValueHandling.Ignore)]
         public string Account { get; set; }
 
         [JsonProperty(PropertyName = "iban", NullValueHandling = NullValueHandling.Ignore)]
