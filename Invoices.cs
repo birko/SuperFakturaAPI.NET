@@ -92,13 +92,13 @@ namespace Birko.SuperFaktura
             return superFaktura.DeserializeResult<StringMessageResponse>(result);
         }
 
-        public async Task<byte[]> Download(int invoiceId, string token, string language = Request.ValueLists.LanguageType.Slovak)
+        public async Task<byte[]> Download(int invoiceId, string token, string language = Request.ValueLists.LanguageType.Slovak, bool signature = false, bool bySquare = false, bool paypal = false)
         {
             if (!Request.ValueLists.LanguageType.Languages.Contains(language))
             {
                 language = Request.ValueLists.LanguageType.Slovak;
             }
-            var result = await superFaktura.GetByte($"{language}/invoices/pdf/{invoiceId}/token:{token}").ConfigureAwait(false);
+            var result = await superFaktura.GetByte($"{language}/invoices/pdf/{invoiceId}/token:{token}/signature:{(signature ? 1 : 0)}/bysquare:{(bySquare ? 1 : 0)}/paypal:{(paypal ? 1 : 0)}").ConfigureAwait(false);
             //Code below tests if response is a SuperFaktura error response or PDF File
             try
             {

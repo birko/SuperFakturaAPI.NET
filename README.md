@@ -93,7 +93,7 @@ Class that wrappes exports API calls
 * **Download(int id)** - downloads export according given `id` as byte array
 
 ### Invoices
-Class that wrappes invoce API calls
+Class that wrappes invoice API calls
 
 #### Public Methods
 * **List(Request.Invoice.Filter filter, bool listInfo = true)** - gets list of invoices according `filter`
@@ -102,13 +102,13 @@ Class that wrappes invoce API calls
 * **View(int id)** - gets invoice detail according `id`
 * **ListDetails(int[] ids)** - gets invoice details according given list of invoice `id`
 * **SetInvoiceLanguage(int id, string language)** - sets the default language for given invoice `id`
-* **Download(int id, string token, string language)** - gets the PDF for given invoice `id` as byte array
+* **Download(int id, string token, string language, bool signature = false, bool bySquare = false, bool paypal = false)** - gets the PDF for given invoice `id` as byte array. You can specify some options can be displayed on invocie
 * **Delete(int id)** - deletes invoice with given `id`
 * **WillNotBePaid(int id)** - sets invoice with given `id` asn wil not be paid
 * **SendEmail(Request.Invoice.Email email)** - sends Email with invoice
 * **MarkAsSentViaMail(Request.Invoice.MarkEmail email)** - marks sended email with invoice
 * **SendPost(Post post)** - send invoice throw regular post
-* **MarkAsSent(int id)** - marks invoce as send
+* **MarkAsSent(int id)** - marks invoice as send
 * **DeleteItem(int id, int itemid)** - deletes item with `itemid` from invoice with given `id`
 * **DeleteItem(int id, int[] itemid)** - deletes items according given list of `itemid` from invoice with given `id`
 * **AddPayment(Request.Invoice.Payment payment)** - adds payment to invoice
@@ -173,6 +173,6 @@ List are stored in `Birko.SuperFaktura.Request.ValueLists` namespace
 * **LanguageType** - list of supported languages
 * **PaymentType** - list of payment types
 * **PeriodTypes** - list of period types
-* **RoundingType** - list of invoce or expense rounding types
+* **RoundingType** - list of invoice or expense rounding types
 * **TimeFilterConstants** - list of time numeric constants used in some filters
 * **TimeFilter** - list of time string constants used in some filters
