@@ -83,11 +83,26 @@ namespace SuperFaktura.Tests
                 Name = string.Empty,
                 HeaderComment = "Za testovacie produkty",
                 PaymentType = Birko.SuperFaktura.Request.ValueLists.PaymentType.BankTransfer,
-                InvoiceType = Birko.SuperFaktura.Request.ValueLists.InvoiceType.Regular,
+                InvoiceType = Birko.SuperFaktura.Request.ValueLists.InvoiceType.ProForma,
                 IssuedBy = "SF tester",
                 IssuedByEmail = "superfaktura@example.com",
                 IssuedByWeb = "www.finstat.sk",
                 IssuedByPhone = "0987654321",
+                InvoiceCurrency = "EUR"
+                //BankAccounts = new[] {
+                //    new  Birko.SuperFaktura.Request.BankAccounts.BankAccount()
+                //    {
+                //        IBAN ="SK0000000000000000",
+                //        BankName = "New Bank1",
+                //        SWIFT = "12345"
+                //    },
+                //    new  Birko.SuperFaktura.Request.BankAccounts.BankAccount()
+                //    {
+                //        IBAN ="SK0000000000000001",
+                //        BankName = "New Bank2",
+                //        SWIFT = "12346"
+                //    }
+                //}
             };
             var items = new List<Birko.SuperFaktura.Request.Invoice.Item>(new[] {
                 new Birko.SuperFaktura.Request.Invoice.Item()
@@ -96,23 +111,23 @@ namespace SuperFaktura.Tests
                         Description = "test",
                         Quantity =  1,
                         Unit = "ks",
-                        Tax = 20,
-                        UnitPrice = 1,
+                        Tax = 23,
+                        UnitPrice = 1200,
                     }
             });
             var settings = new Birko.SuperFaktura.Request.Invoice.InvoiceSettings()
             {
-                BySquare = true,
-                PayPal = true,
-                OnlinePayment = true,
-                CallbackPayment = "www.finstat.sk",
+                //BySquare = true,
+                //PayPal = true,
+                //OnlinePayment = true,
+                //CallbackPayment = "www.finstat.sk",
             };
 
             var extra = new Birko.SuperFaktura.Request.Invoice.Extra()
             {
 
             };
-            var task = await apiClient.Invoices.Add(sfinvoice, client, items.ToArray(), null, settings, extra);
+            var task = await apiClient.Invoices.Add(sfinvoice, client, items.ToArray(), null, settings, null);
             task.ShouldNotBeNull();
         }
 
@@ -348,6 +363,16 @@ namespace SuperFaktura.Tests
             var detail = invoices?.Items?.First();
             var bytes = await apiClient.Invoices.Download(detail.Invoice.ID.Value, detail.Invoice.Token);
             bytes.ShouldNotBeEmpty();
+            System.IO.File.WriteAllBytes("invoice.pdf", bytes);
+            bytes = await apiClient.Invoices.Download(detail.Invoice.ID.Value, detail.Invoice.Token, signature: true);
+            bytes.ShouldNotBeEmpty();
+            System.IO.File.WriteAllBytes("invoicesignature.pdf", bytes);
+            bytes = await apiClient.Invoices.Download(detail.Invoice.ID.Value, detail.Invoice.Token, bySquare: true);
+            bytes.ShouldNotBeEmpty();
+            System.IO.File.WriteAllBytes("invoicebySquare.pdf", bytes);
+            bytes = await apiClient.Invoices.Download(detail.Invoice.ID.Value, detail.Invoice.Token, paypal: true);
+            bytes.ShouldNotBeEmpty();
+            System.IO.File.WriteAllBytes("invoicepaypal.pdf", bytes);
         }
 
         [Fact]
@@ -361,6 +386,7 @@ namespace SuperFaktura.Tests
             var detail = invoices?.Items?.First();
             var bytes = await apiClient.Invoices.DownloadReceipt(detail.Invoice.ID.Value);
             bytes.ShouldNotBeEmpty();
+            System.IO.File.WriteAllBytes("invoicereceipt.pdf", bytes);
         }
     }
 }

@@ -37,6 +37,7 @@ namespace SuperFaktura.Tests
         {
             var bytes = await apiClient.Exports.Download(132);
             bytes.ShouldNotBeEmpty();
+            System.IO.File.WriteAllBytes("export.zip", bytes);
         }
     }
 }

@@ -128,6 +128,8 @@ namespace SuperFaktura.Tests
             }
             var bytes = await apiClient.CashRegisters.Download(items.Items.FirstOrDefault().CashRegisterItem.ID);
             bytes.ShouldNotBeEmpty();
+
+            System.IO.File.WriteAllBytes("receipt.pdf", bytes);
         }
     }
 }
