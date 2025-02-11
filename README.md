@@ -102,7 +102,7 @@ Class that wrappes invoice API calls
 * **View(int id)** - gets invoice detail according `id`
 * **ListDetails(int[] ids)** - gets invoice details according given list of invoice `id`
 * **SetInvoiceLanguage(int id, string language)** - sets the default language for given invoice `id`
-* **Download(int id, string token, string language, bool signature = false, bool bySquare = false, bool paypal = false)** - gets the PDF for given invoice `id` as byte array. You can specify some options can be displayed on invocie
+* **Download(int id, string token, string language, bool? signature = null, bool? bySquare = null, bool? paypal = null)** - gets the PDF for given invoice `id` as byte array. You can specify some options can be displayed on invocie
 * **Delete(int id)** - deletes invoice with given `id`
 * **WillNotBePaid(int id)** - sets invoice with given `id` asn wil not be paid
 * **SendEmail(Request.Invoice.Email email)** - sends Email with invoice
