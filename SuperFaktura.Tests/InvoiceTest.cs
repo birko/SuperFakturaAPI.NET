@@ -363,16 +363,22 @@ namespace SuperFaktura.Tests
             var detail = invoices?.Items?.First();
             var bytes = await apiClient.Invoices.Download(detail.Invoice.ID.Value, detail.Invoice.Token);
             bytes.ShouldNotBeEmpty();
-            System.IO.File.WriteAllBytes("invoice.pdf", bytes);
-            bytes = await apiClient.Invoices.Download(detail.Invoice.ID.Value, detail.Invoice.Token, signature: true);
+            System.IO.File.WriteAllBytes("invoicenone.pdf", bytes);
+            bytes = await apiClient.Invoices.Download(detail.Invoice.ID.Value, detail.Invoice.Token, Birko.SuperFaktura.Request.ValueLists.LanguageType.Slovak, true, false, false);
             bytes.ShouldNotBeEmpty();
             System.IO.File.WriteAllBytes("invoicesignature.pdf", bytes);
-            bytes = await apiClient.Invoices.Download(detail.Invoice.ID.Value, detail.Invoice.Token, bySquare: true);
+            bytes = await apiClient.Invoices.Download(detail.Invoice.ID.Value, detail.Invoice.Token, Birko.SuperFaktura.Request.ValueLists.LanguageType.Slovak, false, true, false);
             bytes.ShouldNotBeEmpty();
             System.IO.File.WriteAllBytes("invoicebySquare.pdf", bytes);
-            bytes = await apiClient.Invoices.Download(detail.Invoice.ID.Value, detail.Invoice.Token, paypal: true);
+            bytes = await apiClient.Invoices.Download(detail.Invoice.ID.Value, detail.Invoice.Token, Birko.SuperFaktura.Request.ValueLists.LanguageType.Slovak, false, false, true);
             bytes.ShouldNotBeEmpty();
             System.IO.File.WriteAllBytes("invoicepaypal.pdf", bytes);
+            bytes = await apiClient.Invoices.Download(detail.Invoice.ID.Value, detail.Invoice.Token, Birko.SuperFaktura.Request.ValueLists.LanguageType.Slovak, false, false, false);
+            bytes.ShouldNotBeEmpty();
+            System.IO.File.WriteAllBytes("invoiceblank.pdf", bytes);
+            bytes = await apiClient.Invoices.Download(detail.Invoice.ID.Value, detail.Invoice.Token, Birko.SuperFaktura.Request.ValueLists.LanguageType.Slovak, true, true, true);
+            bytes.ShouldNotBeEmpty();
+            System.IO.File.WriteAllBytes("invoicell.pdf", bytes);
         }
 
         [Fact]
