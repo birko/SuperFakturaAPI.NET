@@ -13,9 +13,9 @@
     <Title>SuperFaktura API Client</Title>
     <Copyright>Birko</Copyright>
     <PackageTags>superfaktura;api;.net</PackageTags>
-    <AssemblyVersion>1.1.7</AssemblyVersion>
-    <FileVersion>1.1.7</FileVersion>
-    <Version>1.1.7</Version>
+    <AssemblyVersion>1.1.8</AssemblyVersion>
+    <FileVersion>1.1.8</FileVersion>
+    <Version>1.1.8</Version>
     <PackageIcon>superfaktura-sk-logo23-rgb.png</PackageIcon>
   </PropertyGroup>
 
