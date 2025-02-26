@@ -49,7 +49,7 @@ namespace Birko.SuperFaktura.Request.Invoice
         [JsonProperty(PropertyName = "created", NullValueHandling = NullValueHandling.Ignore)]
         public DateTime? Created { get; set; } = null;
 
-        [JsonProperty(PropertyName = "country_exchange_rate ", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(PropertyName = "country_exchange_rate", NullValueHandling = NullValueHandling.Ignore)]
         public decimal CountryExchangeRate { get; set; } = 1;
 
         [JsonProperty(PropertyName = "delivery", NullValueHandling = NullValueHandling.Ignore)]
