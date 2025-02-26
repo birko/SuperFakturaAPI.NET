@@ -41,7 +41,7 @@ namespace SuperFaktura.Tests
                 return;
             }
 
-            var account = await apiClient.BankAccounts.Edit(accounts.First().ID, new Birko.SuperFaktura.Request.BankAccounts.BankAccount()
+            var account = await apiClient.BankAccounts.Edit(accounts.First().ID.Value, new Birko.SuperFaktura.Request.BankAccounts.BankAccount()
             {
                 Default = true,
                 BankName = "testBankEdit",
@@ -62,7 +62,7 @@ namespace SuperFaktura.Tests
                 return;
             }
 
-            var account = await apiClient.BankAccounts.Delete(accounts.First().ID);
+            var account = await apiClient.BankAccounts.Delete(accounts.First().ID.Value);
             account.ShouldNotBe(null);
             account.Error.Equals(0);
         }

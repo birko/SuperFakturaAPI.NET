@@ -132,6 +132,84 @@ namespace SuperFaktura.Tests
         }
 
         [Fact]
+        public async Task TestAddCZ()
+        {
+            var now = DateTime.Now.Date;
+            var client = new Birko.SuperFaktura.Request.Client.Client()
+            {
+                BankAccount = string.Empty,
+                Name = "Ing. František Beren",
+                ICO = "47883421",
+                DIC = "2020202020",
+                ICDPH = string.Empty,
+                Email = string.Empty,
+                Phone = string.Empty,
+                Address = "Vasilov 116",
+                City = "Vasilov",
+                ZIP = "02951",
+                CountryName = "Slovensko",
+                CountryID = 191,
+            };
+            var sfinvoice = new Birko.SuperFaktura.Request.Invoice.Invoice()
+            {
+                Constant = "308",
+                Created = now,
+                DueDate = now.AddDays(14),
+                Comment = "SF unit test cz",
+                Name = string.Empty,
+                HeaderComment = "Za testovacie produkty CZ",
+                PaymentType = Birko.SuperFaktura.Request.ValueLists.PaymentType.BankTransfer,
+                InvoiceType = Birko.SuperFaktura.Request.ValueLists.InvoiceType.Regular,
+                IssuedBy = "SF tester",
+                IssuedByEmail = "superfaktura@example.com",
+                IssuedByWeb = "www.finstat.sk",
+                IssuedByPhone = "0987654321",
+                InvoiceCurrency = "CZK",
+                CountryExchangeRate = 1,
+                ExchangeRate = 26,
+                //BankAccounts = new[] {
+                //    new  Birko.SuperFaktura.Request.BankAccounts.BankAccount()
+                //    {
+                //        IBAN ="SK0000000000000000",
+                //        BankName = "New Bank1",
+                //        SWIFT = "12345"
+                //    },
+                //    new  Birko.SuperFaktura.Request.BankAccounts.BankAccount()
+                //    {
+                //        IBAN ="SK0000000000000001",
+                //        BankName = "New Bank2",
+                //        SWIFT = "12346"
+                //    }
+                //}
+            };
+            var items = new List<Birko.SuperFaktura.Request.Invoice.Item>(new[] {
+                new Birko.SuperFaktura.Request.Invoice.Item()
+                    {
+                        Name = "test",
+                        Description = "test",
+                        Quantity =  1,
+                        Unit = "ks",
+                        Tax = 23,
+                        UnitPrice = 1200,
+                    }
+            });
+            var settings = new Birko.SuperFaktura.Request.Invoice.InvoiceSettings()
+            {
+                //BySquare = true,
+                //PayPal = true,
+                //OnlinePayment = true,
+                //CallbackPayment = "www.finstat.sk",
+            };
+
+            var extra = new Birko.SuperFaktura.Request.Invoice.Extra()
+            {
+
+            };
+            var task = await apiClient.Invoices.Add(sfinvoice, client, items.ToArray(), null, settings, null);
+            task.ShouldNotBeNull();
+        }
+
+        [Fact]
         public async Task TestEdit()
         {
             var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter() { PerPage = 200});
