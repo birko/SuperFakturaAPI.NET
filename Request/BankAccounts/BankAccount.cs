@@ -4,6 +4,9 @@ namespace Birko.SuperFaktura.Request.BankAccounts
 {
     public class BankAccount: Data
     {
+        [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
+        public int? ID { get; set; }
+
         [JsonProperty(PropertyName = "default", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.StringBooleanConverter))]
         public bool Default { get; set; }

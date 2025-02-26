@@ -20,15 +20,9 @@ namespace Birko.SuperFaktura.Response.Invoice
         [JsonProperty(PropertyName = "client_data", NullValueHandling = NullValueHandling.Ignore)]
         public string ClientData { get; set; }
 
-        [JsonProperty(PropertyName = "country_exchange_rate", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal? CountryExchangeRate { get; set; } = null;
-
         [JsonProperty(PropertyName = "demo", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(StringBooleanConverter))]
         public bool? Demo { get; set; } = null;
-
-        [JsonProperty(PropertyName = "exchange_rate", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal? ExchangeRate { get; set; } = null;
 
         [JsonProperty(PropertyName = "flag", NullValueHandling = NullValueHandling.Ignore)]
         public string Flag { get; set; }

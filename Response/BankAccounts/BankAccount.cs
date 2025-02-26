@@ -5,9 +5,6 @@ namespace Birko.SuperFaktura.Response.BankAccounts
 {
     public class BankAccount : Request.BankAccounts.BankAccount
     {
-        [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
-        public int ID { get; internal set; }
-
         [JsonProperty(PropertyName = "user_id", NullValueHandling = NullValueHandling.Ignore)]
         public int UserID { get; set; }
 

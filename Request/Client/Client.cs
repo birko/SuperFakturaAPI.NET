@@ -102,5 +102,15 @@ namespace Birko.SuperFaktura.Request.Client
         [JsonProperty(PropertyName = "update", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.StringBooleanConverter))]
         public bool Update { get; set; }
+
+        [JsonProperty(PropertyName = "data_source", NullValueHandling = NullValueHandling.Ignore)]
+        public string DataSource { get; set; } = ClientDataSource.Empty;
+    }
+
+    public static class ClientDataSource
+    {
+        public const string Empty = "empty";
+        public const string Merge = "merge";
+        public const string AddressBook = "addressbook";
     }
 }
