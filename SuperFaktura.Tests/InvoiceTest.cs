@@ -456,7 +456,7 @@ namespace SuperFaktura.Tests
             System.IO.File.WriteAllBytes("invoiceblank.pdf", bytes);
             bytes = await apiClient.Invoices.Download(detail.Invoice.ID.Value, detail.Invoice.Token, Birko.SuperFaktura.Request.ValueLists.LanguageType.Slovak, true, true, true);
             bytes.ShouldNotBeEmpty();
-            System.IO.File.WriteAllBytes("invoicell.pdf", bytes);
+            System.IO.File.WriteAllBytes("invoiceall.pdf", bytes);
         }
 
         [Fact]
