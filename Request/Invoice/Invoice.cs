@@ -110,7 +110,6 @@ namespace Birko.SuperFaktura.Request.Invoice
         [JsonProperty(PropertyName = "mark_sent_subject", NullValueHandling = NullValueHandling.Ignore)]
         public string MarkSentSubject { get; set; }
 
-
         [JsonProperty(PropertyName = "order_no", NullValueHandling = NullValueHandling.Ignore)]
         public string OrderNumber { get; set; }
 
