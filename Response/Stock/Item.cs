@@ -24,9 +24,6 @@ namespace Birko.SuperFaktura.Response.Stock
         [JsonProperty(PropertyName = "modified", NullValueHandling = NullValueHandling.Ignore)]
         public DateTime Modified { get; set; }
 
-        [JsonProperty(PropertyName = "purchase_currency", NullValueHandling = NullValueHandling.Ignore)]
-        public string PurchaseCurrency { get; set; }
-
         [JsonProperty(PropertyName = "purchase_unit_price", NullValueHandling = NullValueHandling.Ignore)]
         public decimal? PurchaseUnitVAT { get; set; }
 
