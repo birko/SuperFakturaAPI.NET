@@ -35,6 +35,9 @@ namespace Birko.SuperFaktura.Request.Stock
         [JsonProperty(PropertyName = "purchase_unit_price", NullValueHandling = NullValueHandling.Ignore)]
         public float PurchaseUnitPrice { get; set; }
 
+        [JsonProperty(PropertyName = "purchase_currency", NullValueHandling = NullValueHandling.Ignore)]
+        public string PurchaseCurrency { get; set; }
+
         [JsonProperty(PropertyName = "vat", NullValueHandling = NullValueHandling.Ignore)]
         public decimal VAT { get; set; }
 
