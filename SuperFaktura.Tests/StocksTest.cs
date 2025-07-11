@@ -33,6 +33,7 @@ namespace SuperFaktura.Tests
                 VAT = 20,
                 WatchStock = true,
                 PurchaseUnitPrice = 1,
+                PurchaseCurrency = "EUR"
             });
             task.ShouldNotBeNull();
         }
@@ -68,6 +69,7 @@ namespace SuperFaktura.Tests
                 VAT = 20,
                 WatchStock = true,
                 PurchaseUnitPrice = 1,
+                PurchaseCurrency = "EUR"
             });
             task.ShouldNotBeNull();
         }

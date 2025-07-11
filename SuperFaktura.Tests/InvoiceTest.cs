@@ -165,8 +165,8 @@ namespace SuperFaktura.Tests
                 IssuedByWeb = "www.finstat.sk",
                 IssuedByPhone = "0987654321",
                 InvoiceCurrency = "CZK",
-                CountryExchangeRate = 1,
-                ExchangeRate = 26,
+                //CountryExchangeRate = 26,
+                //ExchangeRate = 26,
                 //BankAccounts = new[] {
                 //    new  Birko.SuperFaktura.Request.BankAccounts.BankAccount()
                 //    {
@@ -190,7 +190,7 @@ namespace SuperFaktura.Tests
                         Quantity =  1,
                         Unit = "ks",
                         Tax = 23,
-                        UnitPrice = 1200,
+                        UnitPrice = 1000,
                     }
             });
             var settings = new Birko.SuperFaktura.Request.Invoice.InvoiceSettings()
