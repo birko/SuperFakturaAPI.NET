@@ -429,6 +429,41 @@ namespace Birko.SuperFaktura
             }
         }
 
+        internal async Task<string> Delete(string uri, object data)
+        {
+            return await Delete(uri, JsonConvert.SerializeObject(data)).ConfigureAwait(false);
+        }
+
+        internal async Task<string> Delete(string uri, string data)
+        {
+            RequestDelay();
+            var client = CreateClient();
+            HttpResponseMessage response = null;
+            try
+            {
+                IncreaseRequestCount(ProfileKey);
+                var request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Delete,
+                    RequestUri = new Uri(uri),
+                    Content = new StringContent(data, Encoding.UTF8, "application/json")
+                };
+
+
+                response = await client.SendAsync(request).ConfigureAwait(false);
+                ParseResponse(response);
+                if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                }
+                return await Task.FromResult<string>(null).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw HandleRequestException(uri, response, ex);
+            }
+        }
+
         private string CheckSum(Request.Data data)
         {
             data.Date = DateTime.Now.ToString("yyyy-MM-dd");

@@ -19,6 +19,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)BankAccounts.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\CashRegister\CashRegisterItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\CashRegister\Filter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Request\Expense\ExpenseExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Payment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Expense\ExpenseItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Expense\Extra.cs" />

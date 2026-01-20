@@ -1,8 +1,11 @@
 ﻿using Birko.SuperFaktura.Request.Expense;
 using Birko.SuperFaktura.Response;
 using Birko.SuperFaktura.Response.Expense;
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Birko.SuperFaktura
@@ -77,6 +80,36 @@ namespace Birko.SuperFaktura
         {
             var result = await superFaktura.Get($"expenses/deleteRelatedItem/{relationID}").ConfigureAwait(false);
             return superFaktura.DeserializeResult<ErrorMessageResponse>(result);
+        }
+
+        public async Task<byte[]> DownloadAttachments(int expenseID, int? attachementID = null)
+        {
+            var result = await superFaktura.GetByte($"expenses/downloadAttachment/{expenseID}/{attachementID}").ConfigureAwait(false);
+            //Code below tests if response is a SuperFaktura error response or PDF File
+            try
+            {
+                string testResult = Encoding.UTF8.GetString(result);
+                superFaktura.DeserializeResult<ErrorMessageResponse>(testResult);
+            }
+            catch (Exceptions.ParseException) when (result != null && result.Length != 0)
+            {
+                //test deserialization failed. it is a pdf file
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return result;
+        }
+
+        public async Task<Response<Detail>> DeleteExpenseItem(int expenseID, IEnumerable<int> deleteItemIDS, bool createBlank =false)
+        {
+            var result = await superFaktura.Delete($"/expense_items/delete", new {
+                expense_id = expenseID,
+                delete_ids = deleteItemIDS.ToArray(),
+                create_blank_if_empty = createBlank
+            }).ConfigureAwait(false);
+            return superFaktura.DeserializeResult<Response<Detail>>(result);
         }
     }
 }

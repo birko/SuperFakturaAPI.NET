@@ -17,7 +17,7 @@ namespace Birko.SuperFaktura.Request.Invoice
     public class InvoiceInfo : InvoiceBasic
     {
         [JsonProperty(PropertyName = "type", NullValueHandling = NullValueHandling.Ignore)]
-        public string Type{ get; internal set; }
+        public string Type { get; internal set; }
 
         [JsonProperty(PropertyName = "name", NullValueHandling = NullValueHandling.Ignore)]
         public string Name { get; set; }
@@ -30,6 +30,9 @@ namespace Birko.SuperFaktura.Request.Invoice
 
     public class Invoice : InvoiceInfo
     {
+        [JsonProperty(PropertyName = "client_id", NullValueHandling = NullValueHandling.Ignore)]
+        public int? ClientID { get; set; } = null;
+
         [JsonProperty(PropertyName = "add_rounding_item", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.StringBooleanConverter))]
         public bool? AddRoundingItem { get; set; } = null;

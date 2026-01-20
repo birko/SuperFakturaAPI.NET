@@ -1,8 +1,10 @@
 ﻿using Birko.SuperFaktura.Request.Expense;
 using Birko.SuperFaktura.Response;
 using Birko.SuperFaktura.Response.Expense;
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Birko.SuperFaktura
@@ -33,6 +35,19 @@ namespace Birko.SuperFaktura
         public async Task<byte[]> Download(int id)
         {
             var result = await superFaktura.GetByte($"exports/download_export/{id}").ConfigureAwait(false);
+            try
+            {
+                string testResult = Encoding.UTF8.GetString(result);
+                superFaktura.DeserializeResult<ErrorMessageResponse>(testResult);
+            }
+            catch (Exceptions.ParseException) when (result != null && result.Length != 0)
+            {
+                //test deserialization failed. it is a pdf file
+            }
+            catch (Exception)
+            {
+                throw;
+            }
             return result;
         }
     }

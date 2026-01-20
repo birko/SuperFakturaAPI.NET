@@ -212,6 +212,19 @@ namespace Birko.SuperFaktura
         public async Task<byte[]> DownloadReceipt(int invoiceID)
         {
             var result = await superFaktura.GetByte(string.Format("invoices/receipt/{0}", invoiceID)).ConfigureAwait(false);
+            try
+            {
+                string testResult = Encoding.UTF8.GetString(result);
+                superFaktura.DeserializeResult<ErrorMessageResponse>(testResult);
+            }
+            catch (Exceptions.ParseException) when (result != null && result.Length != 0)
+            {
+                //test deserialization failed. it is a pdf file
+            }
+            catch (Exception)
+            {
+                throw;
+            }
             return result;
         }
 

@@ -5,6 +5,8 @@ namespace Birko.SuperFaktura.Request.Client
 {
     public class Client
     {
+        [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
+        public int? ID { get; set; } = null;
 
         [JsonProperty(PropertyName = "name", NullValueHandling = NullValueHandling.Ignore)]
         public string Name { get; set; } = string.Empty;

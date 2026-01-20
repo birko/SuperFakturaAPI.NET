@@ -1,8 +1,9 @@
 ﻿using Newtonsoft.Json;
+using System.Globalization;
 
 namespace Birko.SuperFaktura.Request.BankAccounts
 {
-    public class BankAccount: Data
+    public class BankAccount : Data
     {
         [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
         public int? ID { get; set; }
@@ -32,5 +33,12 @@ namespace Birko.SuperFaktura.Request.BankAccounts
         [JsonProperty(PropertyName = "show", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.StringBooleanConverter))]
         public bool Show { get; set; }
+
+        [JsonProperty(PropertyName = "show_account", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.StringBooleanConverter))]
+        public bool ShowAccount { get; set; }
+
+        [JsonProperty(PropertyName = "currency", NullValueHandling = NullValueHandling.Ignore)]
+        public string Currency { get; set; } = RegionInfo.CurrentRegion.ISOCurrencySymbol;
     }
 }

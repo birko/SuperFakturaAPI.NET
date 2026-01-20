@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Birko.SuperFaktura
@@ -65,7 +66,21 @@ namespace Birko.SuperFaktura
 
         public async Task<byte[]> Download(int id)
         {
-            return await superFaktura.GetByte($"cash_register_items/receipt/{id}").ConfigureAwait(false);
+            var result = await superFaktura.GetByte($"cash_register_items/receipt/{id}").ConfigureAwait(false);
+            try
+            {
+                string testResult = Encoding.UTF8.GetString(result);
+                superFaktura.DeserializeResult<ErrorMessageResponse>(testResult);
+            }
+            catch (Exceptions.ParseException) when (result != null && result.Length != 0)
+            {
+                //test deserialization failed. it is a pdf file
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return result;
         }
     }
 }

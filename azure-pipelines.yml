@@ -5,6 +5,7 @@
 
 trigger:
 - master
+- refs/tags/*
 
 pool:
   vmImage: 'windows-latest'
@@ -12,6 +13,8 @@ pool:
 variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
+  # Derive PackageVersion from tag name (strip leading 'v' if present)
+  PackageVersion: $[replace(variables['Build.SourceBranchName'], 'v', '')]
 
 steps:
 - task: CopyFiles@2
