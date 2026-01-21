@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -13,9 +13,9 @@
     <Title>SuperFaktura API Client</Title>
     <Copyright>Birko</Copyright>
     <PackageTags>superfaktura;api;.net</PackageTags>
-    <AssemblyVersion>1.1.16</AssemblyVersion>
-    <FileVersion>1.1.16</FileVersion>
-    <Version>1.1.16</Version>
+    <AssemblyVersion>1.1.21</AssemblyVersion>
+    <FileVersion>1.1.21</FileVersion>
+    <Version>1.1.21</Version>
     <PackageIcon>superfaktura-sk-logo23-rgb.png</PackageIcon>
   </PropertyGroup>
 
