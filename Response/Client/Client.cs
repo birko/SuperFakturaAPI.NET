@@ -1,18 +1,13 @@
-﻿using Birko.SuperFaktura.Response.Invoice;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 
 namespace Birko.SuperFaktura.Response.Client
 {
-    public class Client: Request.Client.Client
+    public class Client : Request.Client.Client
     {
         [JsonProperty(PropertyName = "Country", NullValueHandling = NullValueHandling.Ignore)]
         public Country Country { get; set; }
-
-        [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
-        public int? ID { get; internal set; }
 
         [JsonProperty(PropertyName = "bank_account_id", NullValueHandling = NullValueHandling.Ignore)]
         public string BankAccountID { get; set; } = string.Empty;
@@ -38,7 +33,7 @@ namespace Birko.SuperFaktura.Response.Client
         public Client Client { get; set; }
     }
 
-    public class DetailClient: TagResponse
+    public class DetailClient : TagResponse
     {
         public Client Client { get; set; }
         public Country Country { get; set; }
