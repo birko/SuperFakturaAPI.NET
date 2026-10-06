@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore
+        run: dotnet restore SuperFaktura.slnx
+
+      - name: Build
+        run: dotnet build SuperFaktura.slnx --configuration Release --no-restore
+
+      # Offline tests only: they check requests and responses without calling the API.
+      # Integration tests need sandbox credentials (SuperFaktura.Tests/Properties/launchSettings.json).
+      - name: Test
+        run: dotnet test SuperFaktura.slnx --configuration Release --no-build --filter "FullyQualifiedName~SerializationTest"
+
+      # Tag v1.2.3 publishes version 1.2.3; other builds use <Version> from SuperFaktura.csproj.
+      - name: Pack
+        run: |
+          VERSION_ARG=""
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            VERSION_ARG="-p:PackageVersion=${GITHUB_REF_NAME#v}"
+          fi
+          dotnet pack SuperFaktura/SuperFaktura.csproj --configuration Release --no-build --output out $VERSION_ARG
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget
+          path: out/*.nupkg
+
+      - name: Push package
+        if: github.ref_type == 'tag'
+        env:
+          NUGET_SOURCE: ${{ secrets.NUGET_SOURCE }}
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: dotnet nuget push "out/*.nupkg" --source "$NUGET_SOURCE" --api-key "$NUGET_API_KEY" --skip-duplicate
