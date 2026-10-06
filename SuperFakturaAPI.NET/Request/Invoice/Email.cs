@@ -13,11 +13,12 @@ namespace Birko.SuperFaktura.Request.Invoice
         public IEnumerable<string> CC { get; set; }
         [JsonProperty(PropertyName = "bcc", NullValueHandling = NullValueHandling.Ignore)]
         public IEnumerable<string> BCC { get; set; }
+        // subject/body: null = the email template of the account is used.
         [JsonProperty(PropertyName = "subject", NullValueHandling = NullValueHandling.Ignore)]
-        public string Subject { get; set; } = string.Empty;
+        public string Subject { get; set; }
         [JsonProperty(PropertyName = "body", NullValueHandling = NullValueHandling.Ignore)]
-        public string Body { get; set; } = string.Empty;
+        public string Body { get; set; }
         [JsonProperty(PropertyName = "pdf_language", NullValueHandling = NullValueHandling.Ignore)]
-        public string PDFLanguage { get; set; } = ValueLists.LanguageType.Slovak;
+        public string PDFLanguage { get; set; }
     }
 }

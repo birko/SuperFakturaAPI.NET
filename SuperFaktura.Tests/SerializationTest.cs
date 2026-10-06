@@ -820,6 +820,42 @@ namespace SuperFaktura.Tests
         }
 
         [Fact]
+        public void InvoiceItemFromDetailIsSentBackWithLowercaseId()
+        {
+            // Sandbox: items sent to invoices/edit with "ID" (upper case) are appended instead of updated
+            var item = JsonConvert.DeserializeObject<Birko.SuperFaktura.Response.Invoice.Item>("{\"id\":\"103367380\",\"name\":\"edit item A\"}");
+
+            var json = Serialize(item);
+            json["id"].Value<int>().ShouldBe(103367380);
+            json.ContainsKey("ID").ShouldBeFalse();
+            Serialize(new Birko.SuperFaktura.Request.Invoice.Item { ID = 5, Name = "x" })["id"].Value<int>().ShouldBe(5);
+        }
+
+        [Fact]
+        public void ClientAndExpenseDetailReadTagObjects()
+        {
+            // Sandbox: clients/view returns [{"Tag":{...}}], expenses/view returns [{...}] - not a list of IDs
+            var client = JsonConvert.DeserializeObject<Birko.SuperFaktura.Response.Client.DetailClient>(
+                "{\"Client\":{\"id\":\"84746\"},\"Tag\":[{\"Tag\":{\"id\":\"460\",\"name\":\"CR_12\",\"client_count\":5}},{\"Tag\":{\"id\":\"528\",\"name\":\"CR_10\"}}]}");
+            var expense = JsonConvert.DeserializeObject<Birko.SuperFaktura.Response.Expense.Detail>(
+                "{\"Expense\":{\"id\":\"1\"},\"Tag\":[{\"id\":\"564\",\"name\":\"probe\",\"expense_count\":1}]}");
+
+            client.Tag.Select(t => t.ID).ShouldBe(new[] { 460, 528 });
+            client.Tag.First().Name.ShouldBe("CR_12");
+            expense.Tag.Single().ID.ShouldBe(564);
+            expense.Tag.Single().Name.ShouldBe("probe");
+        }
+
+        [Fact]
+        public void InvoiceEmailSendsOnlyFieldsThatWereSet()
+        {
+            // invoice.md "Send invoice via mail": body/subject default to the templates, pdf_language optional
+            var json = Serialize(new Birko.SuperFaktura.Request.Invoice.Email { InvoiceID = 1, To = "recipient@example.com" });
+
+            json.Properties().Select(p => p.Name).OrderBy(n => n).ShouldBe(new[] { "invoice_id", "to" });
+        }
+
+        [Fact]
         public void InvalidJsonResponseThrowsParseException()
         {
             Should.Throw<Birko.SuperFaktura.Exceptions.ParseException>(() =>

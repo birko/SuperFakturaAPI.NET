@@ -40,13 +40,14 @@ namespace Birko.SuperFaktura.Response
     public class TagResponse : ErrorMessageResponse
     {
         [JsonProperty(PropertyName = "Tag", NullValueHandling = NullValueHandling.Ignore)]
-        public IEnumerable<int> Tag { get; set; }
+        [JsonConverter(typeof(Converters.InvoiceTagConverter))]
+        public Invoice.Tag[] Tag { get; set; }
 
         public override string ToString()
         {
             StringBuilder builder = new StringBuilder();
             builder.AppendLine(base.ToString());
-            builder.AppendLine($"Tag: {Tag?.Count()}");
+            builder.AppendLine($"Tag: {Tag?.Length}");
 
             return builder.ToString();
         }

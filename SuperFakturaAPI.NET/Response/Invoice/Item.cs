@@ -20,8 +20,9 @@ namespace Birko.SuperFaktura.Response.Invoice
         [JsonProperty(PropertyName = "hide_in_autocomplete", NullValueHandling = NullValueHandling.Ignore)]
         public bool? HideInAutocomplete { get; set; }
 
-        [JsonProperty(PropertyName = "ID", NullValueHandling = NullValueHandling.Ignore)]
-        public int ID { get; set; }
+        // Lower case "id" so the item is updated (not appended) when sent back with Invoices.Edit.
+        [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
+        public new int ID { get; set; }
 
         [JsonProperty(PropertyName = "invoice_id", NullValueHandling = NullValueHandling.Ignore)]
         public int InvoiceId { get; set; }

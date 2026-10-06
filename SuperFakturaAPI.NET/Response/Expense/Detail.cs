@@ -38,7 +38,8 @@ namespace Birko.SuperFaktura.Response.Expense
         public IEnumerable<RelatedItem> RelatedItem { get; set; } = null;
 
         [JsonProperty(PropertyName = "Tag", NullValueHandling = NullValueHandling.Ignore)]
-        public IEnumerable<int> Tag { get; set; }
+        [JsonConverter(typeof(InvoiceTagConverter))]
+        public Invoice.Tag[] Tag { get; set; }
 
         [JsonProperty(PropertyName = "VatSummary", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(VatSummaryConverter))]

@@ -6,8 +6,9 @@ using System.Linq;
 
 namespace Birko.SuperFaktura.Converters
 {
-    // Invoice view/list responses return tags nested under an inner "Tag" wrapper:
+    // Invoice and client view/list responses return tags nested under an inner "Tag" wrapper:
     //   "Tag": [ { "Tag": { "id": "477", "name": "...", ... } } ]
+    // expense responses return them flat: "Tag": [ { "id": "564", ... } ].
     // This converter unwraps each element so it maps onto a flat Response.Invoice.Tag.
     public class InvoiceTagConverter : JsonConverter
     {

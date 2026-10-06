@@ -5,6 +5,10 @@ namespace Birko.SuperFaktura.Request.Invoice
     // Fields left null are not sent; server defaults: discount 0, quantity 1, load_data_from_stock 0.
     public class Item
     {
+        // Existing item ID; on Edit, items with ID are updated, items without ID are added.
+        [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
+        public int? ID { get; set; }
+
         [JsonProperty(PropertyName = "AccountingDetail", NullValueHandling = NullValueHandling.Ignore)]
         public AccountingDetail AccountingDetail { get; set; } = null;
 
