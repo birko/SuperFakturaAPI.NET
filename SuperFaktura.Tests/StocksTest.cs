@@ -1,4 +1,4 @@
-﻿using Shouldly;
+using Shouldly;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,15 +10,32 @@ namespace SuperFaktura.Tests
 {
     public class StocksTest: SuperFakturaTest
     {
+        // Unique SKU, so the item is found by the sku filter and never collides with existing items.
+        private static async Task<Birko.SuperFaktura.Response.Stock.Detail> AddTestItem(string name = "test")
+        {
+            return await apiClient.Stock.Add(new Birko.SuperFaktura.Request.Stock.Item()
+            {
+                Description = "Test desc",
+                Name = name,
+                SKU = UniqueName("SKU"),
+                Unit = "ks",
+                UnitPrice = 1,
+                VAT = 20,
+                WatchStock = true,
+                Stock = 10,
+                PurchaseUnitPrice = 1,
+                PurchaseCurrency = "EUR"
+            });
+        }
+
         [Fact]
         public async Task TestList()
         {
-            var sku = UniqueName("SKU");
-            var added = await apiClient.Stock.Add(new Birko.SuperFaktura.Request.Stock.Item() { Name = "List test", SKU = sku, UnitPrice = 1 });
+            var added = await AddTestItem("List test");
             try
             {
                 // sku filter: exactly the item created by this test
-                var list = await apiClient.Stock.List(new Birko.SuperFaktura.Request.Stock.Filter() { SKU = sku });
+                var list = await apiClient.Stock.List(new Birko.SuperFaktura.Request.Stock.Filter() { SKU = added.StockItem.SKU });
                 list.ShouldNotBeNull();
                 list.Items.ShouldNotBeNull();
                 list.ItemCount.ShouldBe(1);
@@ -33,99 +50,107 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestAdd()
         {
-            var task = await apiClient.Stock.Add(new Birko.SuperFaktura.Request.Stock.Item()
+            var task = await AddTestItem();
+            try
             {
-                Description = "Test desc",
-                Name = "test",
-                SKU = "test0001",
-                Unit = "ks",
-                UnitPrice = 1,
-                VAT = 20,
-                WatchStock = true,
-                PurchaseUnitPrice = 1,
-                PurchaseCurrency = "EUR"
-            });
-            task.ShouldNotBeNull();
+                task.ShouldNotBeNull();
+                task.StockItem.ID.ShouldNotBeNull();
+            }
+            finally
+            {
+                await apiClient.Stock.Delete(task.StockItem.ID.Value);
+            }
         }
-
 
         [Fact]
         public async Task TestView()
         {
-            var list = await apiClient.Stock.List(new Birko.SuperFaktura.Request.Stock.Filter() { });
-            if (!(list?.Items?.Any() ?? false))
+            var added = await AddTestItem();
+            try
             {
-                return;
+                var task = await apiClient.Stock.View(added.StockItem.ID.Value);
+                task.ShouldNotBeNull();
+                task.SKU.ShouldBe(added.StockItem.SKU);
             }
-            var task = await apiClient.Stock.View(list.Items.First().StockItem.ID.Value);
-            task.ShouldNotBeNull();
+            finally
+            {
+                await apiClient.Stock.Delete(added.StockItem.ID.Value);
+            }
         }
 
         [Fact]
         public async Task TestEdit()
         {
-            var list = await apiClient.Stock.List(new Birko.SuperFaktura.Request.Stock.Filter() { });
-            if (!(list?.Items?.Any() ?? false))
+            var added = await AddTestItem();
+            try
             {
-                return;
+                var task = await apiClient.Stock.Edit(added.StockItem.ID.Value, new Birko.SuperFaktura.Request.Stock.Item()
+                {
+                    Description = "Test desc Edit",
+                });
+                task.ShouldNotBeNull();
+                var view = await apiClient.Stock.View(added.StockItem.ID.Value);
+                view.Description.ShouldBe("Test desc Edit");
+                view.Stock.ShouldBe(10);
             }
-            var task = await apiClient.Stock.Edit(list.Items.First().StockItem.ID.Value, new Birko.SuperFaktura.Request.Stock.Item()
+            finally
             {
-                Description = "Test desc Edit",
-                Name = "test",
-                SKU = "test0001",
-                Unit = "ks",
-                UnitPrice = 1,
-                VAT = 20,
-                WatchStock = true,
-                PurchaseUnitPrice = 1,
-                PurchaseCurrency = "EUR"
-            });
-            task.ShouldNotBeNull();
+                await apiClient.Stock.Delete(added.StockItem.ID.Value);
+            }
         }
 
         [Fact]
         public async Task TestAddStockMovement()
         {
-            var list = await apiClient.Stock.List(new Birko.SuperFaktura.Request.Stock.Filter() { });
-            if (!(list?.Items?.Any() ?? false))
+            var added = await AddTestItem();
+            try
             {
-                return;
+                var task = await apiClient.Stock.AddStockMovement(new Birko.SuperFaktura.Request.Stock.Log()
+                {
+                    StockItemID = added.StockItem.ID.Value,
+                    Note = "TestMovement",
+                    Quantity = 1
+                });
+                task.ShouldNotBeNull();
+                (await apiClient.Stock.View(added.StockItem.ID.Value)).Stock.ShouldBe(11);
             }
-            var task = await apiClient.Stock.AddStockMovement(new Birko.SuperFaktura.Request.Stock.Log()
+            finally
             {
-                StockItemID = list.Items.First().StockItem.ID.Value,
-                Note = "TestMovement",
-                Quantity = 1
-            });
-            task.ShouldNotBeNull();
+                await apiClient.Stock.Delete(added.StockItem.ID.Value);
+            }
         }
 
         [Fact]
         public async Task TestListStockMovements()
         {
-            var list = await apiClient.Stock.List(new Birko.SuperFaktura.Request.Stock.Filter() { });
-            if (!(list?.Items?.Any() ?? false))
+            var added = await AddTestItem();
+            try
             {
-                return;
+                await apiClient.Stock.AddStockMovement(new Birko.SuperFaktura.Request.Stock.Log()
+                {
+                    StockItemID = added.StockItem.ID.Value,
+                    Note = "TestMovement",
+                    Quantity = 1
+                });
+                var task = await apiClient.Stock.ListStockMovements(added.StockItem.ID.Value, new Birko.SuperFaktura.Request.PagedParameters());
+                task.ShouldNotBeNull();
+                task.Items.ShouldNotBeNull();
+                task.Items.ShouldContain(x => x.StockLog.Note == "TestMovement");
+                task.ItemCount.ShouldBeGreaterThan(0);
             }
-            var task = await apiClient.Stock.ListStockMovements(list.Items.First().StockItem.ID.Value, new Birko.SuperFaktura.Request.PagedParameters());
-            task.ShouldNotBeNull();
-            task.Items.ShouldNotBeNull();
-            task.Items.Count().ShouldBeGreaterThan(0);
-            task.ItemCount.ShouldBeGreaterThan(0);
+            finally
+            {
+                await apiClient.Stock.Delete(added.StockItem.ID.Value);
+            }
         }
 
         [Fact]
         public async Task TestDelete()
         {
-            var list = await apiClient.Stock.List(new Birko.SuperFaktura.Request.Stock.Filter() { });
-            if (!(list?.Items?.Any() ?? false))
-            {
-                return;
-            }
-            var task = await apiClient.Stock.Delete(list.Items.First().StockItem.ID.Value);
+            var added = await AddTestItem();
+            var task = await apiClient.Stock.Delete(added.StockItem.ID.Value);
             task.ShouldNotBeNull();
+            (await apiClient.Stock.List(new Birko.SuperFaktura.Request.Stock.Filter() { SKU = added.StockItem.SKU })).ItemCount.ShouldBe(0);
         }
     }
 }

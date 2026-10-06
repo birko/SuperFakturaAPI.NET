@@ -128,7 +128,16 @@ namespace SuperFaktura.Tests
 
             };
             var task = await apiClient.Invoices.Add(sfinvoice, client, items.ToArray(), null, settings, null);
-            task.ShouldNotBeNull();
+            try
+            {
+                task.ShouldNotBeNull();
+                task.Invoice.ID.ShouldNotBeNull();
+            }
+            finally
+            {
+                // the client (matched by ICO) is shared, only the invoice is removed
+                await apiClient.Invoices.Delete(task.Invoice.ID.Value);
+            }
         }
 
         [Fact]
@@ -206,7 +215,16 @@ namespace SuperFaktura.Tests
 
             };
             var task = await apiClient.Invoices.Add(sfinvoice, client, items.ToArray(), null, settings, null);
-            task.ShouldNotBeNull();
+            try
+            {
+                task.ShouldNotBeNull();
+                task.Invoice.ID.ShouldNotBeNull();
+            }
+            finally
+            {
+                // the client (matched by ICO) is shared, only the invoice is removed
+                await apiClient.Invoices.Delete(task.Invoice.ID.Value);
+            }
         }
 
         [Fact]
@@ -469,8 +487,8 @@ namespace SuperFaktura.Tests
                 }
             };
 
-            var tagA = await apiClient.Tags.Add(new Birko.SuperFaktura.Request.Tags.Tag() { Name = "edit tag A" });
-            var tagB = await apiClient.Tags.Add(new Birko.SuperFaktura.Request.Tags.Tag() { Name = "edit tag B" });
+            var tagA = await apiClient.Tags.Add(new Birko.SuperFaktura.Request.Tags.Tag() { Name = UniqueName("edit tag A") });
+            var tagB = await apiClient.Tags.Add(new Birko.SuperFaktura.Request.Tags.Tag() { Name = UniqueName("edit tag B") });
             var tagIds = new[] { tagA.ID, tagB.ID };
 
             int? invoiceId = null;
@@ -553,9 +571,9 @@ namespace SuperFaktura.Tests
                 }
             };
 
-            var tagA = await apiClient.Tags.Add(new Birko.SuperFaktura.Request.Tags.Tag() { Name = "replace tag A" });
-            var tagB = await apiClient.Tags.Add(new Birko.SuperFaktura.Request.Tags.Tag() { Name = "replace tag B" });
-            var tagC = await apiClient.Tags.Add(new Birko.SuperFaktura.Request.Tags.Tag() { Name = "replace tag C" });
+            var tagA = await apiClient.Tags.Add(new Birko.SuperFaktura.Request.Tags.Tag() { Name = UniqueName("replace tag A") });
+            var tagB = await apiClient.Tags.Add(new Birko.SuperFaktura.Request.Tags.Tag() { Name = UniqueName("replace tag B") });
+            var tagC = await apiClient.Tags.Add(new Birko.SuperFaktura.Request.Tags.Tag() { Name = UniqueName("replace tag C") });
 
             int? invoiceId = null;
             try
@@ -597,40 +615,48 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestView()
         {
-            var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter() { PerPage = 200 });
-            if (!(invoices?.Items?.Any() ?? false))
+            var detail = await CreateTestInvoice();
+            try
             {
-                return;
+                var task = await apiClient.Invoices.View(detail.Invoice.ID.Value);
+                task.ShouldNotBeNull();
+                task.Invoice.ID.ShouldBe(detail.Invoice.ID);
             }
-            var detail = invoices?.Items?.First();
-            var task = await apiClient.Invoices.View(detail.Invoice.ID.Value);
-            task.ShouldNotBeNull();
+            finally
+            {
+                await DeleteTestInvoice(detail);
+            }
         }
 
         [Fact]
         public async Task TestSetInvoiceLanguage()
         {
-            var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter() { PerPage = 200 });
-            if (!(invoices?.Items?.Any() ?? false))
+            var detail = await CreateTestInvoice();
+            try
             {
-                return;
+                var task = await apiClient.Invoices.SetInvoiceLanguage(detail.Invoice.ID.Value, Birko.SuperFaktura.Request.ValueLists.LanguageType.German);
+                task.ShouldNotBeNull();
+                (await apiClient.Invoices.View(detail.Invoice.ID.Value)).InvoiceSetting.Language.ShouldBe(Birko.SuperFaktura.Request.ValueLists.LanguageType.German);
             }
-            var detail = invoices?.Items?.First();
-            var task = await apiClient.Invoices.SetInvoiceLanguage(detail.Invoice.ID.Value, Birko.SuperFaktura.Request.ValueLists.LanguageType.German);
-            task.ShouldNotBeNull();
+            finally
+            {
+                await DeleteTestInvoice(detail);
+            }
         }
 
         [Fact]
         public async Task TestWillNotBePaid()
         {
-            var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter() { PerPage = 200 });
-            if (!(invoices?.Items?.Any() ?? false))
+            var detail = await CreateTestInvoice();
+            try
             {
-                return;
+                var task = await apiClient.Invoices.WillNotBePaid(detail.Invoice.ID.Value);
+                task.ShouldNotBeNull();
             }
-            var detail = invoices?.Items?.First();
-            var task = await apiClient.Invoices.WillNotBePaid(detail.Invoice.ID.Value);
-            task.ShouldNotBeNull();
+            finally
+            {
+                await DeleteTestInvoice(detail);
+            }
         }
 
         [Fact]
@@ -657,19 +683,21 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestMarkAsSentViaMail()
         {
-            var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter() { PerPage = 200 });
-            if (!(invoices?.Items?.Any() ?? false))
+            var detail = await CreateTestInvoice();
+            try
             {
-                return;
+                var task = await apiClient.Invoices.MarkAsSentViaMail(new Birko.SuperFaktura.Request.Invoice.MarkEmail() {
+                    InvoiceID  = detail.Invoice.ID.Value,
+                    EmailAddres = "marked@example.com",
+                    Message= "test",
+                    Subject = "test",
+                });
+                task.ShouldNotBeNull();
             }
-            var detail = invoices?.Items?.First();
-            var task = await apiClient.Invoices.MarkAsSentViaMail(new Birko.SuperFaktura.Request.Invoice.MarkEmail() {
-                InvoiceID  = detail.Invoice.ID.Value,
-                EmailAddres = "marked@example.com",
-                Message= "test",
-                Subject = "test",
-            });
-            task.ShouldNotBeNull();
+            finally
+            {
+                await DeleteTestInvoice(detail);
+            }
         }
 
         [Fact]
@@ -693,110 +721,136 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestMarkAsSent()
         {
-            var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter() { PerPage = 200 });
-            if (!(invoices?.Items?.Any() ?? false))
+            var detail = await CreateTestInvoice();
+            try
             {
-                return;
+                var task = await apiClient.Invoices.MarkAsSent(detail.Invoice.ID.Value);
+                task.ShouldNotBeNull();
             }
-            var detail = invoices?.Items?.First();
-            var task = await apiClient.Invoices.MarkAsSent(detail.Invoice.ID.Value);
-            task.ShouldNotBeNull();
+            finally
+            {
+                await DeleteTestInvoice(detail);
+            }
         }
 
         [Fact]
         public async Task TestDeleteItem()
         {
-            var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter() { PerPage = 200 });
-            if (!(invoices?.Items?.Any() ?? false))
+            var detail = await CreateTestInvoice();
+            try
             {
-                return;
+                // an invoice keeps at least one item, so add a second one to delete
+                await apiClient.Invoices.Edit(new Birko.SuperFaktura.Request.Invoice.Invoice { ID = detail.Invoice.ID }, items: new[]
+                {
+                    new Birko.SuperFaktura.Request.Invoice.Item { Name = "item to delete", Quantity = 1, UnitPrice = 5, Tax = 20 }
+                });
+                var view = await apiClient.Invoices.View(detail.Invoice.ID.Value);
+                var toDelete = view.InvoiceItems.Single(x => x.Name == "item to delete");
+
+                var task = await apiClient.Invoices.DeleteItem(detail.Invoice.ID.Value, toDelete.ID);
+                task.ShouldNotBeNull();
+                (await apiClient.Invoices.View(detail.Invoice.ID.Value)).InvoiceItems.ShouldNotContain(x => x.ID == toDelete.ID);
             }
-            var detail = invoices?.Items?.First();
-            if (!(detail.InvoiceItems?.Any() ?? false))
+            finally
             {
-                return;
+                await DeleteTestInvoice(detail);
             }
-            var task = await apiClient.Invoices.DeleteItem(detail.Invoice.ID.Value, detail.InvoiceItems.FirstOrDefault().ID);
-            task.ShouldNotBeNull();
         }
 
         [Fact]
         public async Task TestAddPayment()
         {
-            var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter() { PerPage = 200 });
-            if (!(invoices?.Items?.Any() ?? false))
+            var detail = await CreateTestInvoice();
+            try
             {
-                return;
+                var task = await apiClient.Invoices.AddPayment(new Birko.SuperFaktura.Request.Invoice.Payment() {
+                    InvoiceID = detail.Invoice.ID.Value,
+                    Amount = 0.5m,
+                });
+                task.ShouldNotBeNull();
+                task.PaymentID.ShouldNotBeNull();
             }
-            var detail = invoices?.Items?.First();
-            var task = await apiClient.Invoices.AddPayment(new Birko.SuperFaktura.Request.Invoice.Payment() {
-                InvoiceID = detail.Invoice.ID.Value,
-                Amount = 0.5m,
-
-            });
-            task.ShouldNotBeNull();
+            finally
+            {
+                await DeleteTestInvoice(detail);
+            }
         }
 
         [Fact]
         public async Task TestDeletePayment()
         {
-            var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter() { PerPage = 200 });
-            if (!(invoices?.Items?.Any() ?? false))
+            var detail = await CreateTestInvoice();
+            try
             {
-                return;
-            }
-            var detail = invoices?.Items?.First();
-            // ensure there is a payment to delete so the delete response is actually exercised
-            var added = await apiClient.Invoices.AddPayment(new Birko.SuperFaktura.Request.Invoice.Payment()
-            {
-                InvoiceID = detail.Invoice.ID.Value,
-                Amount = 0.5m,
-            });
-            added.ShouldNotBeNull();
-            added.PaymentID.ShouldNotBeNull();
+                var added = await apiClient.Invoices.AddPayment(new Birko.SuperFaktura.Request.Invoice.Payment()
+                {
+                    InvoiceID = detail.Invoice.ID.Value,
+                    Amount = 0.5m,
+                });
+                added.ShouldNotBeNull();
+                added.PaymentID.ShouldNotBeNull();
 
-            var task = await apiClient.Invoices.DeletePayment(added.PaymentID.Value);
-            task.ShouldNotBeNull();
+                var task = await apiClient.Invoices.DeletePayment(added.PaymentID.Value);
+                task.ShouldNotBeNull();
+            }
+            finally
+            {
+                await DeleteTestInvoice(detail);
+            }
+        }
+
+        private static async Task<Birko.SuperFaktura.Response.Expense.Detail> AddTestExpense()
+        {
+            return await apiClient.Expenses.Add(new Birko.SuperFaktura.Request.Expense.Expense() { Name = UniqueName("related expense"), Currency = "EUR", Amount = 1 });
         }
 
         [Fact]
         public async Task TestAddRelatedItem()
         {
-            var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter() { PerPage = 200 });
-            if (!(invoices?.Items?.Any() ?? false))
+            var invoice = await CreateTestInvoice();
+            var expense = await AddTestExpense();
+            try
             {
-                return;
+                var task = await apiClient.Invoices.AddRelatedItem(new Birko.SuperFaktura.Request.RelatedItem() {
+                    ParentID =  invoice.Invoice.ID.Value,
+                    ParentType = Birko.SuperFaktura.Request.ValueLists.DocumentType.Invoice,
+                    ChildID = expense.Expense.ID.Value,
+                    ChildType = Birko.SuperFaktura.Request.ValueLists.DocumentType.Expense
+                });
+                task.ShouldNotBeNull();
+                (await apiClient.Invoices.View(invoice.Invoice.ID.Value)).RelatedItems.ShouldNotBeEmpty();
             }
-            var invoice = invoices?.Items?.First();
-            var expenses = await apiClient.Expenses.List(new Birko.SuperFaktura.Request.Expense.Filter() { });
-            if (!(expenses.Items?.Any() ?? false))
+            finally
             {
-                return;
+                await apiClient.Expenses.Delete(expense.Expense.ID.Value);
+                await DeleteTestInvoice(invoice);
             }
-            var task = await apiClient.Invoices.AddRelatedItem(new Birko.SuperFaktura.Request.RelatedItem() {
-                ParentID =  invoice.Invoice.ID.Value,
-                ParentType = "invoice",
-                ChildID = expenses.Items.FirstOrDefault().Expense.ID.Value,
-                ChildType = "expense"
-            });
-            task.ShouldNotBeNull();
         }
 
         [Fact]
         public async Task TestDeleteRelatedItem()
         {
-            var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter() { PerPage = 200 });
-            if (!(invoices?.Items?.Any() ?? false))
+            var invoice = await CreateTestInvoice();
+            var expense = await AddTestExpense();
+            try
             {
-                return;
+                await apiClient.Invoices.AddRelatedItem(new Birko.SuperFaktura.Request.RelatedItem() {
+                    ParentID =  invoice.Invoice.ID.Value,
+                    ParentType = Birko.SuperFaktura.Request.ValueLists.DocumentType.Invoice,
+                    ChildID = expense.Expense.ID.Value,
+                    ChildType = Birko.SuperFaktura.Request.ValueLists.DocumentType.Expense
+                });
+                var view = await apiClient.Invoices.View(invoice.Invoice.ID.Value);
+
+                var task = await apiClient.Invoices.DeleteRelatedItem(view.RelatedItems.Single().RelationID);
+                task.ShouldNotBeNull();
+                (await apiClient.Invoices.View(invoice.Invoice.ID.Value)).RelatedItems?.ShouldBeEmpty();
             }
-            var invoice = invoices?.Items?.First();
-            if (!(invoice.RelatedItems?.Any() ?? false))
+            finally
             {
-                return;
+                await apiClient.Expenses.Delete(expense.Expense.ID.Value);
+                await DeleteTestInvoice(invoice);
             }
-            var task = await apiClient.Invoices.DeleteRelatedItem(invoice.RelatedItems.First().RelationID);
-            task.ShouldNotBeNull();
         }
 
         [Fact]
@@ -813,44 +867,38 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestDownload()
         {
-            var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter() { PerPage = 200 });
-            if (!(invoices?.Items?.Any() ?? false))
+            var detail = await CreateTestInvoice();
+            try
             {
-                return;
+                var id = detail.Invoice.ID.Value;
+                var token = detail.Invoice.Token;
+                var slovak = Birko.SuperFaktura.Request.ValueLists.LanguageType.Slovak;
+                (await apiClient.Invoices.Download(id, token)).ShouldNotBeEmpty();
+                (await apiClient.Invoices.Download(id, token, slovak, true, false, false)).ShouldNotBeEmpty();
+                (await apiClient.Invoices.Download(id, token, slovak, false, true, false)).ShouldNotBeEmpty();
+                (await apiClient.Invoices.Download(id, token, slovak, false, false, true)).ShouldNotBeEmpty();
+                (await apiClient.Invoices.Download(id, token, slovak, false, false, false)).ShouldNotBeEmpty();
+                (await apiClient.Invoices.Download(id, token, slovak, true, true, true)).ShouldNotBeEmpty();
             }
-            var detail = invoices?.Items?.First();
-            var bytes = await apiClient.Invoices.Download(detail.Invoice.ID.Value, detail.Invoice.Token);
-            bytes.ShouldNotBeEmpty();
-            System.IO.File.WriteAllBytes("invoicenone.pdf", bytes);
-            bytes = await apiClient.Invoices.Download(detail.Invoice.ID.Value, detail.Invoice.Token, Birko.SuperFaktura.Request.ValueLists.LanguageType.Slovak, true, false, false);
-            bytes.ShouldNotBeEmpty();
-            System.IO.File.WriteAllBytes("invoicesignature.pdf", bytes);
-            bytes = await apiClient.Invoices.Download(detail.Invoice.ID.Value, detail.Invoice.Token, Birko.SuperFaktura.Request.ValueLists.LanguageType.Slovak, false, true, false);
-            bytes.ShouldNotBeEmpty();
-            System.IO.File.WriteAllBytes("invoicebySquare.pdf", bytes);
-            bytes = await apiClient.Invoices.Download(detail.Invoice.ID.Value, detail.Invoice.Token, Birko.SuperFaktura.Request.ValueLists.LanguageType.Slovak, false, false, true);
-            bytes.ShouldNotBeEmpty();
-            System.IO.File.WriteAllBytes("invoicepaypal.pdf", bytes);
-            bytes = await apiClient.Invoices.Download(detail.Invoice.ID.Value, detail.Invoice.Token, Birko.SuperFaktura.Request.ValueLists.LanguageType.Slovak, false, false, false);
-            bytes.ShouldNotBeEmpty();
-            System.IO.File.WriteAllBytes("invoiceblank.pdf", bytes);
-            bytes = await apiClient.Invoices.Download(detail.Invoice.ID.Value, detail.Invoice.Token, Birko.SuperFaktura.Request.ValueLists.LanguageType.Slovak, true, true, true);
-            bytes.ShouldNotBeEmpty();
-            System.IO.File.WriteAllBytes("invoiceall.pdf", bytes);
+            finally
+            {
+                await DeleteTestInvoice(detail);
+            }
         }
 
         [Fact]
         public async Task TestDownloadReceipt()
         {
-            var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter() { PerPage = 200 });
-            if (!(invoices?.Items?.Any() ?? false))
+            var detail = await CreateTestInvoice();
+            try
             {
-                return;
+                var bytes = await apiClient.Invoices.DownloadReceipt(detail.Invoice.ID.Value);
+                bytes.ShouldNotBeEmpty();
             }
-            var detail = invoices?.Items?.First();
-            var bytes = await apiClient.Invoices.DownloadReceipt(detail.Invoice.ID.Value);
-            bytes.ShouldNotBeEmpty();
-            System.IO.File.WriteAllBytes("invoicereceipt.pdf", bytes);
+            finally
+            {
+                await DeleteTestInvoice(detail);
+            }
         }
     }
 }

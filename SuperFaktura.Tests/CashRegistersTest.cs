@@ -1,4 +1,4 @@
-﻿using Shouldly;
+using Shouldly;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +8,26 @@ using Xunit;
 
 namespace SuperFaktura.Tests
 {
+    // Cash registers cannot be created through the API: the tests use the first existing one (read-only)
+    // and return when there is none. Items are created by the tests and deleted afterwards.
     public class CashRegistersTest : SuperFakturaTest
     {
+        private static async Task<int?> FirstCashRegisterId()
+        {
+            var cashRegisters = await apiClient.CashRegisters.List();
+            return cashRegisters?.FirstOrDefault()?.ID;
+        }
+
+        private static async Task<Birko.SuperFaktura.Response.CashRegister.CashRegisterItemResponse> AddTestItem(int cashRegisterId, string description)
+        {
+            return await apiClient.CashRegisters.AddItem(new Birko.SuperFaktura.Request.CashRegister.CashRegisterItem()
+            {
+                CashRegisterID = cashRegisterId,
+                Amount = 5,
+                Description = description
+            });
+        }
+
         [Fact]
         public async Task TestList()
         {
@@ -21,115 +39,114 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestView()
         {
-            var cashRegisters = await apiClient.CashRegisters.List();
-            if (!(cashRegisters?.Any() ?? false))
+            var id = await FirstCashRegisterId();
+            if (id == null)
             {
                 return;
             }
 
-            var cashRegister = await apiClient.CashRegisters.View(cashRegisters.First().ID.Value);
+            var cashRegister = await apiClient.CashRegisters.View(id.Value);
             cashRegister.ShouldNotBe(null);
+            cashRegister.ID.ShouldBe(id);
         }
 
         [Fact]
         public async Task TestGetItems()
         {
-            var cashRegisters = await apiClient.CashRegisters.List();
-            if (!(cashRegisters?.Any() ?? false))
+            var id = await FirstCashRegisterId();
+            if (id == null)
             {
                 return;
             }
-
-            var items = await apiClient.CashRegisters.ListItems(new Birko.SuperFaktura.Request.CashRegister.Filter()
+            var description = UniqueName("TEST list");
+            var added = await AddTestItem(id.Value, description);
+            try
             {
-                ID = cashRegisters.First().ID.Value
-            });
-            items.ShouldNotBe(null);
-            items.ItemCount.Equals(1);
-            items.Items.ShouldNotBeEmpty();
+                var items = await apiClient.CashRegisters.ListItems(new Birko.SuperFaktura.Request.CashRegister.Filter()
+                {
+                    ID = id.Value,
+                    Term = description
+                });
+                items.ShouldNotBe(null);
+                items.CashRegister.ID.ShouldBe(id);
+                items.Items.ShouldContain(x => x.CashRegisterItem.ID == added.CashRegisterItem.ID);
+            }
+            finally
+            {
+                await apiClient.CashRegisters.DeleteItem(added.CashRegisterItem.ID);
+            }
         }
 
         [Fact]
         public async Task TestAddItem()
         {
-            var cashRegisters = await apiClient.CashRegisters.List();
-            if (!(cashRegisters?.Any() ?? false))
+            var id = await FirstCashRegisterId();
+            if (id == null)
             {
                 return;
             }
 
-            var item = await apiClient.CashRegisters.AddItem(new Birko.SuperFaktura.Request.CashRegister.CashRegisterItem()
+            var item = await AddTestItem(id.Value, "TEST");
+            try
             {
-                CashRegisterID = cashRegisters.First().ID.Value,
-                Amount = 5,
-                Description = "TEST"
-            });
-            item.ShouldNotBe(null);
-            item.CashRegisterItem.Description.Equals("TEST");
+                item.ShouldNotBe(null);
+                item.CashRegisterItem.Description.ShouldBe("TEST");
+            }
+            finally
+            {
+                await apiClient.CashRegisters.DeleteItem(item.CashRegisterItem.ID);
+            }
         }
 
         [Fact]
         public async Task TestDeleteItem()
         {
-            var cashRegisters = await apiClient.CashRegisters.List();
-            if (!(cashRegisters?.Any() ?? false))
+            var id = await FirstCashRegisterId();
+            if (id == null)
             {
                 return;
             }
-            var items = await apiClient.CashRegisters.ListItems(new Birko.SuperFaktura.Request.CashRegister.Filter()
-            {
-                ID = cashRegisters.First().ID.Value
-            });
+            var added = await AddTestItem(id.Value, "TEST delete");
 
-            if (!(items.Items?.Any() ?? false))
-            {
-                return;
-            }
-            var summary = await apiClient.CashRegisters.DeleteItem(items.Items.FirstOrDefault().CashRegisterItem.ID);
+            var summary = await apiClient.CashRegisters.DeleteItem(added.CashRegisterItem.ID);
             summary.ShouldNotBe(null);
+            summary.Status.ShouldBe(1);
         }
 
         [Fact]
         public async Task TestDeleteItems()
         {
-            var cashRegisters = await apiClient.CashRegisters.List();
-            if (!(cashRegisters?.Any() ?? false))
+            var id = await FirstCashRegisterId();
+            if (id == null)
             {
                 return;
             }
-            var items = await apiClient.CashRegisters.ListItems(new Birko.SuperFaktura.Request.CashRegister.Filter()
-            {
-                ID = cashRegisters.First().ID.Value
-            });
+            var first = await AddTestItem(id.Value, "TEST delete items 1");
+            var second = await AddTestItem(id.Value, "TEST delete items 2");
 
-            if (!(items.Items?.Any() ?? false))
-            {
-                return;
-            }
-            var summary = await apiClient.CashRegisters.DeleteItems(items.Items.Select(x => x.CashRegisterItem.ID));
+            var summary = await apiClient.CashRegisters.DeleteItems(new[] { first.CashRegisterItem.ID, second.CashRegisterItem.ID });
+            summary.ShouldNotBe(null);
+            summary.Status.ShouldBe(1);
         }
 
         [Fact]
         public async Task TestDownload()
         {
-            var cashRegisters = await apiClient.CashRegisters.List();
-            if (!(cashRegisters?.Any() ?? false))
+            var id = await FirstCashRegisterId();
+            if (id == null)
             {
                 return;
             }
-            var items = await apiClient.CashRegisters.ListItems(new Birko.SuperFaktura.Request.CashRegister.Filter()
+            var added = await AddTestItem(id.Value, "TEST receipt");
+            try
             {
-                ID = cashRegisters.First().ID.Value
-            });
-
-            if (!(items.Items?.Any() ?? false))
-            {
-                return;
+                var bytes = await apiClient.CashRegisters.Download(added.CashRegisterItem.ID);
+                bytes.ShouldNotBeEmpty();
             }
-            var bytes = await apiClient.CashRegisters.Download(items.Items.FirstOrDefault().CashRegisterItem.ID);
-            bytes.ShouldNotBeEmpty();
-
-            System.IO.File.WriteAllBytes("receipt.pdf", bytes);
+            finally
+            {
+                await apiClient.CashRegisters.DeleteItem(added.CashRegisterItem.ID);
+            }
         }
     }
 }

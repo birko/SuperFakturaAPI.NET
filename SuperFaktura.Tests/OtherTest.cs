@@ -56,8 +56,17 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task ListActivityLogs()
         {
-            var task = await apiClient.Other.ListActivityLogs(Birko.SuperFaktura.Request.ValueLists.DocumentType.Expense, 1363);
-            task.ShouldNotBe(null);
+            var invoice = await CreateTestInvoice();
+            try
+            {
+                var task = await apiClient.Other.ListActivityLogs(Birko.SuperFaktura.Request.ValueLists.DocumentType.Invoice, invoice.Invoice.ID.Value);
+                task.ShouldNotBe(null);
+                task.ShouldNotBeEmpty(); // at least the "create" event
+            }
+            finally
+            {
+                await DeleteTestInvoice(invoice);
+            }
         }
     }
 }
