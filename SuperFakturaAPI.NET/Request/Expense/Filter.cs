@@ -33,8 +33,15 @@ namespace Birko.SuperFaktura.Request.Expense
         public DateTime? DeliverySince { get; set; } = null;
         [JsonProperty(PropertyName = "delivery_to")]
         public DateTime? DeliveryTo { get; set; } = null;
+        // Exact due date. Sent as due:3/due_since/due_to (inclusive) - "due:<date>" from the docs is ignored by the API.
         [JsonProperty(PropertyName = "due")]
         public DateTime? Due { get; set; } = null;
+        // Time filter constant for the due date (as in the PHP client); sent as "due" in ToParameters.
+        public int? DueFilter { get; set; } = null;
+        [JsonProperty(PropertyName = "due_since")]
+        public DateTime? DueSince { get; set; } = null;
+        [JsonProperty(PropertyName = "due_to")]
+        public DateTime? DueTo { get; set; } = null;
         [JsonProperty(PropertyName = "payment_type")]
         public string PaymentType { get; set; }
         [JsonProperty(PropertyName = "status")]
@@ -101,9 +108,20 @@ namespace Birko.SuperFaktura.Request.Expense
             {
                 paramString += "/delivery_to:" + DeliveryTo.Value.ToString("yyyy-MM-dd");
             }
-            if (Due.HasValue)
+            var dueSince = DueSince ?? Due;
+            var dueTo = DueTo ?? Due;
+            var due = DueFilter ?? (dueSince.HasValue || dueTo.HasValue ? ValueLists.TimeFilterConstants.SinceTo : (int?)null);
+            if (due.HasValue)
             {
-                paramString += "/due:" + Due.Value.ToString("yyyy-MM-dd");
+                paramString += "/due:" + due;
+            }
+            if (dueSince.HasValue)
+            {
+                paramString += "/due_since:" + dueSince.Value.ToString("yyyy-MM-dd");
+            }
+            if (dueTo.HasValue)
+            {
+                paramString += "/due_to:" + dueTo.Value.ToString("yyyy-MM-dd");
             }
             if (!string.IsNullOrEmpty(PaymentType))
             {

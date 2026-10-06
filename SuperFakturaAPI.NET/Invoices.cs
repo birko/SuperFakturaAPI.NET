@@ -234,12 +234,13 @@ namespace Birko.SuperFaktura
             return result;
         }
 
-        [Obsolete("Not found in API documentation")]
+        // Not in the API docs, used by the official PHP client (createRegularFromProforma): GET returns the
+        // regular invoice prefilled from the proforma, which is then created as is.
         public async Task<Detail> CreateFromProforma(int proformaID)
         {
-            var proforma = await superFaktura.Get(string.Format("invoices/regular.json/{0}", proformaID)).ConfigureAwait(false);
+            var proforma = await superFaktura.Get(string.Format("invoices/regular/{0}.json", proformaID)).ConfigureAwait(false);
             var data =  superFaktura.DeserializeResult<ExpandoObject>(proforma);
-            var result = await superFaktura.Post("/invoices/create", new Request.DataData { Data =  data}).ConfigureAwait(false);
+            var result = await superFaktura.Post("invoices/create", data).ConfigureAwait(false);
             var resultdata = superFaktura.DeserializeResult<Response<Detail>>(result);
             return resultdata.Data;
         }

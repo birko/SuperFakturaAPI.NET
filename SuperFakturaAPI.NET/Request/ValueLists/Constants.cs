@@ -157,6 +157,8 @@ namespace Birko.SuperFaktura.Request.ValueLists
         public const string GoPay = "gopay";
         public const string Other = "other";
         public const string PayPal = "paypal";
+        // Not in the API docs, listed by the official PHP client (superfaktura/apiclient).
+        public const string PostalOrder = "postal_order";
         public const string BankTransfer = "transfer";
         public const string TrustPay = "trustpay";
         public const string Viamo = "viamo";
@@ -165,7 +167,7 @@ namespace Birko.SuperFaktura.Request.ValueLists
         {
             get
             {
-                return new[] { MutalAccreditation, Barion, Besteron, Cash, Card, CashOnDelivery, CreditCard, DebitCard, Encashment, GoPay, Other, PayPal, BankTransfer, TrustPay, Viamo };
+                return new[] { MutalAccreditation, Barion, Besteron, Cash, Card, CashOnDelivery, CreditCard, DebitCard, Encashment, GoPay, Other, PayPal, PostalOrder, BankTransfer, TrustPay, Viamo };
             }
         }
     }

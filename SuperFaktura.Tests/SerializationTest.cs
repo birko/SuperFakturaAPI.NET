@@ -761,10 +761,10 @@ namespace SuperFaktura.Tests
         [Fact]
         public void PaymentTypesMatchDocumentation()
         {
-            // value-lists.md "Payment types"
+            // value-lists.md "Payment types" + postal_order from the official PHP client (superfaktura/apiclient)
             Birko.SuperFaktura.Request.ValueLists.PaymentType.Types.OrderBy(t => t).ShouldBe(new[]
             {
-                "accreditation", "barion", "besteron", "card", "cash", "cod", "credit", "debit", "gopay", "inkaso", "other", "paypal", "transfer", "trustpay", "viamo",
+                "accreditation", "barion", "besteron", "card", "cash", "cod", "credit", "debit", "gopay", "inkaso", "other", "paypal", "postal_order", "transfer", "trustpay", "viamo",
             });
         }
 
@@ -856,6 +856,32 @@ namespace SuperFaktura.Tests
             var json = Serialize(new Birko.SuperFaktura.Request.Invoice.Email { InvoiceID = 1, To = "recipient@example.com" });
 
             json.Properties().Select(p => p.Name).OrderBy(n => n).ShouldBe(new[] { "invoice_id", "to" });
+        }
+
+        [Fact]
+        public void ExpenseFilterSendsDueAsRange()
+        {
+            // Sandbox: "due:<date>" (expenses.md) is ignored; due:3/due_since/due_to works (inclusive), as in the PHP client
+            var exact = new Birko.SuperFaktura.Request.Expense.Filter { Due = new System.DateTime(2026, 9, 30) }.ToParameters();
+            exact.ShouldContain("/due:3/due_since:2026-09-30/due_to:2026-09-30");
+
+            var range = new Birko.SuperFaktura.Request.Expense.Filter { DueSince = new System.DateTime(2026, 9, 1), DueTo = new System.DateTime(2026, 9, 30) }.ToParameters();
+            range.ShouldContain("/due:3/due_since:2026-09-01/due_to:2026-09-30");
+
+            new Birko.SuperFaktura.Request.Expense.Filter { DueFilter = Birko.SuperFaktura.Request.ValueLists.TimeFilterConstants.ThisMonth }.ToParameters()
+                .ShouldContain($"/due:{Birko.SuperFaktura.Request.ValueLists.TimeFilterConstants.ThisMonth}");
+        }
+
+        [Fact]
+        public void InvoiceFilterSendsPaidRange()
+        {
+            // PHP client (superfaktura/apiclient): paid / paid_since / paid_to, verified on sandbox
+            var parameters = new Birko.SuperFaktura.Request.Invoice.Filter { PaidSince = new System.DateTime(2026, 9, 1), PaidTo = new System.DateTime(2026, 9, 30) }.ToParameters();
+
+            parameters.ShouldContain("/paid:3/");
+            parameters.ShouldContain("/paid_since:2026-09-01");
+            parameters.ShouldContain("/paid_to:2026-09-30");
+            new Birko.SuperFaktura.Request.Invoice.Filter().ToParameters().ShouldNotContain("paid");
         }
 
         [Fact]

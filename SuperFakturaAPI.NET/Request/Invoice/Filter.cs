@@ -65,6 +65,17 @@ namespace Birko.SuperFaktura.Request.Invoice
         [JsonProperty(PropertyName = "paydate_to")]
         public DateTime? PayDateTo { get; set; } = null;
 
+        // Payment date filter used by the official PHP client (not in the API docs); unlike paydate it also
+        // matches invoices by their payments (sandbox returned more invoices than for the same paydate range).
+        [JsonProperty(PropertyName = "paid")]
+        public int? Paid { get; set; } = null;
+
+        [JsonProperty(PropertyName = "paid_since")]
+        public DateTime? PaidSince { get; set; } = null;
+
+        [JsonProperty(PropertyName = "paid_to")]
+        public DateTime? PaidTo { get; set; } = null;
+
         //Invoce.Paymenty const
         [JsonProperty(PropertyName = "payment_type")]
         public string PaymentType { get; set; }
@@ -90,6 +101,19 @@ namespace Birko.SuperFaktura.Request.Invoice
             paramString += "/modified:" + TimeFilter(Modified, ModifiedSince, ModifiedTo);
             paramString += "/delivery:" + TimeFilter(Delivery, DeliverySince, DeliveryTo);
             paramString += "/paydate:" + TimeFilter(PayDate, PayDateSince, PayDateTo);
+            var paid = Paid ?? (PaidSince.HasValue || PaidTo.HasValue ? ValueLists.TimeFilterConstants.SinceTo : (int?)null);
+            if (paid.HasValue)
+            {
+                paramString += "/paid:" + paid;
+            }
+            if (PaidSince.HasValue)
+            {
+                paramString += "/paid_since:" + PaidSince.Value.ToString("yyyy-MM-dd");
+            }
+            if (PaidTo.HasValue)
+            {
+                paramString += "/paid_to:" + PaidTo.Value.ToString("yyyy-MM-dd");
+            }
             if (!string.IsNullOrEmpty(Type))
             {
                 paramString += "/type:" + Type;
