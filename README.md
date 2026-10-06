@@ -113,7 +113,7 @@ Class that wrappes invoice API calls
 #### Public Methods
 * **List(Request.Invoice.Filter filter, bool listInfo = true)** - gets list of invoices according `filter`
 * **Add(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Request.Invoice.InvoiceSettings setting = null, Request.Invoice.Extra extra = null, Request.Invoice.MyData myData = null, string checksum = null)** - creates new invoice. Optional  `tags`, `setting`, `extra`, `myData` and `checksum` (own unique identifier, e.g. order number, max 32 chars, for `ResponseByChecksum`) can be specified
-* **Edit(Request.Invoice.Invoice invoice, Client client = null, Request.Invoice.Item[] items = null, int[] tags = null, Request.Invoice.InvoiceSettings setting = null, Request.Invoice.Extra extra = null, Request.Invoice.MyData myData = null)** - updates invoice with `invoice.ID`, only properties that are set are changed. Returns the full invoice detail
+* **Edit(Request.Invoice.Invoice invoice, Client client = null, Request.Invoice.Item[] items = null, int[] tags = null, Request.Invoice.InvoiceSettings setting = null, Request.Invoice.Extra extra = null, Request.Invoice.MyData myData = null)** - updates invoice with `invoice.ID`, only properties that are set are changed. Returns the full invoice detail. Items with `ID` are updated and items without `ID` are added; items that are left out are **not deleted** by the API, remove them with `DeleteItem`
 * **View(int id)** - gets invoice detail according `id`
 * **ListDetails(int[] ids)** - gets invoice details according given list of invoice `id`
 * **SetInvoiceLanguage(int id, string language)** - sets the default language for given invoice `id`

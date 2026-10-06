@@ -390,7 +390,18 @@ namespace SuperFaktura.Tests
                 var edited = await apiClient.Invoices.Edit(detail.Invoice, client, replacement);
                 edited.ShouldNotBeNull();
 
-                // editing must end up with exactly the replacement set: A and C, no B
+                // Known API behaviour (reported to SuperFaktura, unanswered): Edit updates items with
+                // an ID and adds items without one, but keeps items that were left out (B stays).
+                // If this assertion starts failing, the API began replacing items on Edit.
+                var afterEdit = await apiClient.Invoices.View(invoiceId);
+                afterEdit.InvoiceItems.Select(x => x.Name).OrderBy(x => x).ShouldBe(new[] { "edit item A", "edit item B", "replacement item C" });
+
+                // Replacing the item set therefore needs an explicit delete of the left-out items.
+                var keptIds = replacement.Where(x => x.ID.HasValue).Select(x => x.ID.Value).ToArray();
+                var leftOut = afterEdit.InvoiceItems.Where(x => x.Name != newC.Name && !keptIds.Contains(x.ID)).Select(x => x.ID).ToArray();
+                await apiClient.Invoices.DeleteItem(invoiceId, leftOut);
+
+                // ends up with exactly the replacement set: A and C, no B
                 var after = await apiClient.Invoices.View(invoiceId);
                 after.InvoiceItems.ShouldNotBeNull();
                 after.InvoiceItems.Length.ShouldBe(replacement.Length);

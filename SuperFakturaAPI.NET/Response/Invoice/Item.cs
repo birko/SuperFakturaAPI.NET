@@ -21,8 +21,13 @@ namespace Birko.SuperFaktura.Response.Invoice
         public bool? HideInAutocomplete { get; set; }
 
         // Lower case "id" so the item is updated (not appended) when sent back with Invoices.Edit.
+        // Stored in the base property, so the ID is the same when the item is used as Request.Invoice.Item.
         [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
-        public new int ID { get; set; }
+        public new int ID
+        {
+            get { return base.ID ?? 0; }
+            set { base.ID = value; }
+        }
 
         [JsonProperty(PropertyName = "invoice_id", NullValueHandling = NullValueHandling.Ignore)]
         public int InvoiceId { get; set; }

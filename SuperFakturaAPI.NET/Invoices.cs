@@ -67,6 +67,8 @@ namespace Birko.SuperFaktura
         }
 
         // Only fields that are set are changed; invoice.ID is required. Returns the full invoice detail.
+        // Items with an ID are updated, items without one are added; items left out are NOT deleted
+        // (API behaviour) - remove them with DeleteItem.
         public async Task<Detail> Edit(Request.Invoice.Invoice invoice, Client client = null, Request.Invoice.Item[] items = null, int[] tags = null, InvoiceSettings setting = null, Extra extra = null, Request.Invoice.MyData myData = null)
         {
             var data = new InvoiceData

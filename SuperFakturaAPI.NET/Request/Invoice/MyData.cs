@@ -28,14 +28,31 @@ namespace Birko.SuperFaktura.Request.Invoice
 
         // Hides the non-nullable profile fields so they are sent only when set (tax_payer = false would
         // otherwise turn the issuer into a non VAT payer on the invoice).
+        // Setters also update the base properties, so values are visible through UserProfile too.
+        private int? countryID;
+        private bool? taxPayer;
+        private int? userID;
+
         [JsonProperty(PropertyName = "country_id", NullValueHandling = NullValueHandling.Ignore)]
-        public new int? CountryID { get; set; }
+        public new int? CountryID
+        {
+            get { return countryID; }
+            set { countryID = value; base.CountryID = value ?? 0; }
+        }
 
         [JsonProperty(PropertyName = "tax_payer", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.StringBooleanConverter))]
-        public new bool? TaxPayer { get; set; }
+        public new bool? TaxPayer
+        {
+            get { return taxPayer; }
+            set { taxPayer = value; base.TaxPayer = value ?? false; }
+        }
 
         [JsonProperty(PropertyName = "user_id", NullValueHandling = NullValueHandling.Ignore)]
-        public new int? UserID { get; set; }
+        public new int? UserID
+        {
+            get { return userID; }
+            set { userID = value; base.UserID = value ?? 0; }
+        }
     }
 }

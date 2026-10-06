@@ -622,7 +622,9 @@ namespace SuperFaktura.Tests
             var json = Serialize(new Birko.SuperFaktura.Request.Invoice.MyData { CompanyName = "Firma s.r.o." });
 
             json.Properties().Select(p => p.Name).ShouldBe(new[] { "company_name" });
-            Serialize(new Birko.SuperFaktura.Request.Invoice.MyData { CountryID = 191 })["country_id"].Value<int>().ShouldBe(191);
+            var withCountry = new Birko.SuperFaktura.Request.Invoice.MyData { CountryID = 191 };
+            Serialize(withCountry)["country_id"].Value<int>().ShouldBe(191);
+            ((Birko.SuperFaktura.Response.UserProfile)withCountry).CountryID.ShouldBe(191);
         }
 
         [Fact]
@@ -828,6 +830,7 @@ namespace SuperFaktura.Tests
             var json = Serialize(item);
             json["id"].Value<int>().ShouldBe(103367380);
             json.ContainsKey("ID").ShouldBeFalse();
+            ((Birko.SuperFaktura.Request.Invoice.Item)item).ID.ShouldBe(103367380);
             Serialize(new Birko.SuperFaktura.Request.Invoice.Item { ID = 5, Name = "x" })["id"].Value<int>().ShouldBe(5);
         }
 
