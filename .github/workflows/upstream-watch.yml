@@ -1,0 +1,76 @@
+name: Upstream watch
+
+# Daily check of the SuperFaktura API documentation and the official PHP client.
+# A new commit in either repository opens an issue (label "upstream-change") with the
+# changed files and commits; GitHub notifies watchers of the repository about the issue.
+# Optionally the issue is assigned to the Copilot coding agent (secret COPILOT_ASSIGN_TOKEN).
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      COPILOT_ASSIGN_TOKEN: ${{ secrets.COPILOT_ASSIGN_TOKEN }}
+    steps:
+      - name: Check upstream repositories
+        run: |
+          set -euo pipefail
+          gh label create upstream-change --repo "$GITHUB_REPOSITORY" --color FBCA04 \
+            --description "Change in SuperFaktura docs or PHP client" --force >/dev/null
+
+          # repository | commit already reviewed when this workflow was added
+          check() {
+            local repo="$1" baseline="$2" head last base compare commits files body url
+            head=$(gh api "repos/$repo/commits?per_page=1" --jq '.[0].sha')
+            # last processed commit is stored as a marker in the newest issue for the repository
+            last=$(gh issue list --repo "$GITHUB_REPOSITORY" --label upstream-change --state all --limit 100 --json body \
+              --jq "[.[].body | capture(\"<!-- upstream:${repo}@(?<sha>[0-9a-f]{40}) -->\") | .sha][0] // empty")
+            base="${last:-$baseline}"
+            if [ "$head" = "$base" ]; then
+              echo "$repo: no change since ${base:0:7}"
+              return
+            fi
+
+            compare=$(gh api "repos/$repo/compare/$base...$head")
+            commits=$(echo "$compare" | jq -r '.commits[] | "- [`\(.sha[0:7])`](\(.html_url)) \(.commit.message | split("\n")[0])"')
+            files=$(echo "$compare" | jq -r '.files[]? | "- `\(.filename)` (+\(.additions) -\(.deletions))"')
+
+            body=$(cat <<EOF
+          <!-- upstream:${repo}@${head} -->
+          New commits in [\`$repo\`](https://github.com/$repo): [compare ${base:0:7}...${head:0:7}](https://github.com/$repo/compare/$base...$head)
+
+          ### Commits
+          $commits
+
+          ### Changed files
+          $files
+
+          ### What to do
+          - Read the diff and find API changes: new or removed endpoints, attributes, value list items, response fields, changed types or defaults.
+          - Compare them with the library in \`SuperFakturaAPI.NET/\` (request models, response models, \`Request/ValueLists/Constants.cs\`, filters).
+          - For every change add or adjust an offline test in \`SuperFaktura.Tests/SerializationTest.cs\` first, then the model.
+          - Follow \`.github/copilot-instructions.md\`. If nothing affects the library, say so and close the issue.
+          EOF
+            )
+
+            url=$(gh issue create --repo "$GITHUB_REPOSITORY" --label upstream-change \
+              --title "Upstream change: $repo (${head:0:7})" --body "$body")
+            echo "$repo: ${base:0:7} -> ${head:0:7}, created $url"
+
+            if [ -n "${COPILOT_ASSIGN_TOKEN:-}" ]; then
+              GH_TOKEN="$COPILOT_ASSIGN_TOKEN" gh issue edit "$url" --add-assignee "@copilot" \
+                || echo "::warning::Could not assign $url to Copilot (coding agent enabled? token scope?)"
+            fi
+          }
+
+          check superfaktura/docs cac0402e4f8bebfc5eec2f26b588a02a6afd596e
+          check superfaktura/apiclient 0ab949e7e092c14ce8292327dedfbc021f8ea8db
