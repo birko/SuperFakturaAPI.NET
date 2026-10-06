@@ -13,11 +13,21 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestList()
         {
-            var list = await apiClient.Stock.List(new Birko.SuperFaktura.Request.Stock.Filter() { });
-            list.ShouldNotBeNull();
-            list.Items.ShouldNotBeNull();
-            list.Items.Count().ShouldBe(0);
-            list.ItemCount.ShouldBe(0);
+            var sku = UniqueName("SKU");
+            var added = await apiClient.Stock.Add(new Birko.SuperFaktura.Request.Stock.Item() { Name = "List test", SKU = sku, UnitPrice = 1 });
+            try
+            {
+                // sku filter: exactly the item created by this test
+                var list = await apiClient.Stock.List(new Birko.SuperFaktura.Request.Stock.Filter() { SKU = sku });
+                list.ShouldNotBeNull();
+                list.Items.ShouldNotBeNull();
+                list.ItemCount.ShouldBe(1);
+                list.Items.Single().StockItem.ID.ShouldBe(added.StockItem.ID);
+            }
+            finally
+            {
+                await apiClient.Stock.Delete(added.StockItem.ID.Value);
+            }
         }
 
         [Fact]

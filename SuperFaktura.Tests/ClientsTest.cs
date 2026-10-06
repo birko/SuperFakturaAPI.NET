@@ -29,52 +29,49 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestView()
         {
-            var clients = await apiClient.Clients.List(new Birko.SuperFaktura.Request.Client.Filter()
+            var clientId = await CreateTestClient("ClientTest view");
+            try
             {
-                PerPage = 50
-            });
-            if (!(clients.Items?.Any() ?? false))
-            {
-                return;
+                var client = await apiClient.Clients.View(clientId);
+                client.ShouldNotBe(null);
+                client.Client.ID.ShouldBe(clientId);
+                client.Client.Name.ShouldStartWith("ClientTest view");
             }
-            var client = await apiClient.Clients.View(clients.Items.Last().Client.ID.Value);
-            client.ShouldNotBe(null);
-            client.Client.Name.Equals("ClienTest Client");
+            finally
+            {
+                await apiClient.Clients.Delete(clientId);
+            }
         }
 
         [Fact]
         public async Task TestEdit()
         {
-            var clients = await apiClient.Clients.List(new Birko.SuperFaktura.Request.Client.Filter() {
-                PerPage = 50
-            });
-            if (!(clients.Items?.Any() ?? false))
+            var clientId = await CreateTestClient("ClientTest edit");
+            try
             {
-                return;
+                var client = await apiClient.Clients.Edit(clientId, new Birko.SuperFaktura.Request.Client.Client()
+                {
+                    Name = "ClienTest Client Edit",
+                });
+                client.ShouldNotBe(null);
+                client.Error.ShouldBe(0);
+                (await apiClient.Clients.View(clientId)).Client.Name.ShouldBe("ClienTest Client Edit");
             }
-            var client = await apiClient.Clients.Edit(clients.Items.Last().Client.ID.Value, new Birko.SuperFaktura.Request.Client.Client()
+            finally
             {
-                Name = "ClienTest Client Edit",
-            });
-            client.ShouldNotBe(null);
-            client.Error.Equals(0);
+                await apiClient.Clients.Delete(clientId);
+            }
         }
 
         [Fact]
         public async Task TestDelete()
         {
-            var clients = await apiClient.Clients.List(new Birko.SuperFaktura.Request.Client.Filter()
-            {
-                PerPage = 50
-            });
-            if (!(clients.Items?.Any() ?? false))
-            {
-                return;
-            }
-            var client = await apiClient.Clients.Delete(clients.Items.Last().Client.ID.Value);
+            // a client of its own: an existing client may have invoices and cannot be deleted
+            var clientId = await CreateTestClient("ClientTest delete");
+            var client = await apiClient.Clients.Delete(clientId);
             client.ShouldNotBe(null);
-            client.Error.Equals(0);
-            client.RedirectURL.Equals("/clients");
+            client.Error.ShouldBe(0);
+            client.RedirectURL.ShouldBe("/clients");
         }
     }
 }

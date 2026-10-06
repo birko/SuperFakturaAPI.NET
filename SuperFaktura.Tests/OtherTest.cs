@@ -28,12 +28,22 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestSendSMS()
         {
-            var task = await apiClient.Other.SendSMS(new Birko.SuperFaktura.Request.Other.SMS()
+            var invoice = await CreateTestInvoice();
+            try
             {
-                InvoiceID = 3,
-                Text = "test"
-            });
-            task.ShouldNotBe(null);
+                // error 3: "SMS not sent" - the sandbox account has no prepaid SMS
+                var task = await AllowSandboxLimit(() => apiClient.Other.SendSMS(new Birko.SuperFaktura.Request.Other.SMS()
+                {
+                    InvoiceID = invoice.Invoice.ID.Value,
+                    Text = "test",
+                    Phone = "+421900000000"
+                }), 3);
+                task?.InvoiceID.ShouldBe(invoice.Invoice.ID.Value);
+            }
+            finally
+            {
+                await DeleteTestInvoice(invoice);
+            }
         }
 
         [Fact]

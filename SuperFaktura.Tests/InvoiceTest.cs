@@ -212,15 +212,21 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestEdit()
         {
-            var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter() { PerPage = 200});
-            if (!(invoices?.Items?.Any() ?? false))
+            // round trip: the invoice detail read from the API is sent back with one change
+            var created = await CreateTestInvoice();
+            try
             {
-                return;
+                var detail = await apiClient.Invoices.View(created.Invoice.ID.Value);
+                detail.Invoice.IssuedBy = "SF tester2";
+                var task = await apiClient.Invoices.Edit(detail.Invoice, detail.Client, detail.InvoiceItems);
+                task.ShouldNotBeNull();
+                task.Invoice.IssuedBy.ShouldBe("SF tester2");
+                task.InvoiceItems.Length.ShouldBe(created.InvoiceItems.Length);
             }
-            var detail = invoices?.Items?.First();
-            detail.Invoice.IssuedBy = "SF tester2";
-            var task = await apiClient.Invoices.Edit(detail.Invoice, detail.Client, detail.InvoiceItems);
-            task.ShouldNotBeNull();
+            finally
+            {
+                await DeleteTestInvoice(created);
+            }
         }
 
         [Fact]
@@ -630,19 +636,22 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestSendEmail()
         {
-            var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter() { PerPage = 200 });
-            if (!(invoices?.Items?.Any() ?? false))
+            var detail = await CreateTestInvoice();
+            try
             {
-                return;
+                // error 11: "Posielanie e-mailov je vypnuté. Nastavte si vlastné SMTP." - no SMTP on the sandbox account
+                var task = await AllowSandboxLimit(() => apiClient.Invoices.SendEmail(new Birko.SuperFaktura.Request.Invoice.Email()
+                {
+                    InvoiceID = detail.Invoice.ID.Value,
+                    To = "recipient@example.com",
+                    Subject = "test",
+                }), 11);
+                task?.InvoiceID.ShouldBe(detail.Invoice.ID.Value);
             }
-            var detail = invoices?.Items?.First();
-            var task = await apiClient.Invoices.SendEmail(new Birko.SuperFaktura.Request.Invoice.Email()
+            finally
             {
-                InvoiceID = detail.Invoice.ID.Value,
-                To = "recipient@example.com",
-                Subject = "test",
-            });
-            task.ShouldNotBeNull();
+                await DeleteTestInvoice(detail);
+            }
         }
 
         [Fact]
@@ -666,16 +675,19 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestSendPost()
         {
-            var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter() { PerPage = 200 });
-            if (!(invoices?.Items?.Any() ?? false))
+            var detail = await CreateTestInvoice();
+            try
             {
-                return;
+                // error 7: "No post stamps left." - the sandbox account has no post stamp credit
+                var task = await AllowSandboxLimit(() => apiClient.Invoices.SendPost(new Birko.SuperFaktura.Request.Invoice.Post() {
+                    InvoiceID = detail.Invoice.ID.Value,
+                }), 7);
+                task?.Invoice.ID.ShouldBe(detail.Invoice.ID);
             }
-            var detail = invoices?.Items?.First();
-            var task = await apiClient.Invoices.SendPost(new Birko.SuperFaktura.Request.Invoice.Post() {
-                InvoiceID = detail.Invoice.ID.Value,
-            });
-            task.ShouldNotBeNull();
+            finally
+            {
+                await DeleteTestInvoice(detail);
+            }
         }
 
         [Fact]
@@ -790,14 +802,12 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestDelete()
         {
-            var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter() { PerPage = 200 });
-            if (!(invoices?.Items?.Any() ?? false))
-            {
-                return;
-            }
-            var detail = invoices?.Items?.First();
+            // an invoice of its own: deleting the first listed invoice destroyed other tests' data
+            var detail = await CreateTestInvoice();
             var task = await apiClient.Invoices.Delete(detail.Invoice.ID.Value);
             task.ShouldNotBeNull();
+            task.Error.ShouldBe(0);
+            await apiClient.Clients.Delete(detail.Invoice.ClientID.Value);
         }
 
         [Fact]

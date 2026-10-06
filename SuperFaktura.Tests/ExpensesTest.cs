@@ -10,9 +10,20 @@ namespace SuperFaktura.Tests
         [Fact]
         public async Task TestList()
         {
-            var expenses = await apiClient.Expenses.List(new Birko.SuperFaktura.Request.Expense.Filter() { });
-            expenses.ShouldNotBe(null);
-            expenses.Items.ShouldNotBeEmpty();
+            var name = UniqueName("List test");
+            var added = await apiClient.Expenses.Add(new Birko.SuperFaktura.Request.Expense.Expense() { Name = name, Currency = "EUR", Amount = 12 });
+            try
+            {
+                // search filter: exactly the expense created by this test
+                var expenses = await apiClient.Expenses.List(new Birko.SuperFaktura.Request.Expense.Filter() { Search = name });
+                expenses.ShouldNotBe(null);
+                expenses.Items.ShouldNotBeEmpty();
+                expenses.Items.ShouldContain(x => x.Expense.ID == added.Expense.ID);
+            }
+            finally
+            {
+                await apiClient.Expenses.Delete(added.Expense.ID.Value);
+            }
         }
 
         [Fact]

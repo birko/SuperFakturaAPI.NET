@@ -1,4 +1,4 @@
-﻿using Shouldly;
+using Shouldly;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,38 +10,66 @@ namespace SuperFaktura.Tests
 {
     public class ContactPersonsTest : SuperFakturaTest
     {
+        private static Birko.SuperFaktura.Request.ContactPersons.ContactPerson Person(int clientId)
+        {
+            return new Birko.SuperFaktura.Request.ContactPersons.ContactPerson()
+            {
+                ClientID = clientId,
+                Name = "Test",
+                Email = "test@example.com"
+            };
+        }
+
         [Fact]
         public async Task TestGet()
         {
-            var persons = await apiClient.ContactPersons.List(7621);
-            persons.ShouldNotBe(null);
-            persons.ShouldNotBeEmpty();
+            var clientId = await CreateTestClient();
+            try
+            {
+                await apiClient.ContactPersons.Add(Person(clientId));
+                var persons = await apiClient.ContactPersons.List(clientId);
+                persons.ShouldNotBe(null);
+                persons.ShouldNotBeEmpty();
+            }
+            finally
+            {
+                await apiClient.Clients.Delete(clientId);
+            }
         }
 
         [Fact]
         public async Task TestAdd()
         {
-            var client = await apiClient.ContactPersons.Add(new Birko.SuperFaktura.Request.ContactPersons.ContactPerson()
+            var clientId = await CreateTestClient();
+            try
             {
-                ClientID = 7621,
-                Name = "Test",
-                Email = "test@example.com"
-            });
-            client.ShouldNotBe(null);
+                var person = await apiClient.ContactPersons.Add(Person(clientId));
+                person.ShouldNotBe(null);
+                person.ClientID.ShouldBe(clientId);
+                person.Email.ShouldBe("test@example.com");
+            }
+            finally
+            {
+                await apiClient.Clients.Delete(clientId);
+            }
         }
-
 
         [Fact]
         public async Task TestDelete()
         {
-            var persons = await apiClient.ContactPersons.List(7621);
-            if (!(persons?.Any() ?? false))
+            var clientId = await CreateTestClient();
+            try
             {
-                return;
+                var person = await apiClient.ContactPersons.Add(Person(clientId));
+                var result = await apiClient.ContactPersons.Delete(person.ID.Value);
+                result.ShouldNotBe(null);
+                result.Error.ShouldBe(0);
+                (await apiClient.ContactPersons.List(clientId)).ShouldNotContain(p => p.ID == person.ID);
             }
-            var client = await apiClient.ContactPersons.Delete(persons.First().ID.Value);
-            client.ShouldNotBe(null);
-            client.Error.Equals(0);
+            finally
+            {
+                await apiClient.Clients.Delete(clientId);
+            }
         }
     }
 }
