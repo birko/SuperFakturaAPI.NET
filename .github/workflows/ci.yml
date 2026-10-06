@@ -3,9 +3,11 @@ name: CI
 on:
   push:
     branches: [ master ]
-    tags: [ 'v*' ]
   pull_request:
     branches: [ master ]
+  # Publishing a GitHub release with tag vX.Y.Z publishes version X.Y.Z to nuget.org.
+  release:
+    types: [ published ]
   workflow_dispatch:
 
 permissions:
@@ -24,13 +26,13 @@ jobs:
         with:
           dotnet-version: 9.0.x
 
-      # Tag v1.2.3 builds and publishes version 1.2.3 (assembly, file and package version);
+      # Release v1.2.3 builds and publishes version 1.2.3 (assembly, file and package version);
       # other builds use <Version> from SuperFaktura.csproj.
       - name: Version
-        run: |
-          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
-            echo "VERSION_ARG=-p:Version=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
-          fi
+        if: github.event_name == 'release'
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: echo "VERSION_ARG=-p:Version=${TAG#v}" >> "$GITHUB_ENV"
 
       - name: Restore
         run: dotnet restore SuperFaktura.slnx
@@ -57,11 +59,11 @@ jobs:
   # workflow file "ci.yml"; and secret NUGET_USER = nuget.org profile name (not the email).
   publish:
     needs: build
-    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+    if: github.event_name == 'release' && startsWith(github.event.release.tag_name, 'v')
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      id-token: write
+      contents: write   # attach the .nupkg to the release
+      id-token: write   # OIDC token for nuget.org
 
     steps:
       - name: Download package
@@ -83,3 +85,9 @@ jobs:
 
       - name: Push package
         run: dotnet nuget push "out/*.nupkg" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      - name: Attach package to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$TAG" out/*.nupkg --repo "$GITHUB_REPOSITORY" --clobber
