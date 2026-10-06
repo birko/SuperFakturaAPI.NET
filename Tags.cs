@@ -54,10 +54,10 @@ namespace Birko.SuperFaktura
             return superFaktura.DeserializeResult<Response.Tag.Tag>(result);
         }
 
-        public async Task<ErrorMessageResponse> Delete(int id)
+        public async Task<StringMessageResponse> Delete(int id)
         {
             var result = await superFaktura.Get($"tags/delete/{id}").ConfigureAwait(false);
-            return superFaktura.DeserializeResult<ErrorMessageResponse>(result);
+            return superFaktura.DeserializeResult<StringMessageResponse>(result);
         }
     }
 }

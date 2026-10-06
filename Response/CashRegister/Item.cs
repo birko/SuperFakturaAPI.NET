@@ -18,5 +18,23 @@ namespace Birko.SuperFaktura.Response.CashRegister
 
         [JsonProperty(PropertyName = "EetReceipt", NullValueHandling = NullValueHandling.Ignore)]
         public EetReceiptPaged EetReceipt { get; set; }
+
+        [JsonProperty(PropertyName = "0", NullValueHandling = NullValueHandling.Ignore)]
+        public ItemFlags Flags { get; set; }
+    }
+
+    public class ItemFlags
+    {
+        // The item was cancelled by a reverse item.
+        [JsonProperty(PropertyName = "has_storno", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.StringBooleanConverter))]
+        public bool? HasStorno { get; set; }
+    }
+
+    // cash_register_items/index/{ID}: paged items plus the cash register they belong to.
+    public class ItemList : PagedResponse<Item>
+    {
+        [JsonProperty(PropertyName = "CashRegister", NullValueHandling = NullValueHandling.Ignore)]
+        public CashRegister CashRegister { get; set; }
     }
 }

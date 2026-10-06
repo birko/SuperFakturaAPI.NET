@@ -29,7 +29,7 @@ namespace Birko.SuperFaktura
 
         public async Task<IEnumerable<CompanyData>> ListUserCompanies(bool all = false)
         {
-            var result = await superFaktura.Get($"users/getUserCompaniesData/{ (all? 1: 0)}]").ConfigureAwait(false);
+            var result = await superFaktura.Get($"users/getUserCompaniesData/{ (all? 1: 0)}").ConfigureAwait(false);
             var data = superFaktura.DeserializeResult<ListResponse<CompanyData>>(result);
             return data.Data;
         }

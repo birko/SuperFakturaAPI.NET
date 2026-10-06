@@ -11,6 +11,9 @@ namespace Birko.SuperFaktura.Response.CashRegister
         [JsonProperty(PropertyName = "Summary", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.ZeroObjectConverter))]
         public Summary Summary { get; set; }
+
+        [JsonProperty(PropertyName = "status", NullValueHandling = NullValueHandling.Ignore)]
+        public int Status { get;  set; }
     }
 
     public class CashRegisterItemResponse : CashRegisterSummaryResponse
@@ -29,8 +32,5 @@ namespace Birko.SuperFaktura.Response.CashRegister
 
         [JsonProperty(PropertyName = "EetReceipt", NullValueHandling = NullValueHandling.Ignore)]
         public EetReceipt EetReceipt { get; set; }
-
-        [JsonProperty(PropertyName = "status", NullValueHandling = NullValueHandling.Ignore)]
-        public int Status { get;  set; }
     }
 }

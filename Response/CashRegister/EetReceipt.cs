@@ -122,7 +122,7 @@ namespace Birko.SuperFaktura.Response.CashRegister
         [JsonProperty(PropertyName = "user_profile_id", NullValueHandling = NullValueHandling.Ignore)]
         public int UserProfileId { get; set; }
 
-        [JsonProperty(PropertyName = "upid", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(PropertyName = "uuid_zpravy", NullValueHandling = NullValueHandling.Ignore)]
         public string uuid_zpravy { get; set; }
 
         [JsonProperty(PropertyName = "zakl_dan1", NullValueHandling = NullValueHandling.Ignore)]

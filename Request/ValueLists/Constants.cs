@@ -11,6 +11,31 @@ namespace Birko.SuperFaktura.Request.ValueLists
         public static string[] Types = new[] { Item, Service };
     }
 
+    // Keys of ValueLists.ListSequences(): document type the number sequence belongs to.
+    public static class SequenceType
+    {
+        public const string CashRegisterIn = "cash_register_in";
+        public const string CashRegisterOut = "cash_register_out";
+        public const string Delivery = InvoiceType.Delivery;
+        public const string Estimate = InvoiceType.Estimate;
+        public const string Expense = DocumentType.Expense;
+        public const string Order = InvoiceType.Order;
+        public const string ProForma = InvoiceType.ProForma;
+        public const string Regular = InvoiceType.Regular;
+        public const string ReverseOrder = InvoiceType.ReverseOrder;
+
+        public static string[] Types = new[] { CashRegisterIn, CashRegisterOut, Delivery, Estimate, Expense, Order, ProForma, Regular, ReverseOrder };
+    }
+
+    // Cash register items filter "type".
+    public static class CashRegisterItemType
+    {
+        public const string In = "in";
+        public const string Out = "out";
+
+        public static string[] Types = new[] { In, Out };
+    }
+
     public static class DeliveryType
     {
         public const string Courier = "courier";
@@ -24,7 +49,7 @@ namespace Birko.SuperFaktura.Request.ValueLists
 
     public static class DocumentType
     {
-        public const string Invoice = "invocie";
+        public const string Invoice = "invoice";
         public const string Expense = "expense";
     }
 
@@ -128,6 +153,7 @@ namespace Birko.SuperFaktura.Request.ValueLists
         public const string CashOnDelivery = "cod";
         public const string CreditCard = "credit";
         public const string DebitCard = "debit";
+        public const string Encashment = "inkaso";
         public const string GoPay = "gopay";
         public const string Other = "other";
         public const string PayPal = "paypal";
@@ -139,7 +165,7 @@ namespace Birko.SuperFaktura.Request.ValueLists
         {
             get
             {
-                return new[] { MutalAccreditation, Barion, Besteron, Cash, Card, CashOnDelivery, CreditCard, DebitCard, GoPay, Other, PayPal, BankTransfer, TrustPay, Viamo };
+                return new[] { MutalAccreditation, Barion, Besteron, Cash, Card, CashOnDelivery, CreditCard, DebitCard, Encashment, GoPay, Other, PayPal, BankTransfer, TrustPay, Viamo };
             }
         }
     }

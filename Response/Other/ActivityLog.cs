@@ -19,7 +19,7 @@ namespace Birko.SuperFaktura.Response.Other
         [JsonProperty(PropertyName = "item_type", NullValueHandling = NullValueHandling.Ignore)]
         public string ItemType { get; set; }
 
-        [JsonProperty(PropertyName = "Event_type", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(PropertyName = "event_type", NullValueHandling = NullValueHandling.Ignore)]
         public string EventType { get; set; }
 
         [JsonProperty(PropertyName = "client_id", NullValueHandling = NullValueHandling.Ignore)]
@@ -27,5 +27,8 @@ namespace Birko.SuperFaktura.Response.Other
 
         [JsonProperty(PropertyName = "user_id", NullValueHandling = NullValueHandling.Ignore)]
         public int UserID { get; set; }
+
+        [JsonProperty(PropertyName = "created", NullValueHandling = NullValueHandling.Ignore)]
+        public DateTime? Created { get; set; }
     }
 }

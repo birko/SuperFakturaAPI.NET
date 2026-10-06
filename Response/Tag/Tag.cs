@@ -3,7 +3,7 @@ using System;
 
 namespace Birko.SuperFaktura.Response.Tag
 {
-    public class Tag : ErrorMessageResponse
+    public class Tag : StringMessageResponse
     {
         [JsonProperty(PropertyName = "tag_id", NullValueHandling = NullValueHandling.Ignore)]
         public int ID { get; internal set; }

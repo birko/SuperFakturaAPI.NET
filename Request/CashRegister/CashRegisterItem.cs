@@ -23,7 +23,9 @@ namespace Birko.SuperFaktura.Request.CashRegister
         [JsonProperty(PropertyName = "client_name", NullValueHandling = NullValueHandling.Ignore)]
         public string ClientName { get; set; }
 
+        // Date only; the server ignores the time part.
         [JsonProperty(PropertyName = "created", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.DateConverter))]
         public DateTime? Created { get; set; }
 
         [JsonProperty(PropertyName = "description", NullValueHandling = NullValueHandling.Ignore)]

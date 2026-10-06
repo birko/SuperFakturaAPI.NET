@@ -10,8 +10,13 @@ namespace Birko.SuperFaktura.Response.CashRegister
         [JsonProperty(PropertyName = "formatted", NullValueHandling = NullValueHandling.Ignore)]
         public string Formatted { get; set; }
 
+        // Returned by add.
         [JsonProperty(PropertyName = "value", NullValueHandling = NullValueHandling.Ignore)]
         public decimal? Value { get;  set; }
+
+        // Returned by delete instead of "value".
+        [JsonProperty(PropertyName = "raw", NullValueHandling = NullValueHandling.Ignore)]
+        public decimal? Raw { get; set; }
     }
 
     public class Summary

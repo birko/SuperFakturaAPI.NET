@@ -1,10 +1,12 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Globalization;
 
 namespace Birko.SuperFaktura.Request.CashRegister
 {
     public class Filter: PagedSearchParameters
     {
+        // Cash register ID; part of the URL path (cash_register_items/index/{ID}), not a named parameter.
         [JsonProperty(PropertyName = "id")]
         public int ID { get; set; }
 
@@ -32,26 +34,25 @@ namespace Birko.SuperFaktura.Request.CashRegister
         public override string ToParameters(bool listInfo = true)
         {
             string paramString = base.ToParameters(listInfo);
-            paramString += $"/{ID}";
             if (!string.IsNullOrEmpty(DateFilter))
             {
                 paramString += "/datefilter:" + DateFilter;
             }
             if (DateFrom.HasValue)
             {
-                paramString += "/date_from:" + DateFrom;
+                paramString += "/date_from:" + DateFrom.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             }
             if (DateTo.HasValue)
             {
-                paramString += "/date_to:" + DateTo;
+                paramString += "/date_to:" + DateTo.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             }
             if (SumFrom.HasValue)
             {
-                paramString += "/sum_from:" + SumFrom;
+                paramString += "/sum_from:" + SumFrom.Value.ToString(CultureInfo.InvariantCulture);
             }
             if (SumTo.HasValue)
             {
-                paramString += "/sum_to:" + SumTo;
+                paramString += "/sum_to:" + SumTo.Value.ToString(CultureInfo.InvariantCulture);
             }
             if (!string.IsNullOrEmpty(Term))
             {

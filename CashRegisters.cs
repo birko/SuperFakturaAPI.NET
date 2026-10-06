@@ -35,15 +35,22 @@ namespace Birko.SuperFaktura
             return data.CashRegister;
         }
 
-        public async Task<PagedResponse<Item>> ListItems(Filter filter)
+        public async Task<ItemList> ListItems(Filter filter)
         {
-            var result = await superFaktura.Get($"cash_register_items/index/{filter.ToParameters()}").ConfigureAwait(false);
-            return superFaktura.DeserializeResult<PagedResponse<Item>>(result);
+            var result = await superFaktura.Get(ItemsUrl(filter)).ConfigureAwait(false);
+            return superFaktura.DeserializeResult<ItemList>(result);
         }
 
-        public async Task<CashRegisterItemResponse> AddItem(Request.CashRegister.CashRegisterItem item)
+        internal static string ItemsUrl(Filter filter)
         {
-            var result = await superFaktura.Post("cash_register_items/add", new CashRegisterItemData { CashRegisterItem = item}).ConfigureAwait(false);
+            return $"cash_register_items/index/{filter.ID}{filter.ToParameters()}";
+        }
+
+        /// <param name="checksum">Your own unique identifier of this request (e.g. receipt number, max 32 chars).
+        /// If no response arrives, call ResponseByChecksum with it to find out whether the item was created.</param>
+        public async Task<CashRegisterItemResponse> AddItem(Request.CashRegister.CashRegisterItem item, string checksum = null)
+        {
+            var result = await superFaktura.Post("cash_register_items/add", new CashRegisterItemData { CashRegisterItem = item, CheckSum = checksum }).ConfigureAwait(false);
             return superFaktura.DeserializeResult<CashRegisterItemResponse>(result);
         }
 
@@ -60,7 +67,7 @@ namespace Birko.SuperFaktura
             {
                 throw new ArgumentException("Parameter ids is empty");
             }
-            var result = await superFaktura.Post("/cash_register_items/delete", new { ids = string.Join(",", ids) }).ConfigureAwait(false);
+            var result = await superFaktura.Post("cash_register_items/delete", new { ids = string.Join(",", ids) }).ConfigureAwait(false);
             return superFaktura.DeserializeResult<CashRegisterSummaryResponse>(result);
         }
 

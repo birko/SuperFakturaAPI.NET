@@ -40,5 +40,20 @@ namespace Birko.SuperFaktura.Response.CashRegister
 
         [JsonProperty(PropertyName = "user_profile_id", NullValueHandling = NullValueHandling.Ignore)]
         public int? UserProfileID { get; internal set; }
+
+        [JsonProperty(PropertyName = "default", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.StringBooleanConverter))]
+        public bool? Default { get; internal set; }
+
+        // Number of items in the cash register.
+        [JsonProperty(PropertyName = "items", NullValueHandling = NullValueHandling.Ignore)]
+        public int? Items { get; internal set; }
+
+        // Next income / outgo document number, e.g. "P2026001" / "V2026001".
+        [JsonProperty(PropertyName = "sequence_in_no", NullValueHandling = NullValueHandling.Ignore)]
+        public string SequenceInNumber { get; internal set; }
+
+        [JsonProperty(PropertyName = "sequence_out_no", NullValueHandling = NullValueHandling.Ignore)]
+        public string SequenceOutNumber { get; internal set; }
     }
 }
