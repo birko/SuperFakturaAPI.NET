@@ -50,9 +50,34 @@ jobs:
           name: nuget
           path: out/*.nupkg
 
+  # nuget.org Trusted Publishing: a GitHub OIDC token is exchanged for a 1 hour API key, no stored key.
+  # Requires a Trusted Publishing policy on nuget.org: owner "birko", repository "SuperFakturaAPI.NET",
+  # workflow file "ci.yml"; and secret NUGET_USER = nuget.org profile name (not the email).
+  publish:
+    needs: build
+    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Download package
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget
+          path: out
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: NuGet login (OIDC to temporary API key)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
       - name: Push package
-        if: github.ref_type == 'tag'
-        env:
-          NUGET_SOURCE: ${{ secrets.NUGET_SOURCE }}
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        run: dotnet nuget push "out/*.nupkg" --source "$NUGET_SOURCE" --api-key "$NUGET_API_KEY" --skip-duplicate
+        run: dotnet nuget push "out/*.nupkg" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
