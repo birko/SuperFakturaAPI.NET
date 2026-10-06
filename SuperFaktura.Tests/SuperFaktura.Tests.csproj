@@ -27,6 +27,6 @@
     </None>
   </ItemGroup>
 
-  <Import Project="..\SuperFakturaAPI.NET.projitems" Label="Shared" />
+  <Import Project="..\SuperFakturaAPI.NET\SuperFakturaAPI.NET.projitems" Label="Shared" />
 
 </Project>

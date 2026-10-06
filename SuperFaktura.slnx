@@ -14,5 +14,5 @@
   <Project Path="SuperFaktura/SuperFaktura.csproj">
     <BuildType Solution="Beta|*" Project="Release" />
   </Project>
-  <Project Path="SuperFakturaAPI.NET.shproj" />
+  <Project Path="SuperFakturaAPI.NET/SuperFakturaAPI.NET.shproj" />
 </Solution>

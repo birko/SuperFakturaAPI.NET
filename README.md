@@ -8,6 +8,12 @@ Library uses System.Net.Http.HttpClient as communication layer and Newtonsoft.Js
 
 Implementation used by [FinStat.sk](http://www.finstat.sk)
 
+## Repository structure
+* **SuperFakturaAPI.NET/** - the library as a .NET Shared Project (`SuperFakturaAPI.NET.projitems`), import it into your project
+* **SuperFaktura/** - NuGet package project (`SuperFaktura`, netstandard2.0)
+* **SuperFaktura.Tests/** - tests: offline `SerializationTest` (no credentials) and integration tests against the SuperFaktura sandbox (credentials in `SuperFaktura.Tests/Properties/launchSettings.json`, not committed)
+* **SuperFaktura.slnx** - solution
+
 ## Client structure
 The main api client class [`SuperFaktura`](#superfaktura) has this hierarchy. Most of used classes is from `Birko.SuperFaktura` namespace
  
