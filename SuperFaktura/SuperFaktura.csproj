@@ -19,10 +19,10 @@
     <PackageIcon>superfaktura-sk-logo23-rgb.png</PackageIcon>
   </PropertyGroup>
 
-  <Import Project="..\..\SuperFakturaAPI.NET\SuperFakturaAPI.NET.projitems" Label="Shared" />
+  <Import Project="..\SuperFakturaAPI.NET.projitems" Label="Shared" />
 
   <ItemGroup>
-    <None Include="..\..\SuperFakturaAPI.NET\README.md">
+    <None Include="..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
