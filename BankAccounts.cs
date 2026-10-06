@@ -42,7 +42,7 @@ namespace Birko.SuperFaktura
 
         public async Task<StringMessageResponse> Delete(int id)
         {
-            var result = await superFaktura.Get(string.Format("bank_accounts/delete/{0}", id)).ConfigureAwait(false);
+            var result = await superFaktura.Post(string.Format("bank_accounts/delete/{0}", id), "{}").ConfigureAwait(false);
             return superFaktura.DeserializeResult<StringMessageResponse>(result);
         }
     }

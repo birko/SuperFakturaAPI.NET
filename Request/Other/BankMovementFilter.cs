@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using System;
+using System.Globalization;
 
 namespace Birko.SuperFaktura.Request.Other
 {
@@ -14,10 +16,13 @@ namespace Birko.SuperFaktura.Request.Other
         public int? Date { get; set; }
 
         [JsonProperty(PropertyName = "date_since")]
-        public decimal? DateSince { get; set; }
+        public DateTime? DateSince { get; set; }
 
         [JsonProperty(PropertyName = "date_to")]
-        public decimal? DateTo { get; set; }
+        public DateTime? DateTo { get; set; }
+
+        [JsonProperty(PropertyName = "move_type")]
+        public string MoveType { get; set; }
 
         [JsonProperty(PropertyName = "status")]
         [JsonConverter(typeof(Converters.StringBooleanConverter))]
@@ -28,23 +33,29 @@ namespace Birko.SuperFaktura.Request.Other
             string paramString = base.ToParameters(listInfo);
             if (AmountFrom != null)
             {
-                paramString += "/amount_from:" + AmountFrom;
+                paramString += "/amount_from:" + AmountFrom.Value.ToString(CultureInfo.InvariantCulture);
             }
-            if (AmountTo > 0)
+            if (AmountTo != null)
             {
-                paramString += "/amount_to:" + AmountTo;
+                paramString += "/amount_to:" + AmountTo.Value.ToString(CultureInfo.InvariantCulture);
             }
-            if (Date != null)
+            // date_since / date_to require date:3 (other.md), so it is added when only the range is given.
+            var date = Date ?? (DateSince != null || DateTo != null ? ValueLists.TimeFilterConstants.SinceTo : (int?)null);
+            if (date != null)
             {
-                paramString += "/date:" + Date;
+                paramString += "/date:" + date;
             }
             if (DateSince != null)
             {
-                paramString += "/dateSinc:" + DateSince;
+                paramString += "/date_since:" + DateSince.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             }
-            if (DateTo > 0)
+            if (DateTo != null)
             {
-                paramString += "/date_to:" + DateTo;
+                paramString += "/date_to:" + DateTo.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+            }
+            if (!string.IsNullOrEmpty(MoveType))
+            {
+                paramString += "/move_type:" + MoveType;
             }
             if (Status)
             {
