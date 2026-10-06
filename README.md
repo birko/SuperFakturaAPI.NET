@@ -34,6 +34,13 @@ It ensures that the delay between api calls is more than 1 second.
 
 #### Public Methods
 * **SuperFaktura(string email, string apiKey, string apptitle = null, string module = "API", int? companyId = null)** - constructor. email and apiKey are mandatory parameters. Given from SuperFaktura.
+* **ResponseByChecksum(string checksum)** - returns the original response of a request sent with given `checksum` (up to 3 months back), or `null` when no such request reached the server. See `checksum` parameter of `Invoices.Add`, `Expenses.Add` and `CashRegisters.AddItem`
+
+#### Errors
+API errors (also HTTP 4xx with an API error body) are thrown as `Birko.SuperFaktura.Exceptions.Exception` with `Error` (API error code), `ErrorMessage` and `ResponseMessage`. A response that is not JSON throws `Exceptions.ParseException`.
+
+#### Request models
+Request properties left `null` are not sent. `Edit` methods therefore change only the properties that were set and the server keeps the stored values.
 
 ### BankAccounts
 Class that wrappes bank accounts API
@@ -48,10 +55,10 @@ Class that wrappes cash registers API calls
 #### Public Methods
 * **List** - returns lists of cash registers
 * **View(int id)** - get cash register detail according given `id`
-* **ListItems(Request.CashRegister.Filter filter)** - gets all items in cash register according `filter`
-* **AddItem(Request.CashRegister.CashRegisterItem item)** - adds cash register item
+* **ListItems(Request.CashRegister.Filter filter)** - gets items of cash register `filter.ID` according `filter`, together with the cash register
+* **AddItem(Request.CashRegister.CashRegisterItem item, string checksum = null)** - adds cash register item. Optional `checksum` (own unique identifier, max 32 chars) for `ResponseByChecksum`
 * **DeleteItem(int id)** - deletes cash register item with given `id`
-* **DeleteItem(int[] ids)** - deletes cash register item with given list of `id`
+* **DeleteItems(IEnumerable&lt;int&gt; ids)** - deletes cash register items with given list of `ids`
 * **Download(int id)** - get PDF receipt according cash register item with given `id` as byte array
 
 ### Clients
@@ -75,14 +82,16 @@ Class that wrappes all API calls for expenses handling in SuperFaktura.
 
 #### Public Methods
 * **List(Request.Expense.Filter filter, bool listInfo)** - gets list of expenses according `filter`
-* **Add(Request.Expense.Expense expense, Request.Expense.ExpenseItem[] items = null, Request.Client.Client client = null, Request.Expense.Extra extra = null, int[] tags = null)** - adds new expense entry. Optional  `items`, `client`, `extra` and `tags` can be specified
-* **Edit(Request.Expense.Expense expense, Request.Expense.ExpenseItem[] items = null, Request.Client.Client client = null, Request.Expense.Extra extra = null, int[] tags = null)** - edits expense entry. Optional  `items`, `client`, `extra` and `tags` can be specified
+* **Add(Request.Expense.Expense expense, Request.Expense.ExpenseItem[] items = null, Request.Client.Client client = null, Request.Expense.Extra extra = null, int[] tags = null, string checksum = null)** - adds new expense entry. Optional  `items`, `client`, `extra`, `tags` and `checksum` (own unique identifier for `ResponseByChecksum`) can be specified
+* **Edit(Request.Expense.Expense expense, Request.Expense.ExpenseItem[] items = null, Request.Client.Client client = null, Request.Expense.Extra extra = null, int[] tags = null)** - edits expense with `expense.ID`. Optional  `items`, `client`, `extra` and `tags` can be specified
 * **View(int id)** - get expense detail with given `id`
 * **Delete(int id)** - deletes expense with given `id`
 * **AddPayment(Request.Expense.Payment payment)** - adds payment to expense
 * **DeletePayment(int id)** - deletes expense payment with given payment `id`
 * **AddRelatedItem(Request.RelatedItem relatedItem)** - adds related item to expense
 * **DeleteRelatedItem(int id)** - deletes related item with given relation `id`
+* **DownloadAttachments(int expenseID, int? attachementID = null)** - downloads attachments for given expense `expenseID` as byte array, optional `attachementID` can be specified or all attachments will be downloaded as zip file
+* **DeleteExpenseItem(int expenseID, IEnumerable<int> deleteItemIDS, bool createBlank = true)** - deletes expense items according given list of `deleteItemIDS` from expense with given `expenseID`. With `createBlank` an empty item is created when all items are deleted (an expense needs at least one item)
 
 ### Exports
 Class that wrappes exports API calls
@@ -97,8 +106,8 @@ Class that wrappes invoice API calls
 
 #### Public Methods
 * **List(Request.Invoice.Filter filter, bool listInfo = true)** - gets list of invoices according `filter`
-* **Add(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Request.Invoice.InvoiceSettings setting = null, Request.Invoice.Extra extra = null, Request.Invoice.MyData myData = null)** - creates new invoice. Optional  `tags`, `setting`, `extra` and `myData` can be specified
-* **Edit(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Request.Invoice.InvoiceSettings setting = null, Request.Invoice.Extra extra = null, Request.Invoice.MyData myData = null)** - updates invoice. Optional  `tags`, `setting`, `extra` and `myData` can be specified
+* **Add(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, Request.Invoice.InvoiceSettings setting = null, Request.Invoice.Extra extra = null, Request.Invoice.MyData myData = null, string checksum = null)** - creates new invoice. Optional  `tags`, `setting`, `extra`, `myData` and `checksum` (own unique identifier, e.g. order number, max 32 chars, for `ResponseByChecksum`) can be specified
+* **Edit(Request.Invoice.Invoice invoice, Client client = null, Request.Invoice.Item[] items = null, int[] tags = null, Request.Invoice.InvoiceSettings setting = null, Request.Invoice.Extra extra = null, Request.Invoice.MyData myData = null)** - updates invoice with `invoice.ID`, only properties that are set are changed. Returns the full invoice detail
 * **View(int id)** - gets invoice detail according `id`
 * **ListDetails(int[] ids)** - gets invoice details according given list of invoice `id`
 * **SetInvoiceLanguage(int id, string language)** - sets the default language for given invoice `id`
@@ -162,6 +171,7 @@ Class that wrappes lists API calls
 #### Constant Lists
 List are stored in `Birko.SuperFaktura.Request.ValueLists` namespace
 * **AccountingDetailType** - list of accounting types for invoices
+* **CashRegisterItemType** - cash register items filter types (in / out)
 * **DeliveryType** - list of deliveries types
 * **DocumentType** - list of document types for related items and logs
 * **ExpenseStatus** - list of expense statuses
@@ -174,5 +184,6 @@ List are stored in `Birko.SuperFaktura.Request.ValueLists` namespace
 * **PaymentType** - list of payment types
 * **PeriodTypes** - list of period types
 * **RoundingType** - list of invoice or expense rounding types
+* **SequenceType** - keys of `ListSequences()` (document types of number sequences)
 * **TimeFilterConstants** - list of time numeric constants used in some filters
 * **TimeFilter** - list of time string constants used in some filters
