@@ -24,25 +24,27 @@ jobs:
         with:
           dotnet-version: 9.0.x
 
+      # Tag v1.2.3 builds and publishes version 1.2.3 (assembly, file and package version);
+      # other builds use <Version> from SuperFaktura.csproj.
+      - name: Version
+        run: |
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            echo "VERSION_ARG=-p:Version=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+          fi
+
       - name: Restore
         run: dotnet restore SuperFaktura.slnx
 
       - name: Build
-        run: dotnet build SuperFaktura.slnx --configuration Release --no-restore
+        run: dotnet build SuperFaktura.slnx --configuration Release --no-restore $VERSION_ARG
 
       # Offline tests only: they check requests and responses without calling the API.
       # Integration tests need sandbox credentials (SuperFaktura.Tests/Properties/launchSettings.json).
       - name: Test
         run: dotnet test SuperFaktura.slnx --configuration Release --no-build --filter "FullyQualifiedName~SerializationTest"
 
-      # Tag v1.2.3 publishes version 1.2.3; other builds use <Version> from SuperFaktura.csproj.
       - name: Pack
-        run: |
-          VERSION_ARG=""
-          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
-            VERSION_ARG="-p:PackageVersion=${GITHUB_REF_NAME#v}"
-          fi
-          dotnet pack SuperFaktura/SuperFaktura.csproj --configuration Release --no-build --output out $VERSION_ARG
+        run: dotnet pack SuperFaktura/SuperFaktura.csproj --configuration Release --no-build --output out $VERSION_ARG
 
       - name: Upload package
         uses: actions/upload-artifact@v4
