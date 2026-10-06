@@ -360,3 +360,6 @@ API
 Training
 Blog
 About
+
+# Local test settings with SuperFaktura API credentials
+**/Properties/launchSettings.json

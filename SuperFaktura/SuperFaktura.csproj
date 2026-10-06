@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Birko</Authors>
+    <Company>Birko</Company>
+    <PackageId>SuperFaktura</PackageId>
+    <PackageProjectUrl>https://github.com/birko/SuperFakturaAPI.NET</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/birko/SuperFakturaAPI.NET</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Description>.NET client library for Superfaktura API</Description>
+    <Title>SuperFaktura API Client</Title>
+    <Copyright>Birko</Copyright>
+    <PackageTags>superfaktura;api;.net</PackageTags>
+    <AssemblyVersion>1.1.22</AssemblyVersion>
+    <FileVersion>1.1.22</FileVersion>
+    <Version>1.1.22</Version>
+    <PackageIcon>superfaktura-sk-logo23-rgb.png</PackageIcon>
+  </PropertyGroup>
+
+  <Import Project="..\..\SuperFakturaAPI.NET\SuperFakturaAPI.NET.projitems" Label="Shared" />
+
+  <ItemGroup>
+    <None Include="..\..\SuperFakturaAPI.NET\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="superfaktura-sk-logo23-rgb.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
