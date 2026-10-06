@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Globalization;
 
 namespace Birko.SuperFaktura.Request.Stock
 {
@@ -19,11 +20,11 @@ namespace Birko.SuperFaktura.Request.Stock
             string paramString = base.ToParameters(listInfo);
             if (PriceFrom != null)
             {
-                paramString += "/price_from:" + PriceFrom;
+                paramString += "/price_from:" + PriceFrom.Value.ToString(CultureInfo.InvariantCulture);
             }
-            if (PriceTo > 0)
+            if (PriceTo != null)
             {
-                paramString += "/price_To:" + PriceTo;
+                paramString += "/price_to:" + PriceTo.Value.ToString(CultureInfo.InvariantCulture);
             }
             if (Status)
             {

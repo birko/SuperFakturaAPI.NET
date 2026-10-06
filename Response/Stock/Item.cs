@@ -24,11 +24,12 @@ namespace Birko.SuperFaktura.Response.Stock
         [JsonProperty(PropertyName = "modified", NullValueHandling = NullValueHandling.Ignore)]
         public DateTime Modified { get; set; }
 
-        [JsonProperty(PropertyName = "purchase_unit_price", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal? PurchaseUnitVAT { get; set; }
-
         [JsonProperty(PropertyName = "purchase_vat", NullValueHandling = NullValueHandling.Ignore)]
         public decimal? PurchaseVAT { get; set; }
+
+        // Returned by Edit: stock before the change.
+        [JsonProperty(PropertyName = "stock_previous", NullValueHandling = NullValueHandling.Ignore)]
+        public decimal? StockPrevious { get; set; }
     }
 
     public class Detail

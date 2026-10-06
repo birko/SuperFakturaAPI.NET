@@ -75,16 +75,16 @@ namespace Birko.SuperFaktura
             return await AddStockMovement(new[] { item }).ConfigureAwait(false);
         }
 
-        public async Task<PagedResponse<LogData>> ListStockMovements(int id, PagedParameters filter, bool listInfo = true)
+        public async Task<PagedResponse<LogItem>> ListStockMovements(int id, PagedParameters filter, bool listInfo = true)
         {
-            var result = await superFaktura.Get(string.Format($"stock_items/movements/{id}", filter.ToParameters(listInfo))).ConfigureAwait(false);
+            var result = await superFaktura.Get($"stock_items/movements/{id}{filter.ToParameters(listInfo)}").ConfigureAwait(false);
             if (listInfo)
             {
-                return superFaktura.DeserializeResult<PagedResponse<LogData>>(result);
+                return superFaktura.DeserializeResult<PagedResponse<LogItem>>(result);
             }
             else
             {
-                return new PagedResponse<LogData> { Items = superFaktura.DeserializeResult<IEnumerable<LogData>>(result) };
+                return new PagedResponse<LogItem> { Items = superFaktura.DeserializeResult<IEnumerable<LogItem>>(result) };
             }
         }
     }
