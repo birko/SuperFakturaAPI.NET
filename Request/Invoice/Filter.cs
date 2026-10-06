@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Globalization;
 
 namespace Birko.SuperFaktura.Request.Invoice
 {
@@ -84,10 +85,11 @@ namespace Birko.SuperFaktura.Request.Invoice
         public override string ToParameters(bool listInfo = true)
         {
             string paramString = base.ToParameters(listInfo);
-            paramString += "/created:" + Created;
-            paramString += "/modified:" + Modified;
-            paramString += "/delivery:" + Delivery;
-            paramString += "/paydate:" + PayDate;
+            // *_since / *_to require the time filter 3 (invoice.md); with the default 0 the server ignores the range.
+            paramString += "/created:" + TimeFilter(Created, CreatedSince, CreatedTo);
+            paramString += "/modified:" + TimeFilter(Modified, ModifiedSince, ModifiedTo);
+            paramString += "/delivery:" + TimeFilter(Delivery, DeliverySince, DeliveryTo);
+            paramString += "/paydate:" + TimeFilter(PayDate, PayDateSince, PayDateTo);
             if (!string.IsNullOrEmpty(Type))
             {
                 paramString += "/type:" + Type;
@@ -110,11 +112,11 @@ namespace Birko.SuperFaktura.Request.Invoice
             }
             if (AmountFrom.HasValue)
             {
-                paramString += "/amount_from:" + AmountFrom;
+                paramString += "/amount_from:" + AmountFrom.Value.ToString(CultureInfo.InvariantCulture);
             }
             if (AmountTo.HasValue)
             {
-                paramString += "/amount_to:" + AmountTo;
+                paramString += "/amount_to:" + AmountTo.Value.ToString(CultureInfo.InvariantCulture);
             }
             if (!string.IsNullOrEmpty(Ignore))
             {
@@ -171,6 +173,11 @@ namespace Birko.SuperFaktura.Request.Invoice
             }
 
             return paramString;
+        }
+
+        private static int TimeFilter(int filter, DateTime? since, DateTime? to)
+        {
+            return filter == ValueLists.TimeFilterConstants.All && (since.HasValue || to.HasValue) ? ValueLists.TimeFilterConstants.SinceTo : filter;
         }
     }
 }

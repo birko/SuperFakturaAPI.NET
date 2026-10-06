@@ -16,6 +16,7 @@ namespace Birko.SuperFaktura.Response.Invoice
         public Invoice Invoice { get; set; } = null;
 
         [JsonProperty(PropertyName = "Tag", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.InvoiceTagConverter))]
         public Tag[] Tag { get; set; } = null;
     }
 
@@ -54,7 +55,7 @@ namespace Birko.SuperFaktura.Response.Invoice
 
         [JsonProperty(PropertyName = "InvoiceSetting", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(ZeroObjectConverter))]
-        public InvoiceSettings InvoiceSetting { get; set; } = null;
+        public InvoiceSettingResponse InvoiceSetting { get; set; } = null;
 
         [JsonProperty(PropertyName = "Logo", NullValueHandling = NullValueHandling.Ignore)]
         public IEnumerable<Logo> Logo { get; set; } = null;

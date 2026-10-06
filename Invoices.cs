@@ -33,10 +33,13 @@ namespace Birko.SuperFaktura
             }
         }
 
-        public async Task<Detail> Add(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, InvoiceSettings setting = null, Extra extra = null, Request.Invoice.MyData myData = null)
+        /// <param name="checksum">Your own unique identifier of this request (e.g. order number, max 32 chars).
+        /// If no response arrives, call ResponseByChecksum with it to find out whether the invoice was created.</param>
+        public async Task<Detail> Add(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, InvoiceSettings setting = null, Extra extra = null, Request.Invoice.MyData myData = null, string checksum = null)
         {
             var data = new InvoiceData
             {
+                CheckSum = checksum,
                 Invoice = invoice,
                 InvoiceItem = items,
                 Tag = tags,
@@ -63,7 +66,8 @@ namespace Birko.SuperFaktura
             return superFaktura.DeserializeResult<Dictionary<int, Detail>>(result);
         }
 
-        public async Task<DetailData> Edit(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, InvoiceSettings setting = null, Extra extra = null, Request.Invoice.MyData myData = null)
+        // Only fields that are set are changed; invoice.ID is required. Returns the full invoice detail.
+        public async Task<Detail> Edit(Request.Invoice.Invoice invoice, Client client = null, Request.Invoice.Item[] items = null, int[] tags = null, InvoiceSettings setting = null, Extra extra = null, Request.Invoice.MyData myData = null)
         {
             var data = new InvoiceData
             {
@@ -77,7 +81,7 @@ namespace Birko.SuperFaktura
             };
 
             var result = await superFaktura.Post("invoices/edit", data).ConfigureAwait(false);
-            var response = superFaktura.DeserializeResult<Response<DetailData>>(result);
+            var response = superFaktura.DeserializeResult<Response<Detail>>(result);
             return response.Data;
         }
 

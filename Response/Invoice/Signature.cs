@@ -52,5 +52,8 @@ namespace Birko.SuperFaktura.Response.Invoice
 
         [JsonProperty(PropertyName = "size", NullValueHandling = NullValueHandling.Ignore)]
         public int Size { get; set; }
+
+        [JsonProperty(PropertyName = "delete_flag", NullValueHandling = NullValueHandling.Ignore)]
+        public bool? DeleteFlag { get; set; }
     }
 }

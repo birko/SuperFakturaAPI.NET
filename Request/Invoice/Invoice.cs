@@ -1,14 +1,13 @@
 ﻿using Birko.SuperFaktura.Request.BankAccounts;
 using Newtonsoft.Json;
 using System;
-using System.Globalization;
 
 namespace Birko.SuperFaktura.Request.Invoice
 {
     public class InvoiceBasic
     {
         [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
-        public int? ID { get; internal set; }
+        public int? ID { get; set; }
 
         [JsonProperty(PropertyName = "invoice_no_formatted", NullValueHandling = NullValueHandling.Ignore)]
         public string InvoiceNumberFormatted { get; set; }
@@ -28,6 +27,7 @@ namespace Birko.SuperFaktura.Request.Invoice
 
     }
 
+    // Fields left null are not sent; the server applies its defaults on Add and keeps stored values on Edit.
     public class Invoice : InvoiceInfo
     {
         [JsonProperty(PropertyName = "client_id", NullValueHandling = NullValueHandling.Ignore)]
@@ -38,24 +38,27 @@ namespace Birko.SuperFaktura.Request.Invoice
         public bool? AddRoundingItem { get; set; } = null;
 
         [JsonProperty(PropertyName = "already_paid", NullValueHandling = NullValueHandling.Ignore)]
-        public bool? AlreadyPaid { get; set; } = null;
+        [JsonConverter(typeof(Converters.StringBooleanConverter))]
+        public bool? AlreadyPaid { get; set; }
 
         [JsonProperty(PropertyName = "bank_accounts", NullValueHandling = NullValueHandling.Ignore)]
         public BankAccount[] BankAccounts { get; set; }
 
         [JsonProperty(PropertyName = "comment", NullValueHandling = NullValueHandling.Ignore)]
-        public string Comment { get; set; } = string.Empty;
+        public string Comment { get; set; }
 
         [JsonProperty(PropertyName = "constant", NullValueHandling = NullValueHandling.Ignore)]
         public string Constant { get; set; }
 
         [JsonProperty(PropertyName = "created", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.DateConverter))]
         public DateTime? Created { get; set; } = null;
 
         [JsonProperty(PropertyName = "country_exchange_rate", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal CountryExchangeRate { get; set; } = 1;
+        public decimal? CountryExchangeRate { get; set; }
 
         [JsonProperty(PropertyName = "delivery", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.DateConverter))]
         public DateTime? Delivery { get; set; } = null;
 
         [JsonProperty(PropertyName = "delivery_type", NullValueHandling = NullValueHandling.Ignore)]
@@ -67,17 +70,18 @@ namespace Birko.SuperFaktura.Request.Invoice
         [JsonProperty(PropertyName = "discount", NullValueHandling = NullValueHandling.Ignore)]
         public decimal? Discount { get; set; } = null;
 
-        [JsonProperty(PropertyName = "discount_total ", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(PropertyName = "discount_total", NullValueHandling = NullValueHandling.Ignore)]
         public decimal? DiscountTotal { get; set; } = null;
 
         [JsonProperty(PropertyName = "due", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.DateConverter))]
         public DateTime? DueDate { get; set; } = null;
 
         [JsonProperty(PropertyName = "estimate_id", NullValueHandling = NullValueHandling.Ignore)]
         public int? EstimateID { get; set; } = null;
 
         [JsonProperty(PropertyName = "exchange_rate", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal ExchangeRate { get; set; } = 1;
+        public decimal? ExchangeRate { get; set; }
 
         [JsonProperty(PropertyName = "header_comment", NullValueHandling = NullValueHandling.Ignore)]
         public string HeaderComment { get; set; }
@@ -86,7 +90,7 @@ namespace Birko.SuperFaktura.Request.Invoice
         public string InternalComment { get; set; }
 
         [JsonProperty(PropertyName = "invoice_currency", NullValueHandling = NullValueHandling.Ignore)]
-        public string InvoiceCurrency { get; set; } = RegionInfo.CurrentRegion.ISOCurrencySymbol;
+        public string InvoiceCurrency { get; set; }
 
         [JsonProperty(PropertyName = "issued_by", NullValueHandling = NullValueHandling.Ignore)]
         public string IssuedBy { get; set; }
@@ -105,7 +109,7 @@ namespace Birko.SuperFaktura.Request.Invoice
 
         [JsonProperty(PropertyName = "mark_sent", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.StringBooleanConverter))]
-        public bool MarkSent { get; set; }
+        public bool? MarkSent { get; set; }
 
         [JsonProperty(PropertyName = "mark_sent_message", NullValueHandling = NullValueHandling.Ignore)]
         public string MarkSentMessage { get; set; }
@@ -123,13 +127,13 @@ namespace Birko.SuperFaktura.Request.Invoice
         public DateTime? PayDate { get; set; } = null;
 
         [JsonProperty(PropertyName = "payment_type", NullValueHandling = NullValueHandling.Ignore)]
-        public string PaymentType { get; set; } = ValueLists.PaymentType.BankTransfer;
+        public string PaymentType { get; set; }
 
         [JsonProperty(PropertyName = "proforma_id", NullValueHandling = NullValueHandling.Ignore)]
-        public int? ProformaID { get; set; } = null;
+        public string ProformaID { get; set; }
 
         [JsonProperty(PropertyName = "rounding", NullValueHandling = NullValueHandling.Ignore)]
-        public string RoundingType { get; set; } = ValueLists.RoundingType.Item;
+        public string RoundingType { get; set; }
 
         [JsonProperty(PropertyName = "sequence_id", NullValueHandling = NullValueHandling.Ignore)]
         public int? SequenceID { get; set; } = null;
@@ -138,14 +142,14 @@ namespace Birko.SuperFaktura.Request.Invoice
         public string Specific { get; set; }
 
         [JsonProperty(PropertyName = "type", NullValueHandling = NullValueHandling.Ignore)]
-        public string InvoiceType { get; set; } = ValueLists.InvoiceType.Regular;
+        public string InvoiceType { get; set; }
 
         [JsonProperty(PropertyName = "variable", NullValueHandling = NullValueHandling.Ignore)]
         public string Variable { get; set; }
 
         [JsonProperty(PropertyName = "vat_transfer", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.StringBooleanConverter))]
-        public bool VATTransfer { get; set; }
+        public bool? VATTransfer { get; set; }
     }
 
 }

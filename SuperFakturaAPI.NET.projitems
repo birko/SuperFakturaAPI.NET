@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Converters\ListConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\ArrayObjectConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\InvoiceTagConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\DateTimeConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\ZeroObjectConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\StringIntConverter.cs" />
@@ -44,6 +45,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Response\Expense\Rate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\Mark.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\PayInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\InvoiceSettingResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Other\Accounts.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Other\Company.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Other\MultiAccount.cs" />

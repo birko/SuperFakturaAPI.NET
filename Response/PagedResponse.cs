@@ -47,6 +47,10 @@ namespace Birko.SuperFaktura.Response
         [JsonProperty(PropertyName = "page", NullValueHandling = NullValueHandling.Ignore)]
         public int Page { get; set; } = 0;
 
+        // True when a filter was applied to the list.
+        [JsonProperty(PropertyName = "filtered", NullValueHandling = NullValueHandling.Ignore)]
+        public bool? Filtered { get; set; }
+
         public override string ToString()
         {
             StringBuilder builder = new StringBuilder();

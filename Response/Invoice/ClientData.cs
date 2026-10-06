@@ -141,5 +141,26 @@ namespace Birko.SuperFaktura.Response.Invoice
 
         [JsonProperty(PropertyName = "zip", NullValueHandling = NullValueHandling.Ignore)]
         public string ZIP { get; set; }
+
+        [JsonProperty(PropertyName = "country_iso_id", NullValueHandling = NullValueHandling.Ignore)]
+        public string CountryISOID { get; set; }
+
+        [JsonProperty(PropertyName = "delivery_country_iso_id", NullValueHandling = NullValueHandling.Ignore)]
+        public string DeliveryCountryISOID { get; set; }
+
+        [JsonProperty(PropertyName = "data_source", NullValueHandling = NullValueHandling.Ignore)]
+        public string DataSource { get; set; }
+
+        [JsonProperty(PropertyName = "match_address", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.StringBooleanConverter))]
+        public bool? MatchAddress { get; set; }
+
+        [JsonProperty(PropertyName = "update", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.StringBooleanConverter))]
+        public bool? Update { get; set; }
+
+        [JsonProperty(PropertyName = "update_addressbook", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.StringBooleanConverter))]
+        public bool? UpdateAddressBook { get; set; }
     }
 }

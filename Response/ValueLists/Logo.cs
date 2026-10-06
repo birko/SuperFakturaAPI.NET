@@ -46,6 +46,12 @@ namespace Birko.SuperFaktura.Response.ValueLists
         [JsonProperty(PropertyName = "size", NullValueHandling = NullValueHandling.Ignore)]
         public int Size { get; set; }
 
+        [JsonProperty(PropertyName = "delete_flag", NullValueHandling = NullValueHandling.Ignore)]
+        public bool? DeleteFlag { get; set; }
+
+        [JsonProperty(PropertyName = "extern_file", NullValueHandling = NullValueHandling.Ignore)]
+        public string ExternFile { get; set; }
+
         [JsonProperty(PropertyName = "url", NullValueHandling = NullValueHandling.Ignore)]
         public string URL { get; set; }
     }

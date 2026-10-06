@@ -13,8 +13,11 @@ namespace Birko.SuperFaktura.Response.Invoice
         [JsonProperty(PropertyName = "paid", NullValueHandling = NullValueHandling.Ignore)]
         public decimal Paid { get; set; }
 
+        // API returns "status" inconsistently as a boolean (false), an int (0/1) or a string;
+        // StringBooleanConverter normalizes all of those forms.
         [JsonProperty(PropertyName = "status", NullValueHandling = NullValueHandling.Ignore)]
-        public int Status { get; set; }
+        [JsonConverter(typeof(Converters.StringBooleanConverter))]
+        public bool Status { get; set; }
 
         [JsonProperty(PropertyName = "to_pay", NullValueHandling = NullValueHandling.Ignore)]
         public decimal ToPay { get; set; }

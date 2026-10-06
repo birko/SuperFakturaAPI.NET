@@ -7,6 +7,14 @@ namespace Birko.SuperFaktura.Response.Invoice
 {
     public class PayInfo
     {
+        [JsonProperty(PropertyName = "sent_by", NullValueHandling = NullValueHandling.Ignore)]
+        public string SentBy { get; set; }
+
+        [JsonProperty(PropertyName = "sent_to_email", NullValueHandling = NullValueHandling.Ignore)]
+        public string SentToEmail { get; set; }
+
+        [JsonProperty(PropertyName = "sent_to_email_cc", NullValueHandling = NullValueHandling.Ignore)]
+        public string SentToEmailCC { get; set; }
 
         [JsonProperty(PropertyName = "to_pay", NullValueHandling = NullValueHandling.Ignore)]
         public decimal ToPay { get; set; }

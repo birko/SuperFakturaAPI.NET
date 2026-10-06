@@ -13,6 +13,6 @@ namespace Birko.SuperFaktura.Request.Invoice
         public DateTime Date { get; set; } = DateTime.Now;
 
         [JsonProperty(PropertyName = "document_no", NullValueHandling = NullValueHandling.Ignore)]
-        public string DocumentNumber { get; set; } = ValueLists.PaymentType.BankTransfer;
+        public string DocumentNumber { get; set; }
     }
 }
