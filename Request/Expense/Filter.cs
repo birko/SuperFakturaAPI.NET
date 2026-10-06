@@ -1,10 +1,18 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Globalization;
 
 namespace Birko.SuperFaktura.Request.Expense
 {
-    public class Filter: SearchParameters
+    public class Filter: PagedSearchParameters
     {
+        [JsonProperty(PropertyName = "modified")]
+        public int? Modified { get; set; } = null;
+        [JsonProperty(PropertyName = "modified_since")]
+        public DateTime? ModifiedSince { get; set; } = null;
+        [JsonProperty(PropertyName = "modified_to")]
+        public DateTime? ModifiedTo { get; set; } = null;
+
         [JsonProperty(PropertyName = "amount_from")]
         public decimal? AmountFrom { get; set; } = null;
         [JsonProperty(PropertyName = "amount_to")]
@@ -39,11 +47,11 @@ namespace Birko.SuperFaktura.Request.Expense
             string paramString = base.ToParameters(listInfo);
             if (AmountFrom.HasValue)
             {
-                paramString += "/amount_from:" + AmountFrom;
+                paramString += "/amount_from:" + AmountFrom.Value.ToString(CultureInfo.InvariantCulture);
             }
             if (AmountTo.HasValue)
             {
-                paramString += "/amount_to:" + AmountTo;
+                paramString += "/amount_to:" + AmountTo.Value.ToString(CultureInfo.InvariantCulture);
             }
             if (Category.HasValue)
             {
@@ -53,9 +61,24 @@ namespace Birko.SuperFaktura.Request.Expense
             {
                 paramString += "/client_id:" + ClientId;
             }
-            if (Created.HasValue)
+            // *_since / *_to require created:3, modified:3, delivery:3 (expenses.md).
+            var created = Created ?? (CreatedSince.HasValue || CreatedTo.HasValue ? ValueLists.TimeFilterConstants.SinceTo : (int?)null);
+            if (created.HasValue)
             {
-                paramString += "/created:" + ClientId;
+                paramString += "/created:" + created;
+            }
+            var modified = Modified ?? (ModifiedSince.HasValue || ModifiedTo.HasValue ? ValueLists.TimeFilterConstants.SinceTo : (int?)null);
+            if (modified.HasValue)
+            {
+                paramString += "/modified:" + modified;
+            }
+            if (ModifiedSince.HasValue)
+            {
+                paramString += "/modified_since:" + ModifiedSince.Value.ToString("yyyy-MM-dd");
+            }
+            if (ModifiedTo.HasValue)
+            {
+                paramString += "/modified_to:" + ModifiedTo.Value.ToString("yyyy-MM-dd");
             }
             if (CreatedSince.HasValue)
             {
@@ -65,9 +88,10 @@ namespace Birko.SuperFaktura.Request.Expense
             {
                 paramString += "/created_to:" + CreatedTo.Value.ToString("yyyy-MM-dd");
             }
-            if (Delivery.HasValue)
+            var delivery = Delivery ?? (DeliverySince.HasValue || DeliveryTo.HasValue ? ValueLists.TimeFilterConstants.SinceTo : (int?)null);
+            if (delivery.HasValue)
             {
-                paramString += "/delivery:" + Delivery;
+                paramString += "/delivery:" + delivery;
             }
             if (DeliverySince.HasValue)
             {

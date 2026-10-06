@@ -3,7 +3,6 @@ using Birko.SuperFaktura.Response;
 using Birko.SuperFaktura.Response.Expense;
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,22 +31,24 @@ namespace Birko.SuperFaktura
             }
         }
 
-        public async Task<ErrorMessageResponse> Delete(int ID)
+        public async Task<StringMessageResponse> Delete(int ID)
         {
             var result = await superFaktura.Get($"expenses/delete/{ID}").ConfigureAwait(false);
-            return superFaktura.DeserializeResult<ErrorMessageResponse>(result);
+            return superFaktura.DeserializeResult<StringMessageResponse>(result);
         }
 
-        public async Task<Detail> Add(Request.Expense.Expense expense, IEnumerable<Request.Expense.ExpenseItem> items = null, Request.Client.Client client= null, Request.Expense.Extra extra = null, IEnumerable<int> tags = null)
+        /// <param name="checksum">Your own unique identifier of this request (e.g. document number, max 32 chars).
+        /// If no response arrives, call ResponseByChecksum with it to find out whether the expense was created.</param>
+        public async Task<Detail> Add(Request.Expense.Expense expense, IEnumerable<Request.Expense.ExpenseItem> items = null, Request.Client.Client client = null, Request.Expense.Extra extra = null, IEnumerable<int> tags = null, string checksum = null)
         {
-            var result = await superFaktura.Post("expenses/add", new ExpenseData { Expense = expense, ExpenseExtra = extra, Tag = tags, Client = client }).ConfigureAwait(false);
+            var result = await superFaktura.Post("expenses/add", new ExpenseData { Expense = expense, ExpenseExtra = extra, Tag = tags, Client = client, ExpenseItems = items, CheckSum = checksum }).ConfigureAwait(false);
             var data = superFaktura.DeserializeResult<Response<Detail>>(result);
             return data.Data;
         }
 
-        public async Task<Response<Detail>> Edit(Request.Expense.Expense expense, Request.Client.Client client = null, Request.Expense.Extra extra = null, IEnumerable<int> tags = null)
+        public async Task<Response<Detail>> Edit(Request.Expense.Expense expense, IEnumerable<Request.Expense.ExpenseItem> items = null, Request.Client.Client client = null, Request.Expense.Extra extra = null, IEnumerable<int> tags = null)
         {
-            var result = await superFaktura.Post("expenses/edit", new ExpenseData { Expense = expense, ExpenseExtra = extra, Tag = tags, Client = client }).ConfigureAwait(false);
+            var result = await superFaktura.Post("expenses/edit", new ExpenseData { Expense = expense, ExpenseExtra = extra, Tag = tags, Client = client, ExpenseItems = items }).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<Detail>>(result);
         }
 
@@ -63,10 +64,10 @@ namespace Birko.SuperFaktura
             return superFaktura.DeserializeResult<PaymentResponse>(result);
         }
 
-        public async Task<ErrorMessageResponse> DeletePayment(int expensePaymentID)
+        public async Task<StringMessageResponse> DeletePayment(int expensePaymentID)
         {
             var result = await superFaktura.Get($"expense_payments/delete/{expensePaymentID}").ConfigureAwait(false);
-            return superFaktura.DeserializeResult<ErrorMessageResponse>(result);
+            return superFaktura.DeserializeResult<StringMessageResponse>(result);
         }
 
         public async Task<RelatedItemResponse> AddRelatedItem(Request.RelatedItem relatedItem)
@@ -102,9 +103,10 @@ namespace Birko.SuperFaktura
             return result;
         }
 
-        public async Task<Response<Detail>> DeleteExpenseItem(int expenseID, IEnumerable<int> deleteItemIDS, bool createBlank =false)
+        public async Task<Response<Detail>> DeleteExpenseItem(int expenseID, IEnumerable<int> deleteItemIDS, bool createBlank = true)
         {
-            var result = await superFaktura.Delete($"/expense_items/delete", new {
+            var result = await superFaktura.Delete("expense_items/delete", new
+            {
                 expense_id = expenseID,
                 delete_ids = deleteItemIDS.ToArray(),
                 create_blank_if_empty = createBlank

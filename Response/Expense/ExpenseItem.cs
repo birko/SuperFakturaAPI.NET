@@ -13,14 +13,8 @@ namespace Birko.SuperFaktura.Response.Expense
         [JsonProperty(PropertyName = "discount_description", NullValueHandling = NullValueHandling.Ignore)]
         public string DiscountDescription { get; set; }
 
-        [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
-        public int ID { get; set; }
-
         [JsonProperty(PropertyName = "ordernum", NullValueHandling = NullValueHandling.Ignore)]
         public int OrderNumber { get; set; }
-
-        [JsonProperty(PropertyName = "quantity", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal Quantity { get; set; }
 
         [JsonProperty(PropertyName = "stock_item_id", NullValueHandling = NullValueHandling.Ignore)]
         public int StockItemID { get; set; }

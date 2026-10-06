@@ -5,6 +5,8 @@ namespace Birko.SuperFaktura.Request.Expense
 {
     public class ExpenseItem
     {
+        [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
+        public int? ID { get; set; }
 
         [JsonProperty(PropertyName = "description", NullValueHandling = NullValueHandling.Ignore)]
         public string Description { get; set; }
@@ -12,10 +14,13 @@ namespace Birko.SuperFaktura.Request.Expense
         [JsonProperty(PropertyName = "name", NullValueHandling = NullValueHandling.Ignore)]
         public string Name { get; set; }
 
+        [JsonProperty(PropertyName = "quantity", NullValueHandling = NullValueHandling.Ignore)]
+        public decimal? Quantity { get; set; }
+
         [JsonProperty(PropertyName = "tax", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal Tax { get; set; }
+        public decimal? Tax { get; set; }
 
         [JsonProperty(PropertyName = "unit_price", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal UnitPrice { get; set; }
+        public decimal? UnitPrice { get; set; }
     }
 }

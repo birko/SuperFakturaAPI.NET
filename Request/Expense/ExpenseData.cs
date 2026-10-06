@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Birko.SuperFaktura.Request.Expense
 {
@@ -10,6 +11,7 @@ namespace Birko.SuperFaktura.Request.Expense
 
         public Client.Client Client { get; set; }
 
+        [JsonProperty(PropertyName = "ExpenseItem", NullValueHandling = NullValueHandling.Ignore)]
         public IEnumerable<ExpenseItem> ExpenseItems { get; set; }
     }
 }

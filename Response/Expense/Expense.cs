@@ -52,6 +52,9 @@ namespace Birko.SuperFaktura.Response.Expense
         [JsonProperty(PropertyName = "home_currency", NullValueHandling = NullValueHandling.Ignore)]
         public string HomeCurrency { get; set; }
 
+        [JsonProperty(PropertyName = "is_payable_by_tatrabanka", NullValueHandling = NullValueHandling.Ignore)]
+        public bool? IsPayableByTatrabanka { get; set; }
+
         [JsonProperty(PropertyName = "missing_bank_account", NullValueHandling = NullValueHandling.Ignore)]
         public bool MissingBankAccount { get; set; }
 
@@ -82,14 +85,14 @@ namespace Birko.SuperFaktura.Response.Expense
         [JsonProperty(PropertyName = "qr_url", NullValueHandling = NullValueHandling.Ignore)]
         public string QRURL { get; set; }
 
-        [JsonProperty(PropertyName = "qr_ur_max", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(PropertyName = "qr_url_max", NullValueHandling = NullValueHandling.Ignore)]
         public string QRURLMAx { get; set; }
 
         [JsonProperty(PropertyName = "rates", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.DictionaryConverter<decimal, Rate>))]
         public IDictionary<decimal, Rate> Rates { get; set; }
 
-        [JsonProperty(PropertyName = "recuring", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(PropertyName = "recurring", NullValueHandling = NullValueHandling.Ignore)]
         public string Recuring { get; set; }
 
         [JsonProperty(PropertyName = "sequence_id", NullValueHandling = NullValueHandling.Ignore)]

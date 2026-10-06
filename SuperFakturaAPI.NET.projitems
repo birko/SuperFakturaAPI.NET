@@ -14,6 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters\DateTimeConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\ZeroObjectConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\StringIntConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\VatSummaryConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exports.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CashRegisters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BankAccounts.cs" />
