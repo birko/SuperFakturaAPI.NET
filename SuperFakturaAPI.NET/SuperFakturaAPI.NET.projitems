@@ -52,7 +52,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Response\RelatedItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Expense\MyData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\RelatedItemResponse.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)response\expense\VATSummary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\Expense\VATSummary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Export\Export.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\QR.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Other\UserProfile.cs" />
@@ -160,9 +160,5 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Response\CashRegister\CashRegister.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)LICENSE" />
-    <None Include="$(MSBuildThisFileDirectory)README.md" />
   </ItemGroup>
 </Project>
