@@ -44,13 +44,12 @@ namespace Birko.SuperFaktura.Converters
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             var stringValue = value.ToString().ToLower();
-            if (stringValue != "true" || stringValue != "false")
+            if (stringValue != "true" && stringValue != "false")
             {
                 writer.WriteValue(stringValue);
                 return;
             }
-            bool convertedValue = (bool)value;
-            writer.WriteValue(convertedValue ? "1" : "0");
+            writer.WriteValue(stringValue == "true" ? "1" : "0");
         }
     }
 

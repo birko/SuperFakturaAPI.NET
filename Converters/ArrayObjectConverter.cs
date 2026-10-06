@@ -18,7 +18,16 @@ namespace Birko.SuperFaktura.Converters
             if (objectType.GetInterfaces().Contains(typeof(IEnumerable)) && reader.TokenType == JsonToken.StartObject)
             {
                 Type type = objectType.GenericTypeArguments?.FirstOrDefault();
-                return new[] { serializer.Deserialize(reader, type) };
+                if (type != null)
+                {
+                    // Build a strongly-typed T[] so it is assignable to the IEnumerable<T> property.
+                    // (new[] { ... } would produce object[], which cannot be set on IEnumerable<T>.)
+                    var single = serializer.Deserialize(reader, type);
+                    var array = Array.CreateInstance(type, 1);
+                    array.SetValue(single, 0);
+                    return array;
+                }
+                return new[] { serializer.Deserialize(reader) };
             }
             else if (!objectType.GetInterfaces().Contains(typeof(IEnumerable)) && reader.TokenType == JsonToken.StartArray)
             {

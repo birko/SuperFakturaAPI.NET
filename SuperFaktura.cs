@@ -1,7 +1,9 @@
 ﻿using Birko.SuperFaktura.Request;
 using Birko.SuperFaktura.Response;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Globalization;
@@ -28,9 +30,11 @@ namespace Birko.SuperFaktura
 
         public RateLimits RateLimit { get; set; } = null;
 
-        private static Dictionary<string, DateTime> _lastRequest = null;
-        private static Dictionary<string, HttpClient> _clientList = null;
-        private static Dictionary<string, int> _requestCount = null;
+        private static readonly ConcurrentDictionary<string, DateTime> _lastRequest = new ConcurrentDictionary<string, DateTime>();
+        private static readonly ConcurrentDictionary<string, HttpClient> _clientList = new ConcurrentDictionary<string, HttpClient>();
+        // Requests made per profile today; the API limit is 1000 requests per day (faq.md).
+        private static readonly Dictionary<string, KeyValuePair<DateTime, int>> _requestCount = new Dictionary<string, KeyValuePair<DateTime, int>>();
+        private static readonly object _requestCountLock = new object();
 
         public string LastCheckSum { get; private set; }
 
@@ -51,16 +55,28 @@ namespace Birko.SuperFaktura
             Module = module;
         }
 
+        // All values need to be URL encoded (intro.md > Authentication), e.g. hello+world@example.com -> hello%2Bworld%40example.com.
+        private string AuthorizationHeader
+        {
+            get
+            {
+                return string.Format("{0} email={1}&apikey={2}&company_id={3}&module={4}",
+                    APIAUTHKEYWORD,
+                    Uri.EscapeDataString(Email ?? string.Empty),
+                    Uri.EscapeDataString(ApiKey ?? string.Empty),
+                    CompanyId,
+                    Uri.EscapeDataString(Module ?? string.Empty));
+            }
+        }
+
         protected HttpClient CreateClient(bool force = false)
         {
-            if (_clientList == null)
-            {
-                _clientList = new Dictionary<string, HttpClient>();
-            }
-
-            var key = ProfileKey;
+            // Cached per URL + full credentials, so clients sharing an API key but differing in
+            // email, module or company_id never reuse each other's Authorization header.
+            var authorization = AuthorizationHeader;
+            var key = string.Format("{0} {1}", APIURL, authorization);
             HttpClient client;
-            if (force || !_clientList.ContainsKey(key) || _clientList[key].Timeout.Seconds != TimeoutSeconds)
+            if (force || !_clientList.ContainsKey(key) || _clientList[key].Timeout.TotalSeconds != TimeoutSeconds)
             {
                 client = new HttpClient
                 {
@@ -69,7 +85,7 @@ namespace Birko.SuperFaktura
                 };
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/*");
-                client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", string.Format("{0} email={1}&apikey={2}&company_id={3}&module={4}", APIAUTHKEYWORD, Email, ApiKey, CompanyId, Module));
+                client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", authorization);
                 _clientList[key] = client;
             }
             else
@@ -96,56 +112,56 @@ namespace Birko.SuperFaktura
 
         internal static void TestError(string result)
         {
+            JToken token;
             try
             {
-                var testResult = JsonConvert.DeserializeObject<ErrorMessageResponse>(result);
-                if (testResult.Error != null && testResult.Error.Value > 0)
-                {
-                    var testMessageResult = JsonConvert.DeserializeObject<StringMessageResponse>(result);
-                    var exception = new Exceptions.Exception(testResult.Error.Value, testMessageResult.Message, testResult.ErrorMessage);
-                    throw (exception);
-                }
+                token = JToken.Parse(result);
             }
             catch (Exception ex)
             {
-                //Test if response is not an array;
-                try
-                {
-                    var testResult = JsonConvert.DeserializeObject<ExpandoObject[]>(result);
-                }
-                catch
-                {
-                    try
-                    {
-                        var testResult = JsonConvert.DeserializeObject<string[]>(result);
-                    }
-                    catch
-                    {
-                        var exception = new Exceptions.ParseException(ex.Message, string.Format("Returned Response: {0}", result));
-                        throw (exception);
-                    }
-                }
+                throw new Exceptions.ParseException(ex.Message, string.Format("Returned Response: {0}", result), ex);
             }
+
+            var apiError = CreateApiError(token);
+            if (apiError != null)
+            {
+                throw apiError;
+            }
+        }
+
+        private static Exceptions.Exception CreateApiError(JToken token, Exception inner = null, string url = null)
+        {
+            // Arrays and other non-object responses never carry an error code.
+            if (!(token is JObject response)
+                || !int.TryParse(response["error"]?.ToString(), out int error)
+                || error <= 0)
+            {
+                return null;
+            }
+
+            // "message" and "error_message" are either a string or an object (e.g. validation errors per field).
+            return new Exceptions.Exception(error, TokenToText(response["message"]), TokenToText(response["error_message"]), inner, url);
+        }
+
+        private static string TokenToText(JToken token)
+        {
+            if (token == null || token.Type == JTokenType.Null)
+            {
+                return null;
+            }
+            return token.Type == JTokenType.String ? token.Value<string>() : token.ToString(Formatting.None);
         }
 
         private void RequestDelay()
         {
             DateTime now = DateTime.Now;
-            if (_lastRequest == null)
-            {
-                _lastRequest = new Dictionary<string, DateTime>();
-            }
-            if (_requestCount == null)
-            {
-                _requestCount = new Dictionary<string, int>();
-            }
             var key = ProfileKey;
             //request throttling
-            if (_requestCount.ContainsKey(key) && _requestCount[key] >= 1000)
+            if (RequestCount(key, now) >= 1000)
             {
                 Task.Delay(TimeSpan.FromSeconds(5)).Wait();
             }
-            else if (_lastRequest.ContainsKey(key) && (now - _lastRequest[key]).Seconds <= 1)
+            else if (_lastRequest.TryGetValue(key, out DateTime last) && (now - last).TotalSeconds <= 1)
             {
                 Task.Delay(TimeSpan.FromSeconds(1)).Wait();
             }
@@ -198,14 +214,14 @@ namespace Birko.SuperFaktura
                         }
                         if (
                             response.Headers.Contains("X-RateLimit-DailyReset")
-                            && DateTime.TryParseExact(response.Headers.GetValues("X-RateLimit-DailyReset").Last(), "dd.MM.yyyy hh:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date)
+                            && ParseRateLimitReset(response.Headers.GetValues("X-RateLimit-DailyReset").Last()) is DateTime dailyReset
                         )
                         {
                             if (RateLimit.Daily == null)
                             {
                                 RateLimit.Daily = new DetailLimit();
                             }
-                            RateLimit.Daily.Reset = date;
+                            RateLimit.Daily.Reset = dailyReset;
                         }
                         if (
                             response.Headers.Contains("X-RateLimit-MonthlyLimit")
@@ -231,13 +247,13 @@ namespace Birko.SuperFaktura
                         }
                         if (
                             response.Headers.Contains("X-RateLimit-MonthlyReset")
-                            && DateTime.TryParseExact(response.Headers.GetValues("X-RateLimit-MonthlyReset").Last(), "dd.MM.yyyy hh:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
+                            && ParseRateLimitReset(response.Headers.GetValues("X-RateLimit-MonthlyReset").Last()) is DateTime monthlyReset)
                         {
                             if (RateLimit.Monthly == null)
                             {
                                 RateLimit.Monthly = new DetailLimit();
                             }
-                            RateLimit.Monthly.Reset = date;
+                            RateLimit.Monthly.Reset = monthlyReset;
                         }
                     }
                 }
@@ -246,6 +262,14 @@ namespace Birko.SuperFaktura
                     response.EnsureSuccessStatusCode();
                 }
             }
+        }
+
+        // intro.md "Limit headers": e.g. "24.12.2030 00:00:00" (24-hour clock).
+        internal static DateTime? ParseRateLimitReset(string value)
+        {
+            return DateTime.TryParseExact(value, "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date)
+                ? date
+                : (DateTime?)null;
         }
 
         internal async Task<string> Get(string uri)
@@ -344,7 +368,6 @@ namespace Birko.SuperFaktura
             if (data is Data dataData)
             {
                 checkSum = CheckSum(dataData);
-                dataData.CheckSum = checkSum;
             }
 #if DEBUG
             Console.WriteLine(JsonConvert.SerializeObject(data));
@@ -358,7 +381,6 @@ namespace Birko.SuperFaktura
             if (data is Data dataData)
             {
                 checkSum = CheckSum(dataData);
-                dataData.CheckSum = checkSum;
             }
 #if DEBUG
             Console.WriteLine(JsonConvert.SerializeObject(data));
@@ -399,7 +421,6 @@ namespace Birko.SuperFaktura
             if (data is Data dataData)
             {
                 checkSum = CheckSum(dataData);
-                dataData.CheckSum = checkSum;
             }
 #if DEBUG
             Console.WriteLine(JsonConvert.SerializeObject(data));
@@ -442,15 +463,7 @@ namespace Birko.SuperFaktura
             try
             {
                 IncreaseRequestCount(ProfileKey);
-                var request = new HttpRequestMessage
-                {
-                    Method = HttpMethod.Delete,
-                    RequestUri = new Uri(uri),
-                    Content = new StringContent(data, Encoding.UTF8, "application/json")
-                };
-
-
-                response = await client.SendAsync(request).ConfigureAwait(false);
+                response = await client.SendAsync(CreateDeleteRequest(uri, data)).ConfigureAwait(false);
                 ParseResponse(response);
                 if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
                 {
@@ -464,43 +477,52 @@ namespace Birko.SuperFaktura
             }
         }
 
-        private string CheckSum(Request.Data data)
+        // Relative URI is resolved against the client's BaseAddress; body is sent as "data=<json>" like POST.
+        internal static HttpRequestMessage CreateDeleteRequest(string uri, string data)
         {
-            data.Date = DateTime.Now.ToString("yyyy-MM-dd");
-            StringBuilder sum = new StringBuilder();
-            using (var md5 = System.Security.Cryptography.MD5.Create())
+            return new HttpRequestMessage
             {
-                byte[] hashBytes = md5.ComputeHash(System.Text.Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)));
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < hashBytes.Length; i++)
-                {
-                    sum.Append(hashBytes[i].ToString("X2"));
-                }
+                Method = HttpMethod.Delete,
+                RequestUri = new Uri(uri, UriKind.Relative),
+                Content = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("data", data) })
+            };
+        }
+
+        // The checksum is a caller-chosen unique identifier (e.g. order number), max 32 chars.
+        // It allows fetching a lost response via ResponseByChecksum (see FAQ "I did not receive response").
+        internal static string CheckSum(Request.Data data)
+        {
+            if (data.CheckSum != null && data.CheckSum.Length > 32)
+            {
+                throw new ArgumentException("Checksum can be at most 32 characters long.", nameof(data.CheckSum));
             }
             return data.CheckSum;
         }
 
-        private static void IncreaseRequestCount(string key, int count = 1, bool set = false)
+        private static void IncreaseRequestCount(string key)
         {
-            if (_requestCount == null)
+            IncreaseRequestCount(key, DateTime.Now);
+        }
+
+        internal static int IncreaseRequestCount(string key, DateTime now)
+        {
+            lock (_requestCountLock)
             {
-                _requestCount = new Dictionary<string, int>();
-            }
-            if (!_requestCount.ContainsKey(key))
-            {
-                _requestCount.Add(key, 0);
-            }
-            if (set)
-            {
-                _requestCount[key] = count;
-            }
-            else
-            {
-                _requestCount[key] += count;
+                var count = RequestCount(key, now) + 1;
+                _requestCount[key] = new KeyValuePair<DateTime, int>(now.Date, count);
+                return count;
             }
         }
 
-        private Exceptions.Exception HandleRequestException(string uri, HttpResponseMessage response, Exception ex, string data = null)
+        private static int RequestCount(string key, DateTime now)
+        {
+            lock (_requestCountLock)
+            {
+                return _requestCount.TryGetValue(key, out var day) && day.Key == now.Date ? day.Value : 0;
+            }
+        }
+
+        internal static Exceptions.Exception HandleRequestException(string uri, HttpResponseMessage response, Exception ex, string data = null)
         {
             string content = null;
             if (response != null)
@@ -510,6 +532,24 @@ namespace Birko.SuperFaktura
                 contentTask.Wait();
                 content = contentTask.Result;
             }
+
+            // HTTP 4xx responses usually carry the regular API error body ({"error": N, ...}).
+            if (!string.IsNullOrEmpty(content))
+            {
+                try
+                {
+                    var apiError = CreateApiError(JToken.Parse(content), ex, uri);
+                    if (apiError != null)
+                    {
+                        return apiError;
+                    }
+                }
+                catch (JsonException)
+                {
+                    // Not JSON (e.g. proxy HTML page) - fall back to the generic exception below.
+                }
+            }
+
             string message = string.Format("ReasonPhrase: {0}\nContent: {1}\nRequest: {2}\nData: {3}",
                     response,
                     content,
@@ -655,10 +695,19 @@ namespace Birko.SuperFaktura
             return null;
         }
 
-        [Obsolete("Not found in API documentation")]
+        // Returns the original response of a request sent with this checksum (up to 3 months back),
+        // or null when no request with this checksum reached the server.
         public async Task<string> ResponseByChecksum(string checksum)
         {
-            return await Get($"api_logs/getResponseByChecksum/{checksum}").ConfigureAwait(false);
+            var result = await Get($"api_logs/getResponseByChecksum/{Uri.EscapeDataString(checksum)}").ConfigureAwait(false);
+            return ParseResponseByChecksum(result);
+        }
+
+        internal static string ParseResponseByChecksum(string result)
+        {
+            TestError(result);
+            // Unknown checksum is answered with an empty array, not with an error.
+            return JToken.Parse(result) is JArray array && array.Count == 0 ? null : result;
         }
     }
 
