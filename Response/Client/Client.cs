@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Birko.SuperFaktura.Converters;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
@@ -8,6 +9,30 @@ namespace Birko.SuperFaktura.Response.Client
     {
         [JsonProperty(PropertyName = "Country", NullValueHandling = NullValueHandling.Ignore)]
         public Country Country { get; set; }
+
+        // Object "DeliveryCountry"; the inherited DeliveryCountry is the custom name ("delivery_country").
+        [JsonProperty(PropertyName = "DeliveryCountry", NullValueHandling = NullValueHandling.Ignore)]
+        public Country DeliveryCountryDetail { get; set; }
+
+        [JsonProperty(PropertyName = "account", NullValueHandling = NullValueHandling.Ignore)]
+        public string Account { get; set; }
+
+        [JsonProperty(PropertyName = "delivery_state", NullValueHandling = NullValueHandling.Ignore)]
+        public string DeliveryState { get; set; }
+
+        [JsonProperty(PropertyName = "distance", NullValueHandling = NullValueHandling.Ignore)]
+        public string Distance { get; set; }
+
+        [JsonProperty(PropertyName = "dont_travel", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(StringBooleanConverter))]
+        public bool? DontTravel { get; set; } = null;
+
+        [JsonProperty(PropertyName = "notices", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(StringBooleanConverter))]
+        public bool? Notices { get; set; } = null;
+
+        [JsonProperty(PropertyName = "state", NullValueHandling = NullValueHandling.Ignore)]
+        public string State { get; set; }
 
         [JsonProperty(PropertyName = "bank_account_id", NullValueHandling = NullValueHandling.Ignore)]
         public string BankAccountID { get; set; } = string.Empty;

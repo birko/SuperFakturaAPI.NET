@@ -31,11 +31,18 @@ namespace Birko.SuperFaktura.Request.Client
         [JsonProperty(PropertyName = "tag")]
         public int? Tag { get; set; }
 
+        // First letter of client name; non-letter characters are under "#".
+        [JsonProperty(PropertyName = "char_filter")]
+        public string CharFilter { get; set; }
+
         public override string ToParameters(bool listInfo = true)
         {
             string paramString = base.ToParameters(listInfo);
-            paramString += "/created:" + Created;
-            paramString += "/modified:" + Modified;
+            // *_since / *_to require created:3 / modified:3 (clients.md).
+            var created = Created == ValueLists.TimeFilterConstants.All && (CreatedSince.HasValue || CreatedTo.HasValue) ? ValueLists.TimeFilterConstants.SinceTo : Created;
+            var modified = Modified == ValueLists.TimeFilterConstants.All && (ModifiedSince.HasValue || ModifiedTo.HasValue) ? ValueLists.TimeFilterConstants.SinceTo : Modified;
+            paramString += "/created:" + created;
+            paramString += "/modified:" + modified;
 
             if (PriceFrom > 0)
             {
@@ -45,11 +52,6 @@ namespace Birko.SuperFaktura.Request.Client
             {
                 paramString += "/price_to:" + PriceTo;
             }
-            if (CreatedSince.HasValue)
-            {
-                paramString += "/created_since:" + CreatedSince.Value.ToString("yyyy-MM-dd");
-            }
-
             if (CreatedSince.HasValue)
             {
                 paramString += "/created_since:" + CreatedSince.Value.ToString("yyyy-MM-dd");
@@ -73,6 +75,10 @@ namespace Birko.SuperFaktura.Request.Client
             if (Tag.HasValue)
             {
                 paramString += "/tag:" + Tag;
+            }
+            if (!string.IsNullOrEmpty(CharFilter))
+            {
+                paramString += "/char_filter:" + CharFilter;
             }
 
             return paramString;

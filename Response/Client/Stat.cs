@@ -59,9 +59,9 @@ namespace Birko.SuperFaktura.Response.Client
         public int ProformaCount { get; set; }
 
         [JsonProperty(PropertyName = "proforma_overdue_count", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal ProformaOverdueCount { get; set; }
+        public int ProformaOverdueCount { get; set; }
 
-        [JsonProperty(PropertyName = "proforma_overdue_Total", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(PropertyName = "proforma_overdue_total", NullValueHandling = NullValueHandling.Ignore)]
         public decimal ProformaOverdueTotal { get; set; }
 
         [JsonProperty(PropertyName = "proforma_total", NullValueHandling = NullValueHandling.Ignore)]
@@ -71,7 +71,7 @@ namespace Birko.SuperFaktura.Response.Client
         public int RegularCount { get; set; }
 
         [JsonProperty(PropertyName = "regular_overdue_count", NullValueHandling = NullValueHandling.Ignore)]
-        public decimal RegularOverdueCount { get; set; }
+        public int RegularOverdueCount { get; set; }
 
         [JsonProperty(PropertyName = "regular_overdue_total", NullValueHandling = NullValueHandling.Ignore)]
         public decimal RegularOverdueTotal { get; set; }
