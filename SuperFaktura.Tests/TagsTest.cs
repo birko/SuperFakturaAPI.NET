@@ -5,7 +5,7 @@ using Xunit;
 
 namespace SuperFaktura.Tests
 {
-    public class TagsTest: SuperFakturaTest
+    public class TagsTest : SuperFakturaTest
     {
 
         [Fact]

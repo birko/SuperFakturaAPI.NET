@@ -14,7 +14,8 @@ namespace SuperFaktura.Tests
         public async Task TestListCountries()
         {
             var countries = await apiClient.ValueLists.ListCountries();
-            countries.Count.ShouldBe(253);
+            // country list only grows over time; assert a sane floor instead of an exact count
+            countries.Count.ShouldBeGreaterThanOrEqualTo(253);
             countries[191].ShouldBe("Slovensko");
         }
 
@@ -22,7 +23,8 @@ namespace SuperFaktura.Tests
         public async Task TestListCountriesFull()
         {
             var countries = await apiClient.ValueLists.ListCountriesFull();
-            countries.Count().ShouldBe(253);
+            // country list only grows over time; assert a sane floor instead of an exact count
+            countries.Count().ShouldBeGreaterThanOrEqualTo(253);
             countries.First().Name.ShouldBe("Slovensko");
         }
 

@@ -224,6 +224,360 @@ namespace SuperFaktura.Tests
         }
 
         [Fact]
+        public async Task TestEditDoesNotAppendItems()
+        {
+            var now = DateTime.Now.Date;
+            var client = new Birko.SuperFaktura.Request.Client.Client()
+            {
+                BankAccount = string.Empty,
+                Name = "Ing. František Beren",
+                ICO = "47883421",
+                DIC = "2020202020",
+                ICDPH = string.Empty,
+                Email = string.Empty,
+                Phone = string.Empty,
+                Address = "Vasilov 116",
+                City = "Vasilov",
+                ZIP = "02951",
+                CountryName = "Slovensko",
+                CountryID = 191,
+            };
+            var sfinvoice = new Birko.SuperFaktura.Request.Invoice.Invoice()
+            {
+                Constant = "308",
+                Created = now,
+                DueDate = now.AddDays(14),
+                Comment = "SF unit test edit append",
+                Name = string.Empty,
+                HeaderComment = "Za testovacie produkty",
+                PaymentType = Birko.SuperFaktura.Request.ValueLists.PaymentType.BankTransfer,
+                InvoiceType = Birko.SuperFaktura.Request.ValueLists.InvoiceType.ProForma,
+                IssuedBy = "SF tester",
+                IssuedByEmail = "superfaktura@example.com",
+                IssuedByWeb = "www.finstat.sk",
+                IssuedByPhone = "0987654321",
+                InvoiceCurrency = "EUR"
+            };
+            var items = new[] {
+                new Birko.SuperFaktura.Request.Invoice.Item()
+                {
+                    Name = "edit item A",
+                    Description = "edit item A",
+                    Quantity = 1,
+                    Unit = "ks",
+                    Tax = 23,
+                    UnitPrice = 100,
+                },
+                new Birko.SuperFaktura.Request.Invoice.Item()
+                {
+                    Name = "edit item B",
+                    Description = "edit item B",
+                    Quantity = 2,
+                    Unit = "ks",
+                    Tax = 23,
+                    UnitPrice = 200,
+                }
+            };
+
+            var created = await apiClient.Invoices.Add(sfinvoice, client, items);
+            created.ShouldNotBeNull();
+            var invoiceId = created.Invoice.ID.Value;
+
+            try
+            {
+                // re-fetch so the items carry their server-assigned IDs
+                var detail = await apiClient.Invoices.View(invoiceId);
+                detail.InvoiceItems.ShouldNotBeNull();
+                var originalCount = detail.InvoiceItems.Length;
+                originalCount.ShouldBe(items.Length);
+
+                // edit without changing the item set
+                detail.Invoice.IssuedBy = "SF tester2";
+                var edited = await apiClient.Invoices.Edit(detail.Invoice, client, detail.InvoiceItems);
+                edited.ShouldNotBeNull();
+
+                // editing must swap (replace) the items, not append them
+                var after = await apiClient.Invoices.View(invoiceId);
+                after.InvoiceItems.ShouldNotBeNull();
+                after.InvoiceItems.Length.ShouldBe(originalCount);
+            }
+            finally
+            {
+                await apiClient.Invoices.Delete(invoiceId);
+            }
+        }
+
+        [Fact]
+        public async Task TestEditReplacesItems()
+        {
+            var now = DateTime.Now.Date;
+            var client = new Birko.SuperFaktura.Request.Client.Client()
+            {
+                BankAccount = string.Empty,
+                Name = "Ing. František Beren",
+                ICO = "47883421",
+                DIC = "2020202020",
+                ICDPH = string.Empty,
+                Email = string.Empty,
+                Phone = string.Empty,
+                Address = "Vasilov 116",
+                City = "Vasilov",
+                ZIP = "02951",
+                CountryName = "Slovensko",
+                CountryID = 191,
+            };
+            var sfinvoice = new Birko.SuperFaktura.Request.Invoice.Invoice()
+            {
+                Constant = "308",
+                Created = now,
+                DueDate = now.AddDays(14),
+                Comment = "SF unit test edit replace",
+                Name = string.Empty,
+                HeaderComment = "Za testovacie produkty",
+                PaymentType = Birko.SuperFaktura.Request.ValueLists.PaymentType.BankTransfer,
+                InvoiceType = Birko.SuperFaktura.Request.ValueLists.InvoiceType.ProForma,
+                IssuedBy = "SF tester",
+                IssuedByEmail = "superfaktura@example.com",
+                IssuedByWeb = "www.finstat.sk",
+                IssuedByPhone = "0987654321",
+                InvoiceCurrency = "EUR"
+            };
+            var items = new[] {
+                new Birko.SuperFaktura.Request.Invoice.Item()
+                {
+                    Name = "edit item A",
+                    Description = "edit item A",
+                    Quantity = 1,
+                    Unit = "ks",
+                    Tax = 23,
+                    UnitPrice = 100,
+                },
+                new Birko.SuperFaktura.Request.Invoice.Item()
+                {
+                    Name = "edit item B",
+                    Description = "edit item B",
+                    Quantity = 2,
+                    Unit = "ks",
+                    Tax = 23,
+                    UnitPrice = 200,
+                }
+            };
+
+            var created = await apiClient.Invoices.Add(sfinvoice, client, items);
+            created.ShouldNotBeNull();
+            var invoiceId = created.Invoice.ID.Value;
+
+            try
+            {
+                // re-fetch so the items carry their server-assigned IDs
+                var detail = await apiClient.Invoices.View(invoiceId);
+                detail.InvoiceItems.ShouldNotBeNull();
+                detail.InvoiceItems.Length.ShouldBe(items.Length);
+
+                // keep A (with its ID), drop B, add a brand new C (no ID)
+                var keepA = detail.InvoiceItems.Single(x => x.Name == "edit item A");
+                var newC = new Birko.SuperFaktura.Request.Invoice.Item()
+                {
+                    Name = "replacement item C",
+                    Description = "replacement item C",
+                    Quantity = 3,
+                    Unit = "ks",
+                    Tax = 23,
+                    UnitPrice = 300,
+                };
+                var replacement = new Birko.SuperFaktura.Request.Invoice.Item[] { keepA, newC };
+
+                var edited = await apiClient.Invoices.Edit(detail.Invoice, client, replacement);
+                edited.ShouldNotBeNull();
+
+                // editing must end up with exactly the replacement set: A and C, no B
+                var after = await apiClient.Invoices.View(invoiceId);
+                after.InvoiceItems.ShouldNotBeNull();
+                after.InvoiceItems.Length.ShouldBe(replacement.Length);
+                var names = after.InvoiceItems.Select(x => x.Name).ToArray();
+                names.ShouldContain("edit item A");
+                names.ShouldContain("replacement item C");
+                names.ShouldNotContain("edit item B");
+            }
+            finally
+            {
+                await apiClient.Invoices.Delete(invoiceId);
+            }
+        }
+
+        [Fact]
+        public async Task TestEditDoesNotDuplicateTags()
+        {
+            var now = DateTime.Now.Date;
+            var client = new Birko.SuperFaktura.Request.Client.Client()
+            {
+                BankAccount = string.Empty,
+                Name = "Ing. František Beren",
+                ICO = "47883421",
+                DIC = "2020202020",
+                ICDPH = string.Empty,
+                Email = string.Empty,
+                Phone = string.Empty,
+                Address = "Vasilov 116",
+                City = "Vasilov",
+                ZIP = "02951",
+                CountryName = "Slovensko",
+                CountryID = 191,
+            };
+            var sfinvoice = new Birko.SuperFaktura.Request.Invoice.Invoice()
+            {
+                Constant = "308",
+                Created = now,
+                DueDate = now.AddDays(14),
+                Comment = "SF unit test edit tags duplicate",
+                Name = string.Empty,
+                HeaderComment = "Za testovacie produkty",
+                PaymentType = Birko.SuperFaktura.Request.ValueLists.PaymentType.BankTransfer,
+                InvoiceType = Birko.SuperFaktura.Request.ValueLists.InvoiceType.ProForma,
+                IssuedBy = "SF tester",
+                IssuedByEmail = "superfaktura@example.com",
+                IssuedByWeb = "www.finstat.sk",
+                IssuedByPhone = "0987654321",
+                InvoiceCurrency = "EUR"
+            };
+            var items = new[] {
+                new Birko.SuperFaktura.Request.Invoice.Item()
+                {
+                    Name = "tag test item",
+                    Description = "tag test item",
+                    Quantity = 1,
+                    Unit = "ks",
+                    Tax = 23,
+                    UnitPrice = 100,
+                }
+            };
+
+            var tagA = await apiClient.Tags.Add(new Birko.SuperFaktura.Request.Tags.Tag() { Name = "edit tag A" });
+            var tagB = await apiClient.Tags.Add(new Birko.SuperFaktura.Request.Tags.Tag() { Name = "edit tag B" });
+            var tagIds = new[] { tagA.ID, tagB.ID };
+
+            int? invoiceId = null;
+            try
+            {
+                var created = await apiClient.Invoices.Add(sfinvoice, client, items, tagIds);
+                created.ShouldNotBeNull();
+                invoiceId = created.Invoice.ID.Value;
+
+                var detail = await apiClient.Invoices.View(invoiceId.Value);
+                detail.Tag.ShouldNotBeNull();
+                var originalCount = detail.Tag.Length;
+                originalCount.ShouldBe(tagIds.Length);
+
+                // edit without changing the tag set
+                detail.Invoice.IssuedBy = "SF tester2";
+                var edited = await apiClient.Invoices.Edit(detail.Invoice, client, detail.InvoiceItems, tagIds);
+                edited.ShouldNotBeNull();
+
+                // editing must swap (replace) the tags, not append them
+                var after = await apiClient.Invoices.View(invoiceId.Value);
+                after.Tag.ShouldNotBeNull();
+                after.Tag.Length.ShouldBe(originalCount);
+            }
+            finally
+            {
+                if (invoiceId.HasValue)
+                {
+                    await apiClient.Invoices.Delete(invoiceId.Value);
+                }
+                await apiClient.Tags.Delete(tagA.ID);
+                await apiClient.Tags.Delete(tagB.ID);
+            }
+        }
+
+        [Fact]
+        public async Task TestEditReplacesTags()
+        {
+            var now = DateTime.Now.Date;
+            var client = new Birko.SuperFaktura.Request.Client.Client()
+            {
+                BankAccount = string.Empty,
+                Name = "Ing. František Beren",
+                ICO = "47883421",
+                DIC = "2020202020",
+                ICDPH = string.Empty,
+                Email = string.Empty,
+                Phone = string.Empty,
+                Address = "Vasilov 116",
+                City = "Vasilov",
+                ZIP = "02951",
+                CountryName = "Slovensko",
+                CountryID = 191,
+            };
+            var sfinvoice = new Birko.SuperFaktura.Request.Invoice.Invoice()
+            {
+                Constant = "308",
+                Created = now,
+                DueDate = now.AddDays(14),
+                Comment = "SF unit test edit tags replace",
+                Name = string.Empty,
+                HeaderComment = "Za testovacie produkty",
+                PaymentType = Birko.SuperFaktura.Request.ValueLists.PaymentType.BankTransfer,
+                InvoiceType = Birko.SuperFaktura.Request.ValueLists.InvoiceType.ProForma,
+                IssuedBy = "SF tester",
+                IssuedByEmail = "superfaktura@example.com",
+                IssuedByWeb = "www.finstat.sk",
+                IssuedByPhone = "0987654321",
+                InvoiceCurrency = "EUR"
+            };
+            var items = new[] {
+                new Birko.SuperFaktura.Request.Invoice.Item()
+                {
+                    Name = "tag test item",
+                    Description = "tag test item",
+                    Quantity = 1,
+                    Unit = "ks",
+                    Tax = 23,
+                    UnitPrice = 100,
+                }
+            };
+
+            var tagA = await apiClient.Tags.Add(new Birko.SuperFaktura.Request.Tags.Tag() { Name = "replace tag A" });
+            var tagB = await apiClient.Tags.Add(new Birko.SuperFaktura.Request.Tags.Tag() { Name = "replace tag B" });
+            var tagC = await apiClient.Tags.Add(new Birko.SuperFaktura.Request.Tags.Tag() { Name = "replace tag C" });
+
+            int? invoiceId = null;
+            try
+            {
+                var created = await apiClient.Invoices.Add(sfinvoice, client, items, new[] { tagA.ID, tagB.ID });
+                created.ShouldNotBeNull();
+                invoiceId = created.Invoice.ID.Value;
+
+                var detail = await apiClient.Invoices.View(invoiceId.Value);
+                detail.Tag.ShouldNotBeNull();
+                detail.Tag.Length.ShouldBe(2);
+
+                // keep A, drop B, add C
+                var replacement = new[] { tagA.ID, tagC.ID };
+                var edited = await apiClient.Invoices.Edit(detail.Invoice, client, detail.InvoiceItems, replacement);
+                edited.ShouldNotBeNull();
+
+                // editing must end up with exactly the replacement set: A and C, no B
+                var after = await apiClient.Invoices.View(invoiceId.Value);
+                after.Tag.ShouldNotBeNull();
+                after.Tag.Length.ShouldBe(replacement.Length);
+                var ids = after.Tag.Select(x => x.ID).ToArray();
+                ids.ShouldContain(tagA.ID);
+                ids.ShouldContain(tagC.ID);
+                ids.ShouldNotContain(tagB.ID);
+            }
+            finally
+            {
+                if (invoiceId.HasValue)
+                {
+                    await apiClient.Invoices.Delete(invoiceId.Value);
+                }
+                await apiClient.Tags.Delete(tagA.ID);
+                await apiClient.Tags.Delete(tagB.ID);
+                await apiClient.Tags.Delete(tagC.ID);
+            }
+        }
+
+        [Fact]
         public async Task TestView()
         {
             var invoices = await apiClient.Invoices.List(new Birko.SuperFaktura.Request.Invoice.Filter() { PerPage = 200 });
@@ -369,11 +723,16 @@ namespace SuperFaktura.Tests
                 return;
             }
             var detail = invoices?.Items?.First();
-            if (!(detail.InvoicePayment?.Any() ?? false))
+            // ensure there is a payment to delete so the delete response is actually exercised
+            var added = await apiClient.Invoices.AddPayment(new Birko.SuperFaktura.Request.Invoice.Payment()
             {
-                return;
-            }
-            var task = await apiClient.Invoices.DeletePayment(detail.InvoicePayment.First().ID);
+                InvoiceID = detail.Invoice.ID.Value,
+                Amount = 0.5m,
+            });
+            added.ShouldNotBeNull();
+            added.PaymentID.ShouldNotBeNull();
+
+            var task = await apiClient.Invoices.DeletePayment(added.PaymentID.Value);
             task.ShouldNotBeNull();
         }
 
