@@ -12,6 +12,7 @@
     <Description>.NET client library for Superfaktura API</Description>
     <Title>SuperFaktura API Client</Title>
     <Copyright>Birko</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>superfaktura;api;.net</PackageTags>
     <!-- AssemblyVersion and FileVersion are derived from Version; CI overrides it from the tag (v1.2.3 -> 1.2.3). -->
     <Version>1.2.0</Version>
