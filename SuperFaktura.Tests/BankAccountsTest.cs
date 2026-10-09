@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using Shouldly;
 using System;
 using System.Collections.Generic;
@@ -5,11 +6,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace SuperFaktura.Tests
 {
     public class BankAccountsTest: SuperFakturaTest
     {
+        private readonly ITestOutputHelper output;
+
+        public BankAccountsTest(ITestOutputHelper output)
+        {
+            this.output = output;
+        }
+
         // Own account, not default - the sandbox default bank account stays untouched.
         private static async Task<Birko.SuperFaktura.Response.BankAccounts.BankAccount> AddTestAccount()
         {
@@ -71,6 +80,65 @@ namespace SuperFaktura.Tests
             }
             finally
             {
+                await apiClient.BankAccounts.Delete(added.ID.Value);
+            }
+        }
+
+        [Fact]
+        public async Task TestListRawResponseFlags()
+        {
+            var added = await AddTestAccount();
+            try
+            {
+                var raw = JObject.Parse(await apiClient.Get("bank_accounts/index"));
+                var account = (JObject)raw["BankAccounts"]
+                    .Select(x => x["BankAccount"])
+                    .Single(x => x["id"].Value<string>() == added.ID.ToString());
+                output.WriteLine(account.ToString());
+
+                // Undocumented "currency" is returned (null when not set on the account);
+                // "show_account" is not part of the list response.
+                account.ContainsKey("currency").ShouldBeTrue();
+                account["currency"].Type.ShouldBe(JTokenType.Null);
+                account["show"].Type.ShouldBe(JTokenType.Boolean);
+                account.ContainsKey("show_account").ShouldBeFalse();
+            }
+            finally
+            {
+                await apiClient.BankAccounts.Delete(added.ID.Value);
+            }
+        }
+
+        [Fact]
+        public async Task TestInvoiceMyDataBankAccountFlags()
+        {
+            var added = await AddTestAccount();
+            Birko.SuperFaktura.Response.Invoice.Detail invoice = null;
+            try
+            {
+                invoice = await CreateTestInvoice();
+                var raw = JObject.Parse(await apiClient.Get(string.Format("invoices/view/{0}.json", invoice.Invoice.ID)));
+                output.WriteLine(raw["MyData"]["BankAccount"].ToString());
+                output.WriteLine(raw["Invoice"]["my_data"].ToString());
+
+                // A newly created invoice lists every account of the profile, with "show", "show_account"
+                // and "currency" - unlike older invoices whose snapshot has only "show_account" as "0"/"1".
+                var account = (JObject)raw["MyData"]["BankAccount"].Single(x => x["id"].Value<string>() == added.ID.ToString());
+                account["show"].Type.ShouldBe(JTokenType.Boolean);
+                account["show_account"].Type.ShouldBe(JTokenType.Boolean);
+                account.ContainsKey("currency").ShouldBeTrue();
+
+                var typed = (await apiClient.Invoices.View(invoice.Invoice.ID.Value)).MyData.BankAccount.Single(x => x.ID == added.ID);
+                typed.Show.ShouldBe(false);
+                typed.ShowAccount.ShouldBe(false);
+                typed.Currency.ShouldBeNull();
+            }
+            finally
+            {
+                if (invoice != null)
+                {
+                    await DeleteTestInvoice(invoice);
+                }
                 await apiClient.BankAccounts.Delete(added.ID.Value);
             }
         }
