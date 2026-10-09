@@ -283,27 +283,80 @@ namespace SuperFaktura.Tests
         [Fact]
         public void BankAccountSendsExplicitFlagsAsZeroOrOne()
         {
-            var json = Serialize(new Birko.SuperFaktura.Request.BankAccounts.BankAccount { Default = false, Show = true, ShowAccount = true });
+            var json = Serialize(new Birko.SuperFaktura.Request.BankAccounts.BankAccount { Default = false, Show = true });
 
             json["default"].Value<string>().ShouldBe("0");
             json["show"].Value<string>().ShouldBe("1");
-            json["show_account"].Value<string>().ShouldBe("1");
         }
 
         [Fact]
         public void BankAccountResponseFromDocumentationDeserializes()
         {
-            // bank-account.md "Get list of bank accounts", plus a null flag.
+            // bank-account.md "Get list of bank accounts".
             var account = JsonConvert.DeserializeObject<Birko.SuperFaktura.Response.BankAccounts.BankAccount>(
                 "{\"account\":\"\",\"bank_code\":\"\",\"bank_name\":\"FatraBanka\",\"country_id\":\"191\",\"created\":\"2050-01-01 23:59:59\"," +
                 "\"currency\":null,\"default\":true,\"iban\":\"SK012345678901234567890000\",\"id\":\"1\",\"modified\":\"2050-01-01 23:59:59\"," +
-                "\"show\":true,\"show_account\":null,\"swift\":\"SUZUKI\",\"user_id\":\"1\",\"user_profile_id\":\"1\"}");
+                "\"show\":true,\"swift\":\"SUZUKI\",\"user_id\":\"1\",\"user_profile_id\":\"1\"}");
 
             account.Default.ShouldBe(true);
             account.Show.ShouldBe(true);
-            account.ShowAccount.ShouldBeNull();
             account.CountryID.ShouldBe(191);
             account.Currency.ShouldBeNull();
+        }
+
+        // MyData.BankAccount of an invoice saved in the web UI (production response, account numbers replaced).
+        // The UI form posts only these fields, so "show" and "currency" are missing.
+        private const string InvoiceMyDataBankAccounts =
+            "{\"id\":\"1\",\"BankAccount\":[" +
+            "{\"id\":\"7860\",\"show_account\":\"0\",\"default\":\"1\",\"country_id\":\"191\",\"bank_name\":\"SK bank\",\"bank_code\":\"7500\",\"account\":\"1111111111\",\"iban\":\"SK0000000000001111111111\",\"swift\":\"AAAASKBX\"}," +
+            "{\"id\":\"12953\",\"show_account\":\"0\",\"default\":\"\",\"country_id\":\"191\",\"bank_name\":\"SK bank 2\",\"bank_code\":\"1100\",\"account\":\"2222222222\",\"iban\":\"SK0000000000002222222222\",\"swift\":\" BBBBSKBX\"}," +
+            "{\"id\":\"90269\",\"show_account\":\"1\",\"default\":\"\",\"country_id\":\"191\",\"bank_name\":\"CZ bank\",\"bank_code\":\"0300\",\"account\":\"3333333333\",\"iban\":\"CZ0000000000003333333333\",\"swift\":\"CCCCCZPP\"}]}";
+
+        [Fact]
+        public void InvoiceMyDataBankAccountsDeserializeShowAccountAndDefault()
+        {
+            var accounts = JsonConvert.DeserializeObject<Birko.SuperFaktura.Response.Invoice.MyData>(InvoiceMyDataBankAccounts).BankAccount;
+
+            accounts.Select(x => x.ID).ShouldBe(new int?[] { 7860, 12953, 90269 });
+            accounts.Select(x => x.ShowAccount).ShouldBe(new bool?[] { false, false, true });
+            accounts.Select(x => x.Default).ShouldBe(new bool?[] { true, false, false });
+        }
+
+        [Fact]
+        public void InvoiceMyDataBankAccountsHaveNoShowNorCurrency()
+        {
+            var accounts = JsonConvert.DeserializeObject<Birko.SuperFaktura.Response.Invoice.MyData>(InvoiceMyDataBankAccounts).BankAccount;
+
+            accounts.ShouldAllBe(x => x.Show == null);
+            accounts.ShouldAllBe(x => x.Currency == null);
+        }
+
+        [Fact]
+        public void InvoiceMyDataAccountShownOnInvoiceIsTheOneWithShowAccount()
+        {
+            var accounts = JsonConvert.DeserializeObject<Birko.SuperFaktura.Response.Invoice.MyData>(InvoiceMyDataBankAccounts).BankAccount;
+
+            accounts.Where(x => x.ShowAccount == true).Select(x => x.IBAN).ShouldBe(new[] { "CZ0000000000003333333333" });
+        }
+
+        // Sandbox invoice 344656 after saving it in the web UI with accounts 455 and 559 ticked.
+        // Account 455 has show = false in its settings, yet show_account = "1" on this invoice.
+        private const string SandboxUiInvoiceMyDataBankAccounts =
+            "{\"id\":\"1731\",\"BankAccount\":[" +
+            "{\"id\":\"454\",\"show_account\":\"0\",\"default\":\"1\",\"country_id\":\"0\",\"bank_name\":\"testBankEdit\",\"bank_code\":\"\",\"account\":\"\",\"iban\":\"SK3112000000198742637541\",\"swift\":\"\"}," +
+            "{\"id\":\"455\",\"show_account\":\"1\",\"default\":\"\",\"country_id\":\"0\",\"bank_name\":\"testBankEdit\",\"bank_code\":\"\",\"account\":\"\",\"iban\":\"SK5114101852382058014929\",\"swift\":\"\"}," +
+            "{\"id\":\"559\",\"show_account\":\"1\",\"default\":\"\",\"country_id\":\"191\",\"bank_name\":\"\\u010ceskoslovensk\\u00e1 obchodn\\u00ed banka, a. s.\",\"bank_code\":\"0300\",\"account\":\"0348091572\",\"iban\":\"CZ9703000000000348091572\",\"swift\":\"CEKOCZPP\"}]}";
+
+        [Fact]
+        public void SandboxUiInvoiceMyDataBankAccountsDeserialize()
+        {
+            var accounts = JsonConvert.DeserializeObject<Birko.SuperFaktura.Response.Invoice.MyData>(SandboxUiInvoiceMyDataBankAccounts).BankAccount;
+
+            accounts.Select(x => x.ID).ShouldBe(new int?[] { 454, 455, 559 });
+            accounts.Select(x => x.ShowAccount).ShouldBe(new bool?[] { false, true, true });
+            accounts.Select(x => x.Default).ShouldBe(new bool?[] { true, false, false });
+            accounts.ShouldAllBe(x => x.Show == null && x.Currency == null);
+            accounts[2].BankName.ShouldBe("Československá obchodní banka, a. s.");
         }
 
         [Fact]

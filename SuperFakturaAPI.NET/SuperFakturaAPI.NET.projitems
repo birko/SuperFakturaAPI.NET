@@ -44,6 +44,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Response\Expense\ExpenseItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Expense\PaymentResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Expense\Rate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\InvoiceBankAccount.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\Mark.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\PayInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\InvoiceSettingResponse.cs" />

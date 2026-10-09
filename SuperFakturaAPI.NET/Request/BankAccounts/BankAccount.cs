@@ -31,14 +31,14 @@ namespace Birko.SuperFaktura.Request.BankAccounts
         [JsonProperty(PropertyName = "swift", NullValueHandling = NullValueHandling.Ignore)]
         public string SWIFT { get; set; }
 
+        // Account setting "show on invoices". Whether the account is shown on a particular invoice is
+        // Response.Invoice.InvoiceBankAccount.ShowAccount.
         [JsonProperty(PropertyName = "show", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.StringBooleanConverter))]
         public bool? Show { get; set; }
 
-        [JsonProperty(PropertyName = "show_account", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonConverter(typeof(Converters.StringBooleanConverter))]
-        public bool? ShowAccount { get; set; }
-
+        // Not documented, but bank_accounts/add stores it. The API never filters an invoice's accounts
+        // by invoice currency.
         [JsonProperty(PropertyName = "currency", NullValueHandling = NullValueHandling.Ignore)]
         public string Currency { get; set; }
     }

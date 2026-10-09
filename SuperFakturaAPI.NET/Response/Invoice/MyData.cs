@@ -1,5 +1,4 @@
-﻿using Birko.SuperFaktura.Response.BankAccounts;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Birko.SuperFaktura.Response.Invoice
 {
@@ -7,7 +6,7 @@ namespace Birko.SuperFaktura.Response.Invoice
     {
 
         [JsonProperty(PropertyName = "BankAccount", NullValueHandling = NullValueHandling.Ignore)]
-        public BankAccount[] BankAccount { get; set; }
+        public InvoiceBankAccount[] BankAccount { get; set; }
 
         [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
         public int ID { get; set; }
