@@ -589,7 +589,7 @@ namespace SuperFaktura.Tests
                 Discount = 5,
                 Created = new System.DateTime(2026, 9, 1, 15, 30, 0),
                 DueDate = new System.DateTime(2026, 9, 30),
-                ProformaID = "1,2,3",
+                ProformaID = new int?[] { 1, 2, 3 },
             });
 
             json.Properties().Select(p => p.Name).OrderBy(n => n).ShouldBe(new[] { "created", "discount", "due", "id", "proforma_id" });

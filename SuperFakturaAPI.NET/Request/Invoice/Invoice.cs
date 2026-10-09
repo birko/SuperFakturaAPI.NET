@@ -130,7 +130,8 @@ namespace Birko.SuperFaktura.Request.Invoice
         public string PaymentType { get; set; }
 
         [JsonProperty(PropertyName = "proforma_id", NullValueHandling = NullValueHandling.Ignore)]
-        public string ProformaID { get; set; }
+        [JsonConverter(typeof(Converters.CommaSeparatedIntArrayConverter))]
+        public int?[] ProformaID { get; set; }
 
         [JsonProperty(PropertyName = "rounding", NullValueHandling = NullValueHandling.Ignore)]
         public string RoundingType { get; set; }
