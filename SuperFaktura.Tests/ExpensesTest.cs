@@ -99,6 +99,42 @@ namespace SuperFaktura.Tests
         }
 
         [Fact]
+        public async Task TestListFiltersByMultipleStatuses()
+        {
+            // one unpaid and one fully paid expense sharing a unique name, found by search
+            var name = UniqueName("Status test");
+            var unpaid = await apiClient.Expenses.Add(new Birko.SuperFaktura.Request.Expense.Expense { Name = name + " unpaid", Currency = "EUR", Amount = 12 });
+            var paid = await apiClient.Expenses.Add(new Birko.SuperFaktura.Request.Expense.Expense { Name = name + " paid", Currency = "EUR", Amount = 12 });
+            try
+            {
+                await apiClient.Expenses.AddPayment(new Birko.SuperFaktura.Request.Expense.Payment
+                {
+                    ExpenseID = paid.Expense.ID.Value,
+                    Currency = "EUR",
+                    Amount = (await apiClient.Expenses.View(paid.Expense.ID.Value)).Expense.Total,
+                });
+
+                async Task<int[]> ListIds(params int[] statuses)
+                {
+                    var list = await apiClient.Expenses.List(new Birko.SuperFaktura.Request.Expense.Filter { Search = name, Status = statuses });
+                    return (list?.Items ?? Enumerable.Empty<Birko.SuperFaktura.Response.Expense.Detail>())
+                        .Select(x => x.Expense.ID.Value).OrderBy(x => x).ToArray();
+                }
+
+                var both = new[] { unpaid.Expense.ID.Value, paid.Expense.ID.Value }.OrderBy(x => x).ToArray();
+                (await ListIds(Birko.SuperFaktura.Request.ValueLists.ExpenseStatus.New, Birko.SuperFaktura.Request.ValueLists.ExpenseStatus.Paid))
+                    .ShouldBe(both);
+                (await ListIds(Birko.SuperFaktura.Request.ValueLists.ExpenseStatus.New)).ShouldBe(new[] { unpaid.Expense.ID.Value });
+                (await ListIds(Birko.SuperFaktura.Request.ValueLists.ExpenseStatus.Paid)).ShouldBe(new[] { paid.Expense.ID.Value });
+            }
+            finally
+            {
+                await apiClient.Expenses.Delete(unpaid.Expense.ID.Value);
+                await apiClient.Expenses.Delete(paid.Expense.ID.Value);
+            }
+        }
+
+        [Fact]
         public async Task TestAddPayment()
         {
             var added = await AddTestExpense();

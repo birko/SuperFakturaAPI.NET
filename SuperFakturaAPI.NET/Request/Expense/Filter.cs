@@ -44,8 +44,9 @@ namespace Birko.SuperFaktura.Request.Expense
         public DateTime? DueTo { get; set; } = null;
         [JsonProperty(PropertyName = "payment_type")]
         public string PaymentType { get; set; }
+        // ValueLists.ExpenseStatus
         [JsonProperty(PropertyName = "status")]
-        public string Status { get; set; }
+        public int[] Status { get; set; }
         [JsonProperty(PropertyName = "type")]
         public string Type { get; set; }
 
@@ -127,9 +128,10 @@ namespace Birko.SuperFaktura.Request.Expense
             {
                 paramString += "/payment_type:" + PaymentType;
             }
-            if (!string.IsNullOrEmpty(Status))
+            var status = JoinValues(Status);
+            if (status != null)
             {
-                paramString += "/status:" + Status;
+                paramString += "/status:" + status;
             }
             if (!string.IsNullOrEmpty(Type))
             {

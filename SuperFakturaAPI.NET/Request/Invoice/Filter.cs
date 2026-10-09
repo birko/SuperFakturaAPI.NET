@@ -35,11 +35,13 @@ namespace Birko.SuperFaktura.Request.Invoice
         public DateTime? DeliveryTo { get; set; } = null;
 
         //Delivery const
+        // Single value only: the docs allow "mail|courier", but the sandbox then returns nothing (even for "mail|mail").
         [JsonProperty(PropertyName = "delivery_type")]
         public string DeliveryType { get; set; }
 
+        // Invoice IDs to leave out of the list.
         [JsonProperty(PropertyName = "ignore")]
-        public string Ignore { get; set; }
+        public int[] Ignore { get; set; }
 
         [JsonProperty(PropertyName = "invoice_no_formatted")]
         public string InvoiceNumberFormatted { get; set; }
@@ -78,7 +80,7 @@ namespace Birko.SuperFaktura.Request.Invoice
 
         //Invoce.Paymenty const
         [JsonProperty(PropertyName = "payment_type")]
-        public string PaymentType { get; set; }
+        public string[] PaymentType { get; set; }
 
         //Invoce.status const
         [JsonProperty(PropertyName = "status")]
@@ -88,7 +90,7 @@ namespace Birko.SuperFaktura.Request.Invoice
         public int? Tag { get; set; } = null;
 
         [JsonProperty(PropertyName = "type")]
-        public string Type { get; set; }
+        public string[] Type { get; set; }
 
         [JsonProperty(PropertyName = "variable")]
         public string Variable { get; set; }
@@ -114,17 +116,19 @@ namespace Birko.SuperFaktura.Request.Invoice
             {
                 paramString += "/paid_to:" + PaidTo.Value.ToString("yyyy-MM-dd");
             }
-            if (!string.IsNullOrEmpty(Type))
+            var type = JoinValues(Type);
+            if (type != null)
             {
-                paramString += "/type:" + Type;
+                paramString += "/type:" + type;
             }
             if (!string.IsNullOrEmpty(DeliveryType))
             {
                 paramString += "/delivery_type:" + DeliveryType;
             }
-            if (!string.IsNullOrEmpty(PaymentType))
+            var paymentType = JoinValues(PaymentType);
+            if (paymentType != null)
             {
-                paramString += "/payment_type:" + PaymentType;
+                paramString += "/payment_type:" + paymentType;
             }
             if (Status.HasValue)
             {
@@ -142,9 +146,10 @@ namespace Birko.SuperFaktura.Request.Invoice
             {
                 paramString += "/amount_to:" + AmountTo.Value.ToString(CultureInfo.InvariantCulture);
             }
-            if (!string.IsNullOrEmpty(Ignore))
+            var ignore = JoinValues(Ignore);
+            if (ignore != null)
             {
-                paramString += "/ignore:" + Ignore;
+                paramString += "/ignore:" + ignore;
             }
             if (!string.IsNullOrEmpty(OrderNumber))
             {

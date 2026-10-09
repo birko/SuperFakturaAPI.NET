@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Birko.SuperFaktura.Request
@@ -31,6 +33,13 @@ namespace Birko.SuperFaktura.Request
                 paramString += "/sort:" + Sort;
             }
             return paramString;
+        }
+
+        // Filters taking several values expect them separated by a pipe, e.g. /type:regular|proforma.
+        protected static string JoinValues<T>(IEnumerable<T> values)
+        {
+            var parts = values?.Select(v => v?.ToString()).Where(v => !string.IsNullOrEmpty(v)).ToArray();
+            return parts == null || parts.Length == 0 ? null : string.Join("|", parts);
         }
     }
 

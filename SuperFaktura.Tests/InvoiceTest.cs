@@ -32,7 +32,7 @@ namespace SuperFaktura.Tests
                 {
                     Page = page,
                     PerPage = 200,
-                    Type = String.Join("|", Birko.SuperFaktura.Request.ValueLists.InvoiceType.Types),
+                    Type = Birko.SuperFaktura.Request.ValueLists.InvoiceType.Types,
                 });
 #if DEBUG
                 Console.WriteLine($"Response Page: {invoices.Page}/{invoices.PageCount}");
@@ -40,6 +40,79 @@ namespace SuperFaktura.Tests
                 page++;
                 invoices.ShouldNotBe(null);
                 end = invoices.Page == invoices.PageCount;
+            }
+        }
+
+        [Fact]
+        public async Task TestListFiltersByMultipleValues()
+        {
+            // two invoices of one new client differing in type, payment type and delivery type;
+            // client_id keeps the results to this test's data
+            var first = await CreateTestInvoice("sf-test-multi");
+            var clientId = first.Invoice.ClientID.Value;
+            var second = await apiClient.Invoices.Add(
+                new Birko.SuperFaktura.Request.Invoice.Invoice
+                {
+                    Name = UniqueName("sf-test-multi"),
+                    InvoiceType = Birko.SuperFaktura.Request.ValueLists.InvoiceType.ProForma,
+                    PaymentType = Birko.SuperFaktura.Request.ValueLists.PaymentType.Cash,
+                    DeliveryType = Birko.SuperFaktura.Request.ValueLists.DeliveryType.Courier,
+                },
+                new Birko.SuperFaktura.Request.Client.Client { ID = clientId },
+                new[] { new Birko.SuperFaktura.Request.Invoice.Item { Name = "test item", Quantity = 1, UnitPrice = 10, Tax = 20 } });
+            try
+            {
+                await apiClient.Invoices.Edit(new Birko.SuperFaktura.Request.Invoice.Invoice
+                {
+                    ID = first.Invoice.ID,
+                    PaymentType = Birko.SuperFaktura.Request.ValueLists.PaymentType.BankTransfer,
+                    DeliveryType = Birko.SuperFaktura.Request.ValueLists.DeliveryType.Mail,
+                });
+                var firstId = first.Invoice.ID.Value;
+                var secondId = second.Invoice.ID.Value;
+                var bothTypes = new[] { Birko.SuperFaktura.Request.ValueLists.InvoiceType.Regular, Birko.SuperFaktura.Request.ValueLists.InvoiceType.ProForma };
+
+                async Task<int[]> ListIds(Birko.SuperFaktura.Request.Invoice.Filter filter)
+                {
+                    filter.ClientId = clientId;
+                    filter.PerPage = 200;
+                    var list = await apiClient.Invoices.List(filter);
+                    return (list?.Items ?? Enumerable.Empty<Birko.SuperFaktura.Response.Invoice.Detail>())
+                        .Select(x => x.Invoice.ID.Value).OrderBy(x => x).ToArray();
+                }
+
+                (await ListIds(new Birko.SuperFaktura.Request.Invoice.Filter { Type = bothTypes }))
+                    .ShouldBe(new[] { firstId, secondId });
+                (await ListIds(new Birko.SuperFaktura.Request.Invoice.Filter { Type = new[] { Birko.SuperFaktura.Request.ValueLists.InvoiceType.ProForma } }))
+                    .ShouldBe(new[] { secondId });
+
+                (await ListIds(new Birko.SuperFaktura.Request.Invoice.Filter
+                {
+                    Type = bothTypes,
+                    PaymentType = new[] { Birko.SuperFaktura.Request.ValueLists.PaymentType.BankTransfer, Birko.SuperFaktura.Request.ValueLists.PaymentType.Cash },
+                })).ShouldBe(new[] { firstId, secondId });
+                (await ListIds(new Birko.SuperFaktura.Request.Invoice.Filter
+                {
+                    Type = bothTypes,
+                    PaymentType = new[] { Birko.SuperFaktura.Request.ValueLists.PaymentType.Cash },
+                })).ShouldBe(new[] { secondId });
+
+                // delivery_type takes a single value only (see Filter.DeliveryType)
+                (await ListIds(new Birko.SuperFaktura.Request.Invoice.Filter
+                {
+                    Type = bothTypes,
+                    DeliveryType = Birko.SuperFaktura.Request.ValueLists.DeliveryType.Mail,
+                })).ShouldBe(new[] { firstId });
+
+                (await ListIds(new Birko.SuperFaktura.Request.Invoice.Filter { Type = bothTypes, Ignore = new[] { firstId } }))
+                    .ShouldBe(new[] { secondId });
+                (await ListIds(new Birko.SuperFaktura.Request.Invoice.Filter { Type = bothTypes, Ignore = new[] { firstId, secondId } }))
+                    .ShouldBeEmpty();
+            }
+            finally
+            {
+                await apiClient.Invoices.Delete(second.Invoice.ID.Value);
+                await DeleteTestInvoice(first);
             }
         }
 

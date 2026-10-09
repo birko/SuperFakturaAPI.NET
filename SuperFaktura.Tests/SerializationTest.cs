@@ -885,6 +885,29 @@ namespace SuperFaktura.Tests
         }
 
         [Fact]
+        public void FiltersSendMultipleValuesSeparatedByPipe()
+        {
+            // invoice.md list: type, ignore, payment_type "Use | as separator for multiple values"
+            // (delivery_type too per the docs, but the sandbox accepts a single value only)
+            var parameters = new Birko.SuperFaktura.Request.Invoice.Filter
+            {
+                Type = new[] { "regular", "proforma" },
+                Ignore = new[] { 1, 2 },
+                PaymentType = new[] { "transfer", "cash" },
+            }.ToParameters();
+
+            parameters.ShouldContain("/type:regular|proforma");
+            parameters.ShouldContain("/ignore:1|2");
+            parameters.ShouldContain("/payment_type:transfer|cash");
+            var empty = new Birko.SuperFaktura.Request.Invoice.Filter { Type = new string[0], Ignore = new int[0] }.ToParameters();
+            empty.ShouldNotContain("/type:");
+            empty.ShouldNotContain("/ignore:");
+
+            // expenses.md list: status "use pipe (|) to add various statuses (e.g. 1|2)"
+            new Birko.SuperFaktura.Request.Expense.Filter { Status = new[] { 1, 2 } }.ToParameters().ShouldContain("/status:1|2");
+        }
+
+        [Fact]
         public void InvalidJsonResponseThrowsParseException()
         {
             Should.Throw<Birko.SuperFaktura.Exceptions.ParseException>(() =>
