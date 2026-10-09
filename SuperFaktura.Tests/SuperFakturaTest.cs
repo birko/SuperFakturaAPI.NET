@@ -38,8 +38,13 @@ namespace SuperFaktura.Tests
                 // full address: sending by post fails with "Address data error" (6) without it
                 new Birko.SuperFaktura.Request.Client.Client
                 {
-                    Name = UniqueName(prefix + "-client"), Phone = "+421900000000", Email = "recipient@example.com",
-                    Address = "Hlavná 1", City = "Bratislava", ZIP = "81101", CountryID = 191,
+                    Name = UniqueName(prefix + "-client"),
+                    Phone = "+421900000000",
+                    Email = "recipient@example.com",
+                    Address = "Hlavná 1",
+                    City = "Bratislava",
+                    ZIP = "81101",
+                    CountryID = 191,
                 },
                 new[] { new Birko.SuperFaktura.Request.Invoice.Item { Name = "test item", Quantity = 1, UnitPrice = 10, Tax = 20 } });
         }

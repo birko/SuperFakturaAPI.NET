@@ -2,13 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace SuperFaktura.Tests
 {
-    public class InvoceTests: SuperFakturaTest
+    public class InvoceTests : SuperFakturaTest
     {
 
         [Fact]
@@ -759,10 +758,11 @@ namespace SuperFaktura.Tests
             var detail = await CreateTestInvoice();
             try
             {
-                var task = await apiClient.Invoices.MarkAsSentViaMail(new Birko.SuperFaktura.Request.Invoice.MarkEmail() {
-                    InvoiceID  = detail.Invoice.ID.Value,
+                var task = await apiClient.Invoices.MarkAsSentViaMail(new Birko.SuperFaktura.Request.Invoice.MarkEmail()
+                {
+                    InvoiceID = detail.Invoice.ID.Value,
                     EmailAddres = "marked@example.com",
-                    Message= "test",
+                    Message = "test",
                     Subject = "test",
                 });
                 task.ShouldNotBeNull();
@@ -780,7 +780,8 @@ namespace SuperFaktura.Tests
             try
             {
                 // error 7: "No post stamps left." - the sandbox account has no post stamp credit
-                var task = await AllowSandboxLimit(() => apiClient.Invoices.SendPost(new Birko.SuperFaktura.Request.Invoice.Post() {
+                var task = await AllowSandboxLimit(() => apiClient.Invoices.SendPost(new Birko.SuperFaktura.Request.Invoice.Post()
+                {
                     InvoiceID = detail.Invoice.ID.Value,
                 }), 7);
                 task?.Invoice.ID.ShouldBe(detail.Invoice.ID);
@@ -836,7 +837,8 @@ namespace SuperFaktura.Tests
             var detail = await CreateTestInvoice();
             try
             {
-                var task = await apiClient.Invoices.AddPayment(new Birko.SuperFaktura.Request.Invoice.Payment() {
+                var task = await apiClient.Invoices.AddPayment(new Birko.SuperFaktura.Request.Invoice.Payment()
+                {
                     InvoiceID = detail.Invoice.ID.Value,
                     Amount = 0.5m,
                 });
@@ -884,8 +886,9 @@ namespace SuperFaktura.Tests
             var expense = await AddTestExpense();
             try
             {
-                var task = await apiClient.Invoices.AddRelatedItem(new Birko.SuperFaktura.Request.RelatedItem() {
-                    ParentID =  invoice.Invoice.ID.Value,
+                var task = await apiClient.Invoices.AddRelatedItem(new Birko.SuperFaktura.Request.RelatedItem()
+                {
+                    ParentID = invoice.Invoice.ID.Value,
                     ParentType = Birko.SuperFaktura.Request.ValueLists.DocumentType.Invoice,
                     ChildID = expense.Expense.ID.Value,
                     ChildType = Birko.SuperFaktura.Request.ValueLists.DocumentType.Expense
@@ -907,8 +910,9 @@ namespace SuperFaktura.Tests
             var expense = await AddTestExpense();
             try
             {
-                await apiClient.Invoices.AddRelatedItem(new Birko.SuperFaktura.Request.RelatedItem() {
-                    ParentID =  invoice.Invoice.ID.Value,
+                await apiClient.Invoices.AddRelatedItem(new Birko.SuperFaktura.Request.RelatedItem()
+                {
+                    ParentID = invoice.Invoice.ID.Value,
                     ParentType = Birko.SuperFaktura.Request.ValueLists.DocumentType.Invoice,
                     ChildID = expense.Expense.ID.Value,
                     ChildType = Birko.SuperFaktura.Request.ValueLists.DocumentType.Expense
