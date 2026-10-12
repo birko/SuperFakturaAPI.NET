@@ -1,0 +1,56 @@
+{
+  "itemCount": 6,
+  "pageCount": 1,
+  "perPage": 100,
+  "page": 1,
+  "items": [
+    {
+      "Invoice": { "id": "53466660", "type": "proforma", "name": "Zálohová faktúra 920261141", "due": "2026-10-17", "created": "2026-10-10 00:00:00" },
+      "InvoiceEmail": []
+    },
+    {
+      "Invoice": { "id": "53458874", "type": "regular", "name": "Faktúra 20263442", "recurring": "monthly", "due": "2026-10-17", "created": "2026-10-10 00:00:00" },
+      "InvoiceEmail": [
+        {
+          "id": "30955484", "user_id": "20819", "user_profile_id": "8525", "invoice_id": "53458874",
+          "type": "regular", "email": "billing@example.sk", "phone": null,
+          "email_cc": "[]", "email_bcc": "[\"a@example.sk\",\"b@example.sk\"]",
+          "subject": "Faktúra 20263442", "message": "Dobrý deň, ...",
+          "due": "-7", "created": "2026-10-10 09:18:24"
+        }
+      ]
+    },
+    {
+      "Invoice": { "id": "53377264", "type": "proforma", "name": "Zálohová faktúra 920261125", "due": "2026-10-14", "created": "2026-10-07 00:00:00" },
+      "InvoiceEmail": [
+        {
+          "id": "30912603", "user_id": "14198", "user_profile_id": "8525", "invoice_id": "53377264",
+          "type": "manual", "email": "", "phone": null, "email_cc": "", "email_bcc": "",
+          "subject": "", "message": "", "due": null, "created": "2026-10-07 07:28:11"
+        }
+      ]
+    },
+    {
+      "Invoice": { "id": "90000001", "type": "regular", "name": "Synthetic – due zero", "due": "2026-10-20", "created": "2026-10-06 00:00:00" },
+      "InvoiceEmail": [
+        { "id": "90000101", "invoice_id": "90000001", "type": "regular", "email": "x@example.sk", "due": "0", "created": "2026-10-06 10:00:00" }
+      ]
+    },
+    {
+      "Invoice": { "id": "90000002", "type": "regular", "name": "Synthetic – due positive, numeric token, missing key", "due": "2026-10-20", "created": "2026-10-06 00:00:00" },
+      "InvoiceEmail": [
+        { "id": "90000102", "invoice_id": "90000002", "type": "regular", "email": "x@example.sk", "due": "14", "created": "2026-10-06 10:00:00" },
+        { "id": "90000103", "invoice_id": "90000002", "type": "regular", "email": "x@example.sk", "due": -3, "created": "2026-10-06 10:00:00" },
+        { "id": "90000104", "invoice_id": "90000002", "type": "regular", "email": "x@example.sk", "created": "2026-10-06 10:00:00" }
+      ]
+    },
+    {
+      "Invoice": { "id": "90000003", "type": "regular", "name": "Synthetic – due as date / empty string", "due": "2026-10-20", "created": "2026-10-06 00:00:00" },
+      "InvoiceEmail": [
+        { "id": "90000105", "invoice_id": "90000003", "type": "regular", "email": "x@example.sk", "due": "2026-10-13", "created": "2026-10-06 10:00:00" },
+        { "id": "90000106", "invoice_id": "90000003", "type": "regular", "email": "x@example.sk", "due": "", "created": "2026-10-06 10:00:00" }
+      ]
+    }
+  ],
+  "filtered": true
+}

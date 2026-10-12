@@ -25,6 +25,9 @@
     <None Update="Properties\launchSettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="TestData\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <Import Project="..\SuperFakturaAPI.NET\SuperFakturaAPI.NET.projitems" Label="Shared" />

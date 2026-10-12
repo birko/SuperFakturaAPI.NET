@@ -11,8 +11,10 @@ namespace Birko.SuperFaktura.Response.Invoice
         [JsonProperty(PropertyName = "email_bcc", NullValueHandling = NullValueHandling.Ignore)]
         public string EmailBCC { get; set; }
 
+        // Day offset as a string (e.g. "-7"), not a date.
         [JsonProperty(PropertyName = "due", NullValueHandling = NullValueHandling.Ignore)]
-        public DateTime? Due { get; set; }
+        [JsonConverter(typeof(Converters.StringIntConverter))]
+        public int? Due { get; set; }
 
         [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
         public int? ID { get; set; }

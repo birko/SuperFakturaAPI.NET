@@ -720,6 +720,45 @@ namespace SuperFaktura.Tests
             detail.SignatureRaw.DeleteFlag.ShouldBeNull();
         }
 
+        // invoices/index.json from production: InvoiceEmail.due is a day offset ("-7"), not a date
+        private static Birko.SuperFaktura.Response.Invoice.PagedResponse DeserializeInvoiceEmailDueFixture()
+        {
+            var json = System.IO.File.ReadAllText(System.IO.Path.Combine(System.AppContext.BaseDirectory, "TestData", "superfaktura-invoice-email-due.json"));
+            return new Birko.SuperFaktura.SuperFakturaSandbox("test@example.sk", "key").DeserializeResult<Birko.SuperFaktura.Response.Invoice.PagedResponse>(json);
+        }
+
+        [Fact]
+        public void InvoiceListWithEmailDueOffsetDeserializes()
+        {
+            DeserializeInvoiceEmailDueFixture().Items.Count().ShouldBe(6);
+        }
+
+        [Fact]
+        public void InvoiceEmailDueOffsetOfRecurringInvoice()
+        {
+            var email = DeserializeInvoiceEmailDueFixture().Items.Single(x => x.Invoice.ID == 53458874).InvoiceEmail.First();
+
+            email.Due.ShouldBe(-7);
+            email.Created.ShouldBe(new System.DateTime(2026, 10, 10, 9, 18, 24));
+        }
+
+        [Theory]
+        [InlineData("\"-7\"", -7)]
+        [InlineData("\"0\"", 0)]
+        [InlineData("\"14\"", 14)]
+        [InlineData("-3", -3)]
+        [InlineData("null", null)]
+        [InlineData(null, null)]
+        [InlineData("\"\"", null)]
+        [InlineData("\"2026-10-13\"", null)]
+        public void InvoiceEmailDueReadsDayOffset(string due, int? expected)
+        {
+            // due == null: the key is missing
+            var json = due == null ? "{\"id\":\"1\"}" : "{\"id\":\"1\",\"due\":" + due + "}";
+
+            JsonConvert.DeserializeObject<Birko.SuperFaktura.Response.Invoice.Email>(json).Due.ShouldBe(expected);
+        }
+
         [Fact]
         public void PagedResponseReadsFiltered()
         {
