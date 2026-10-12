@@ -759,6 +759,37 @@ namespace SuperFaktura.Tests
             JsonConvert.DeserializeObject<Birko.SuperFaktura.Response.Invoice.Email>(json).Due.ShouldBe(expected);
         }
 
+        private class DueAsDate
+        {
+            [JsonProperty(PropertyName = "due")]
+            public System.DateTime? Due { get; set; }
+
+            [JsonProperty(PropertyName = "due_converted")]
+            [JsonConverter(typeof(Birko.SuperFaktura.Converters.DateConverter))]
+            public System.DateTime? DueConverted { get; set; }
+        }
+
+        [Fact]
+        public void ModelCoverageFindsValuesNotFittingTheType()
+        {
+            var result = ModelCoverage.Compare(JObject.Parse("{\"due\":\"-7\",\"due_converted\":\"-7\"}"), typeof(DueAsDate));
+
+            result.Mismatched.Count.ShouldBe(2);
+            result.Mismatched[0].ShouldStartWith("due = \"-7\" -> DateTime?: Could not convert string to DateTime");
+            result.Mismatched[1].ShouldBe("due_converted = \"-7\" -> DateTime?: read as null");
+            ModelCoverage.Compare(JObject.Parse("{\"due\":null,\"due_converted\":\"\"}"), typeof(DueAsDate)).Mismatched.ShouldBeEmpty();
+        }
+
+        [Fact]
+        public void InvoiceEmailDueFixtureFitsTheModel()
+        {
+            var json = JObject.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(System.AppContext.BaseDirectory, "TestData", "superfaktura-invoice-email-due.json")));
+
+            // "2026-10-13" is not a day offset; the model reads it as null
+            ModelCoverage.Compare(json, typeof(Birko.SuperFaktura.Response.Invoice.PagedResponse)).Mismatched
+                .ShouldBe(new[] { "items[].InvoiceEmail[].due = \"2026-10-13\" -> Int32?: read as null" });
+        }
+
         [Fact]
         public void PagedResponseReadsFiltered()
         {
