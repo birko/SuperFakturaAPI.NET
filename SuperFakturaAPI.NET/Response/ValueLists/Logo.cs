@@ -54,5 +54,8 @@ namespace Birko.SuperFaktura.Response.ValueLists
 
         [JsonProperty(PropertyName = "url", NullValueHandling = NullValueHandling.Ignore)]
         public string URL { get; set; }
+
+        [JsonProperty(PropertyName = "mobile_path", NullValueHandling = NullValueHandling.Ignore)]
+        public string MobilePath { get; set; }
     }
 }

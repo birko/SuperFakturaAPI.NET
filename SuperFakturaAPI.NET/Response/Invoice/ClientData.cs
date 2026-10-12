@@ -162,5 +162,13 @@ namespace Birko.SuperFaktura.Response.Invoice
         [JsonProperty(PropertyName = "update_addressbook", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.StringBooleanConverter))]
         public bool? UpdateAddressBook { get; set; }
+
+        [JsonProperty(PropertyName = "updateClient", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.StringBooleanConverter))]
+        public bool? UpdateClient { get; set; }
+
+        [JsonProperty(PropertyName = "save_contact_from_document", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.StringBooleanConverter))]
+        public bool? SaveContactFromDocument { get; set; }
     }
 }

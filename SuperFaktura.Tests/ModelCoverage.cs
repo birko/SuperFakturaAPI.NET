@@ -80,7 +80,13 @@ namespace SuperFaktura.Tests
                 else
                 {
                     CheckType(property.Value, match, path + property.Name, result);
-                    Compare(property.Value, match.PropertyType, path + property.Name + ".", result);
+                    var value = property.Value;
+                    // InvoiceTagConverter unwraps [{"Tag":{...}}] into the tag objects
+                    if (match.Converter is Birko.SuperFaktura.Converters.InvoiceTagConverter && value is JArray tags)
+                    {
+                        value = new JArray(tags.Select(tag => tag["Tag"] is JObject inner ? inner : tag));
+                    }
+                    Compare(value, match.PropertyType, path + property.Name + ".", result);
                 }
             }
             foreach (var property in contract.Properties.Where(p => !p.Ignored && p.Readable))

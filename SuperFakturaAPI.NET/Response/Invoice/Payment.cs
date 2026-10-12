@@ -19,6 +19,20 @@ namespace Birko.SuperFaktura.Response.Invoice
 
         [JsonProperty(PropertyName = "exchange_rate", NullValueHandling = NullValueHandling.Ignore)]
         public decimal ExchangeRate { get; set; }
+        [JsonProperty(PropertyName = "country_exchange_rate", NullValueHandling = NullValueHandling.Ignore)]
+        public decimal? CountryExchangeRate { get; set; }
+        [JsonProperty(PropertyName = "income_with_vat", NullValueHandling = NullValueHandling.Ignore)]
+        public decimal? IncomeWithVAT { get; set; }
+        [JsonProperty(PropertyName = "income_without_vat", NullValueHandling = NullValueHandling.Ignore)]
+        public decimal? IncomeWithoutVAT { get; set; }
+        [JsonProperty(PropertyName = "income_with_vat_home", NullValueHandling = NullValueHandling.Ignore)]
+        public decimal? IncomeWithVATHome { get; set; }
+        [JsonProperty(PropertyName = "income_without_vat_home", NullValueHandling = NullValueHandling.Ignore)]
+        public decimal? IncomeWithoutVATHome { get; set; }
+        // Payment date without time
+        [JsonProperty(PropertyName = "created_date", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(Converters.DateConverter))]
+        public DateTime? CreatedDate { get; set; }
 
         [JsonProperty(PropertyName = "home_currency", NullValueHandling = NullValueHandling.Ignore)]
         public string HomeCurrency { get; set; }

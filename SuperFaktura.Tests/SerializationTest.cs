@@ -791,6 +791,60 @@ namespace SuperFaktura.Tests
         }
 
         [Fact]
+        public void InvoiceDetailReadsUndocumentedFieldsFromProduction()
+        {
+            // Values as returned by production invoices/index.json
+            var detail = JsonConvert.DeserializeObject<Birko.SuperFaktura.Response.Invoice.Detail>(
+                "{\"InvoicePayment\":[{\"country_exchange_rate\":\"24.40300000000000\",\"income_with_vat\":\"430.50\",\"income_without_vat\":\"350.00\",\"income_with_vat_home\":\"430.50\",\"income_without_vat_home\":\"350.00\",\"created_date\":\"2026-10-01\"}]," +
+                "\"InvoiceExtra\":{\"recurring_start_email_process\":\"2026-10-10 09:25\",\"recurring_start_post_process\":\"2026-10-10 09:20\"}," +
+                "\"InvoiceSetting\":{\"show_summary\":true,\"force_paid\":true,\"add_proforma_item\":\"\",\"payme\":\"0\"}," +
+                "\"ClientData\":{\"updateClient\":\"0\",\"save_contact_from_document\":\"1\"}," +
+                "\"MyData\":{\"user_profile_id\":\"\",\"logo_id\":\"24636\",\"logo_key\":\"\",\"web\":\"www.example.sk\",\"travel_agencies\":\"0\"," +
+                "\"BankAccount\":[{\"id\":\"1\",\"user_id\":\"54488\",\"user_profile_id\":\"8525\",\"created\":\"2014-02-04 20:42:50\",\"modified\":\"2026-05-21 14:01:38\"}]}," +
+                "\"PostStamp\":[{\"post_stamp_package_id\":\"2961\"}]}");
+
+            var payment = detail.InvoicePayment.Single();
+            payment.CountryExchangeRate.ShouldBe(24.403m);
+            payment.IncomeWithVAT.ShouldBe(430.50m);
+            payment.IncomeWithoutVATHome.ShouldBe(350m);
+            payment.CreatedDate.ShouldBe(new System.DateTime(2026, 10, 1));
+            detail.InvoiceExtra.RecurringStartEmailProcess.ShouldBe(new System.DateTime(2026, 10, 10, 9, 25, 0));
+            detail.InvoiceSetting.ShowSummary.ShouldBe(true);
+            detail.InvoiceSetting.ForcePaid.ShouldBe(true);
+            detail.InvoiceSetting.PayMe.ShouldBe(false);
+            detail.ClientData.UpdateClient.ShouldBe(false);
+            detail.ClientData.SaveContactFromDocument.ShouldBe(true);
+            detail.MyData.UserProfileID.ShouldBeNull();
+            detail.MyData.LogoID.ShouldBe(24636);
+            detail.MyData.Web.ShouldBe("www.example.sk");
+            detail.MyData.TravelAgencies.ShouldBe(false);
+            var account = detail.MyData.BankAccount.Single();
+            account.UserID.ShouldBe(54488);
+            account.UserProfileID.ShouldBe(8525);
+            account.Created.ShouldBe(new System.DateTime(2014, 2, 4, 20, 42, 50));
+            detail.PostStamp.Single().PostStampPackageID.ShouldBe(2961);
+        }
+
+        [Fact]
+        public void ExpensePaymentReadsUndocumentedFieldsFromProduction()
+        {
+            var payment = JsonConvert.DeserializeObject<Birko.SuperFaktura.Response.Expense.Payment>(
+                "{\"user_id\":\"14198\",\"user_profile_id\":\"8525\",\"force_paid\":\"0\",\"amount_home\":\"204.0000\",\"amount_country_home\":\"204.0000\",\"amount_expense\":\"203.8780\"," +
+                "\"vat\":\"46.9200\",\"total\":\"250.9200\",\"total_home\":\"250.9200\",\"total_country_home\":\"250.9200\",\"total_expense\":\"250.7700\"," +
+                "\"country_exchange_rate\":\"1.00000000000000\",\"expense_exchange_rate\":\"1.00000000000000\",\"document_no\":\"\"}");
+
+            payment.UserID.ShouldBe(14198);
+            payment.ForcePaid.ShouldBe(false);
+            payment.AmountHome.ShouldBe(204m);
+            payment.AmountExpense.ShouldBe(203.878m);
+            payment.VAT.ShouldBe(46.92m);
+            payment.Total.ShouldBe(250.92m);
+            payment.TotalExpense.ShouldBe(250.77m);
+            payment.ExpenseExchangeRate.ShouldBe(1m);
+            payment.DocumentNo.ShouldBe("");
+        }
+
+        [Fact]
         public void PagedResponseReadsFiltered()
         {
             JsonConvert.DeserializeObject<Birko.SuperFaktura.Response.Invoice.PagedResponse>("{\"itemCount\":0,\"items\":[],\"filtered\":true}")

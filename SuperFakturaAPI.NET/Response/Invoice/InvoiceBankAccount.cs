@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using System;
 
 namespace Birko.SuperFaktura.Response.Invoice
 {
@@ -14,5 +15,18 @@ namespace Birko.SuperFaktura.Response.Invoice
         [JsonProperty(PropertyName = "show_account", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(Converters.StringBooleanConverter))]
         public bool? ShowAccount { get; set; }
+
+        // Copied from the profile account; missing on accounts sent in bank_accounts without an id.
+        [JsonProperty(PropertyName = "user_id", NullValueHandling = NullValueHandling.Ignore)]
+        public int? UserID { get; set; }
+
+        [JsonProperty(PropertyName = "user_profile_id", NullValueHandling = NullValueHandling.Ignore)]
+        public int? UserProfileID { get; set; }
+
+        [JsonProperty(PropertyName = "created", NullValueHandling = NullValueHandling.Ignore)]
+        public DateTime? Created { get; set; }
+
+        [JsonProperty(PropertyName = "modified", NullValueHandling = NullValueHandling.Ignore)]
+        public DateTime? Modified { get; set; }
     }
 }

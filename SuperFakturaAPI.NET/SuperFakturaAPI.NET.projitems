@@ -127,6 +127,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\ClientData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\Detail.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\Email.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\InvoiceExtraResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\Invoice.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\Item.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\MyData.cs" />

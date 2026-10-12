@@ -48,7 +48,7 @@ namespace Birko.SuperFaktura.Response.Invoice
         public IEnumerable<Email> InvoiceEmail { get; set; } = null;
 
         [JsonProperty(PropertyName = "InvoiceExtra", NullValueHandling = NullValueHandling.Ignore)]
-        public Request.Invoice.Extra InvoiceExtra { get; set; } = null;
+        public InvoiceExtraResponse InvoiceExtra { get; set; } = null;
 
         [JsonProperty(PropertyName = "InvoicePayment", NullValueHandling = NullValueHandling.Ignore)]
         public IEnumerable<Payment> InvoicePayment { get; set; } = null;

@@ -18,6 +18,9 @@ namespace Birko.SuperFaktura.Response.Invoice
         [JsonProperty(PropertyName = "invoice_id", NullValueHandling = NullValueHandling.Ignore)]
         public int? InvoiceID { get; set; }
 
+        [JsonProperty(PropertyName = "post_stamp_package_id", NullValueHandling = NullValueHandling.Ignore)]
+        public int? PostStampPackageID { get; set; }
+
         [JsonProperty(PropertyName = "invoice_language", NullValueHandling = NullValueHandling.Ignore)]
         public string InvoiceLanguage { get; set; }
 
