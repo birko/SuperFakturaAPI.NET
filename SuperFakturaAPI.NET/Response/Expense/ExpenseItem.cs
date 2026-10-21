@@ -7,6 +7,14 @@ namespace Birko.SuperFaktura.Response.Expense
 {
     public class ExpenseItem : Request.Expense.ExpenseItem
     {
+        // Stored in the base property, so the detail is the same when the item is used as Request.Expense.ExpenseItem.
+        [JsonProperty(PropertyName = "AccountingDetail", NullValueHandling = NullValueHandling.Ignore)]
+        public new AccountingDetail AccountingDetail
+        {
+            get { return base.AccountingDetail as AccountingDetail; }
+            set { base.AccountingDetail = value; }
+        }
+
         [JsonProperty(PropertyName = "discount", NullValueHandling = NullValueHandling.Ignore)]
         public decimal Discount { get; set; }
 

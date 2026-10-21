@@ -541,6 +541,52 @@ namespace SuperFaktura.Tests
         }
 
         [Fact]
+        public void ExpenseItemAccountingDetailSerializesDocumentedFields()
+        {
+            var item = Serialize(new Birko.SuperFaktura.Request.Expense.ExpenseItem
+            {
+                AccountingDetail = new Birko.SuperFaktura.Request.Expense.AccountingDetail
+                {
+                    AnalyticsAccount = "analytics",
+                    Operation = "operation",
+                    Order = "order",
+                    Place = "place",
+                    PreConfidence = "preconfidence",
+                    SyntheticAccount = "synthetic",
+                    Type = "service",
+                },
+            });
+
+            item["AccountingDetail"]["analytics_account"].Value<string>().ShouldBe("analytics");
+            item["AccountingDetail"]["operation"].Value<string>().ShouldBe("operation");
+            item["AccountingDetail"]["order"].Value<string>().ShouldBe("order");
+            item["AccountingDetail"]["place"].Value<string>().ShouldBe("place");
+            item["AccountingDetail"]["preconfidence"].Value<string>().ShouldBe("preconfidence");
+            item["AccountingDetail"]["synthetic_account"].Value<string>().ShouldBe("synthetic");
+            item["AccountingDetail"]["type"].Value<string>().ShouldBe("service");
+            Serialize(new Birko.SuperFaktura.Request.Expense.AccountingDetail()).Properties().ShouldBeEmpty();
+        }
+
+        [Fact]
+        public void ExpenseItemAccountingDetailReadsResponseIds()
+        {
+            // shape returned by sandbox expenses/edit/{id}.json
+            var detail = JsonConvert.DeserializeObject<Birko.SuperFaktura.Response.Expense.Detail>(
+                "{\"ExpenseItem\":[{\"id\":\"10745\",\"AccountingDetail\":{\"id\":\"126969\",\"user_profile_id\":\"1731\",\"item_type\":\"expense\","
+                + "\"document_id\":\"4871\",\"document_item_id\":\"10745\",\"place\":\"PL1\",\"type\":\"service\",\"synthetic_account\":\"501\"}}]}");
+
+            var accounting = detail.ExpenseItem.Single().AccountingDetail;
+            accounting.ID.ShouldBe(126969);
+            accounting.UserProfileID.ShouldBe(1731);
+            accounting.ItemType.ShouldBe("expense");
+            accounting.DocumentID.ShouldBe(4871);
+            accounting.DocumentItemID.ShouldBe(10745);
+            accounting.Place.ShouldBe("PL1");
+            accounting.Type.ShouldBe(Birko.SuperFaktura.Request.ValueLists.AccountingDetailType.Service);
+            ((Birko.SuperFaktura.Request.Expense.ExpenseItem)detail.ExpenseItem.Single()).AccountingDetail.ShouldBeSameAs(accounting);
+        }
+
+        [Fact]
         public void ExpenseForEditSendsIdAndDocumentedFormats()
         {
             // expenses.md: id required for edit; dates YYYY-MM-DD; document_number is a string; already_paid int 0|1

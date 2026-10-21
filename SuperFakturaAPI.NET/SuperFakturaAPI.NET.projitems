@@ -39,6 +39,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Response\CashRegister\CashRegisterItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\CashRegister\CashRegisterItemResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Client\Stat.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\Expense\AccountingDetail.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Expense\Extra.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Expense\ExpenseBasicRate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Expense\ExpenseItem.cs" />
