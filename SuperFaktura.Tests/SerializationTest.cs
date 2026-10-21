@@ -541,6 +541,33 @@ namespace SuperFaktura.Tests
         }
 
         [Fact]
+        public void ExpenseItemAccountingDetailSerializesDocumentedFields()
+        {
+            var item = Serialize(new Birko.SuperFaktura.Request.Expense.ExpenseItem
+            {
+                AccountingDetail = new Birko.SuperFaktura.Request.Expense.AccountingDetail
+                {
+                    AnalyticsAccount = "analytics",
+                    Operation = "operation",
+                    Order = "order",
+                    Place = "place",
+                    PreConfidence = "preconfidence",
+                    SyntheticAccount = "synthetic",
+                    Type = "service",
+                },
+            });
+
+            item["AccountingDetail"]["analytics_account"].Value<string>().ShouldBe("analytics");
+            item["AccountingDetail"]["operation"].Value<string>().ShouldBe("operation");
+            item["AccountingDetail"]["order"].Value<string>().ShouldBe("order");
+            item["AccountingDetail"]["place"].Value<string>().ShouldBe("place");
+            item["AccountingDetail"]["preconfidence"].Value<string>().ShouldBe("preconfidence");
+            item["AccountingDetail"]["synthetic_account"].Value<string>().ShouldBe("synthetic");
+            item["AccountingDetail"]["type"].Value<string>().ShouldBe("service");
+            Serialize(new Birko.SuperFaktura.Request.Expense.AccountingDetail()).Properties().ShouldBeEmpty();
+        }
+
+        [Fact]
         public void ExpenseForEditSendsIdAndDocumentedFormats()
         {
             // expenses.md: id required for edit; dates YYYY-MM-DD; document_number is a string; already_paid int 0|1
