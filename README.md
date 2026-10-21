@@ -176,7 +176,7 @@ Class that wrappes lists API calls
 
 #### Constant Lists
 List are stored in `Birko.SuperFaktura.Request.ValueLists` namespace
-* **AccountingDetailType** - list of accounting types for invoices
+* **AccountingDetailType** - list of accounting types for invoice and expense items (`AccountingDetail.Type`)
 * **CashRegisterItemType** - cash register items filter types (in / out)
 * **DeliveryType** - list of deliveries types
 * **DocumentType** - list of document types for related items and logs
