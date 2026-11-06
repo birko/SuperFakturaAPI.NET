@@ -47,6 +47,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Response\Expense\Rate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\InvoiceBankAccount.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\Mark.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\PeppolSendResult.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\PeppolSendStatus.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\PeppolWebhookEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\PayInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Invoice\InvoiceSettingResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Response\Other\Accounts.cs" />
@@ -77,6 +80,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\Exception.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Expenses.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Invoices.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PeppolWebhook.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RateLimits.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Client\Client.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\ConctactPersons\ContactPresonData.cs" />
@@ -106,6 +110,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\MarkEmail.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\MyData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\Payment.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\PeppolSend.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\Post.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Invoice\InvoiceSetting.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Parameters.cs" />

@@ -140,7 +140,18 @@ namespace Birko.SuperFaktura
             }
 
             // "message" and "error_message" are either a string or an object (e.g. validation errors per field).
-            return new Exceptions.Exception(error, TokenToText(response["message"]), TokenToText(response["error_message"]), inner, url);
+            return new Exceptions.Exception(error, TokenToText(response["message"]), TokenToText(response["error_message"]), inner, url,
+                TokenToText(response["error_code"]), NonEmpty(response["data"]));
+        }
+
+        // Error bodies send an empty "data": [] when there is nothing to add.
+        private static JToken NonEmpty(JToken token)
+        {
+            if (token == null || token.Type == JTokenType.Null || (token is JContainer container && !container.HasValues))
+            {
+                return null;
+            }
+            return token;
         }
 
         private static string TokenToText(JToken token)
@@ -382,7 +393,18 @@ namespace Birko.SuperFaktura
             return await PostByte(uri, JsonConvert.SerializeObject(data), checkSum).ConfigureAwait(false);
         }
 
-        internal async Task<string> Patch(string uri, string data, string checkSum = null)
+        internal Task<string> Patch(string uri, string data, string checkSum = null)
+        {
+            return SendJson(new HttpMethod("PATCH"), uri, data, checkSum);
+        }
+
+        // Raw JSON body instead of the "data=" form field, for endpoints documented with Content-Type: application/json.
+        internal Task<string> PostJson(string uri, object data)
+        {
+            return SendJson(HttpMethod.Post, uri, JsonConvert.SerializeObject(data), null);
+        }
+
+        private async Task<string> SendJson(HttpMethod method, string uri, string data, string checkSum)
         {
             RequestDelay();
             var client = CreateClient();
@@ -391,7 +413,7 @@ namespace Birko.SuperFaktura
             {
                 IncreaseRequestCount(ProfileKey);
                 this.LastCheckSum = checkSum;
-                HttpRequestMessage request = new HttpRequestMessage(new HttpMethod("PATCH"), uri)
+                HttpRequestMessage request = new HttpRequestMessage(method, uri)
                 {
                     Content = new StringContent(data, Encoding.UTF8, "application/json")
                 };

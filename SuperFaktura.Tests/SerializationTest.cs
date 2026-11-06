@@ -1131,6 +1131,207 @@ namespace SuperFaktura.Tests
         }
 
         [Fact]
+        public void PeppolSendSendsOnlyInvoiceIdByDefault()
+        {
+            // invoice.md "Send invoice via Peppol": {"invoice_id":50103893}
+            var json = Serialize(new Birko.SuperFaktura.Request.Invoice.PeppolSend { InvoiceID = 50103893 });
+
+            json.Properties().Select(p => p.Name).ShouldBe(new[] { "invoice_id" });
+            json["invoice_id"].Value<int>().ShouldBe(50103893);
+        }
+
+        [Fact]
+        public void PeppolSendSendsWebhookWhenSet()
+        {
+            var json = Serialize(new Birko.SuperFaktura.Request.Invoice.PeppolSend
+            {
+                InvoiceID = 50103893,
+                WebhookUrl = "https://client.example/webhooks/peppol",
+                WebhookSecret = "YOUR_WEBHOOK_SECRET",
+            });
+
+            json["webhook_url"].Value<string>().ShouldBe("https://client.example/webhooks/peppol");
+            json["webhook_secret"].Value<string>().ShouldBe("YOUR_WEBHOOK_SECRET");
+        }
+
+        [Fact]
+        public void PeppolSendResponseDeserializes()
+        {
+            // invoice.md "Send invoice via Peppol" response (HTTP 202)
+            var response = JsonConvert.DeserializeObject<Birko.SuperFaktura.Response.Response<Birko.SuperFaktura.Response.Invoice.PeppolSendResult>>(
+                "{\"error\":0,\"error_message\":\"\",\"data\":{\"invoice_id\":50103893,\"operation_id\":\"018f4471-67f8-7c12-a3b4-123456789abc\",\"status\":\"queued\"}}");
+
+            response.Data.InvoiceID.ShouldBe(50103893);
+            response.Data.OperationID.ShouldBe("018f4471-67f8-7c12-a3b4-123456789abc");
+            response.Data.Status.ShouldBe(Birko.SuperFaktura.Request.ValueLists.PeppolStatus.Queued);
+        }
+
+        [Fact]
+        public void PeppolStatusResponseDeserializes()
+        {
+            // invoice.md "Get Peppol sending status" response
+            var response = JsonConvert.DeserializeObject<Birko.SuperFaktura.Response.Response<Birko.SuperFaktura.Response.Invoice.PeppolSendStatus>>(
+                "{\"error\":0,\"error_message\":\"\",\"data\":{\"invoice_id\":50103893,\"operation_id\":\"018f4471-67f8-7c12-a3b4-123456789abc\",\"status\":\"accepted\","
+                + "\"outbound_document_id\":501,\"provider_document_id\":\"flowis-document-1\",\"provider_status\":\"accepted\",\"failure_code\":null,"
+                + "\"created_at\":\"2026-10-28T09:15:00+01:00\",\"completed_at\":\"2026-10-28T09:15:02+01:00\"}}");
+
+            var status = response.Data;
+            status.InvoiceID.ShouldBe(50103893);
+            status.OperationID.ShouldBe("018f4471-67f8-7c12-a3b4-123456789abc");
+            status.Status.ShouldBe(Birko.SuperFaktura.Request.ValueLists.PeppolStatus.Accepted);
+            status.OutboundDocumentID.ShouldBe(501);
+            status.ProviderDocumentID.ShouldBe("flowis-document-1");
+            status.ProviderStatus.ShouldBe(Birko.SuperFaktura.Request.ValueLists.PeppolProviderStatus.Accepted);
+            status.FailureCode.ShouldBeNull();
+            status.CreatedAt.ShouldBe(new System.DateTimeOffset(2026, 10, 28, 9, 15, 0, System.TimeSpan.FromHours(1)));
+            status.CompletedAt.ShouldBe(new System.DateTimeOffset(2026, 10, 28, 9, 15, 2, System.TimeSpan.FromHours(1)));
+        }
+
+        [Fact]
+        public void PeppolStatusResponseAllowsNullFields()
+        {
+            // "Some fields can be null, for example before a provider document ID is available."
+            var response = JsonConvert.DeserializeObject<Birko.SuperFaktura.Response.Response<Birko.SuperFaktura.Response.Invoice.PeppolSendStatus>>(
+                "{\"error\":0,\"data\":{\"invoice_id\":50103893,\"operation_id\":\"018f4471-67f8-7c12-a3b4-123456789abc\",\"status\":\"queued\","
+                + "\"outbound_document_id\":null,\"provider_document_id\":null,\"provider_status\":null,\"failure_code\":null,"
+                + "\"created_at\":\"2026-10-28T09:15:00+01:00\",\"completed_at\":null}}");
+
+            response.Data.OutboundDocumentID.ShouldBeNull();
+            response.Data.ProviderDocumentID.ShouldBeNull();
+            response.Data.ProviderStatus.ShouldBeNull();
+            response.Data.CompletedAt.ShouldBeNull();
+        }
+
+        [Fact]
+        public void PeppolValueListsMatchDocs()
+        {
+            Birko.SuperFaktura.Request.ValueLists.PeppolStatus.Statuses
+                .ShouldBe(new[] { "queued", "processing", "pending", "accepted", "failed" });
+            Birko.SuperFaktura.Request.ValueLists.PeppolProviderStatus.Statuses
+                .ShouldBe(new[] { "sent", "accepted", "rejected", "failed_delivery" });
+            Birko.SuperFaktura.Request.ValueLists.PeppolErrorCode.Codes.ShouldBe(new[]
+            {
+                "request.invalid_payload", "request.invalid_invoice_id",
+                "peppol.send_not_allowed", "peppol.invoice_not_found", "peppol.sending_not_available", "peppol.send_already_pending",
+                "peppol.invoice_already_sent", "peppol.precheck_failed", "peppol.unexpected_error",
+                "peppol.send_status_not_found", "peppol.send_status_unavailable",
+            });
+        }
+
+        [Fact]
+        public void ErrorResponseKeepsErrorCodeAndData()
+        {
+            // Sandbox, POST invoices/sendPeppol on a company without Peppol (HTTP 409)
+            var ex = Should.Throw<Birko.SuperFaktura.Exceptions.Exception>(() =>
+                Birko.SuperFaktura.AbstractSuperFaktura.TestError("{\"error\":1,\"error_code\":\"peppol.sending_not_available\",\"error_message\":\"Peppol sending is not available for this company.\",\"data\":{\"invoice_id\":999999999}}"));
+
+            ex.Error.ShouldBe(1);
+            ex.ErrorCode.ShouldBe(Birko.SuperFaktura.Request.ValueLists.PeppolErrorCode.SendingNotAvailable);
+            ex.ErrorMessage.ShouldBe("Peppol sending is not available for this company.");
+            ex.ErrorData["invoice_id"].Value<int>().ShouldBe(999999999);
+            ex.Message.ShouldContain("peppol.sending_not_available");
+        }
+
+        [Fact]
+        public void ErrorResponseWithEmptyDataArrayHasNoErrorData()
+        {
+            // Sandbox, GET invoices/getPeppolStatus/0 (HTTP 400): "data":[]
+            var ex = Should.Throw<Birko.SuperFaktura.Exceptions.Exception>(() =>
+                Birko.SuperFaktura.AbstractSuperFaktura.TestError("{\"error\":1,\"error_code\":\"request.invalid_invoice_id\",\"error_message\":\"The invoice ID must be a positive integer.\",\"data\":[]}"));
+
+            ex.ErrorCode.ShouldBe(Birko.SuperFaktura.Request.ValueLists.PeppolErrorCode.InvalidInvoiceId);
+            ex.ErrorData.ShouldBeNull();
+        }
+
+        [Fact]
+        public void ErrorResponseWithoutErrorCodeLeavesItNull()
+        {
+            var ex = Should.Throw<Birko.SuperFaktura.Exceptions.Exception>(() =>
+                Birko.SuperFaktura.AbstractSuperFaktura.TestError("{\"error\":3,\"error_message\":\"Invoice not found\"}"));
+
+            ex.ErrorCode.ShouldBeNull();
+            ex.ErrorData.ShouldBeNull();
+            ex.Message.ShouldNotContain("ErrorCode");
+        }
+
+        [Fact]
+        public void HttpErrorKeepsErrorCodeAndData()
+        {
+            // invoice.md: HTTP 422 peppol.precheck_failed, "Check data.issues for the validation results"
+            var response = new System.Net.Http.HttpResponseMessage((System.Net.HttpStatusCode)422)
+            {
+                Content = new System.Net.Http.StringContent("{\"error\":1,\"error_code\":\"peppol.precheck_failed\",\"error_message\":\"Precheck failed.\",\"data\":{\"issues\":[{\"field\":\"client.ico\"}]}}")
+            };
+            var inner = new System.Net.Http.HttpRequestException("422 (Unprocessable Entity)");
+
+            var ex = Birko.SuperFaktura.AbstractSuperFaktura.HandleRequestException("invoices/sendPeppol", response, inner);
+
+            ex.ErrorCode.ShouldBe(Birko.SuperFaktura.Request.ValueLists.PeppolErrorCode.PrecheckFailed);
+            ex.ErrorData["issues"].ShouldBeOfType<JArray>().Count.ShouldBe(1);
+            ex.URL.ShouldBe("invoices/sendPeppol");
+            ex.InnerException.ShouldBe(inner);
+        }
+
+        // invoice.md "Peppol status webhook" example body; the signature was computed with
+        // printf '%s' "1761739200.<body>" | openssl dgst -sha256 -hmac 'YOUR_WEBHOOK_SECRET'
+        private const string PeppolWebhookBody = "{\"event_id\":\"018f4471-67f8-7c12-a3b4-123456789abd\",\"event_type\":\"invoice.peppol.status_changed\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"operation_id\":\"018f4471-67f8-7c12-a3b4-123456789abc\",\"invoice_id\":50103893,\"status\":\"accepted\",\"provider_document_id\":\"flowis-document-1\",\"provider_status\":\"accepted\",\"failure_code\":null}}";
+        private const string PeppolWebhookTimestamp = "1761739200";
+        private const string PeppolWebhookSecret = "YOUR_WEBHOOK_SECRET";
+        private const string PeppolWebhookSignature = "sha256=f2471c8fe4e116a9fd43ac61a6b066a1ea1d3be227518bd6bd23549edbffd973";
+
+        [Fact]
+        public void PeppolWebhookEventParses()
+        {
+            var webhook = Birko.SuperFaktura.PeppolWebhook.Parse(PeppolWebhookBody);
+
+            webhook.EventID.ShouldBe("018f4471-67f8-7c12-a3b4-123456789abd");
+            webhook.EventType.ShouldBe(Birko.SuperFaktura.PeppolWebhook.StatusChangedEventType);
+            webhook.OccurredAt.ShouldBe(new System.DateTimeOffset(2026, 10, 29, 12, 0, 0, System.TimeSpan.Zero));
+            webhook.Data.OperationID.ShouldBe("018f4471-67f8-7c12-a3b4-123456789abc");
+            webhook.Data.InvoiceID.ShouldBe(50103893);
+            webhook.Data.Status.ShouldBe(Birko.SuperFaktura.Request.ValueLists.PeppolStatus.Accepted);
+            webhook.Data.ProviderDocumentID.ShouldBe("flowis-document-1");
+            webhook.Data.ProviderStatus.ShouldBe(Birko.SuperFaktura.Request.ValueLists.PeppolProviderStatus.Accepted);
+            webhook.Data.FailureCode.ShouldBeNull();
+        }
+
+        [Fact]
+        public void PeppolWebhookSignatureVerifies()
+        {
+            Birko.SuperFaktura.PeppolWebhook.VerifySignature(PeppolWebhookTimestamp, PeppolWebhookBody, PeppolWebhookSignature, PeppolWebhookSecret).ShouldBeTrue();
+            Birko.SuperFaktura.PeppolWebhook.VerifySignature(PeppolWebhookTimestamp, System.Text.Encoding.UTF8.GetBytes(PeppolWebhookBody), PeppolWebhookSignature, PeppolWebhookSecret).ShouldBeTrue();
+        }
+
+        [Theory]
+        [InlineData(PeppolWebhookTimestamp, PeppolWebhookBody + " ", PeppolWebhookSignature, PeppolWebhookSecret)] // body changed
+        [InlineData("1761739201", PeppolWebhookBody, PeppolWebhookSignature, PeppolWebhookSecret)] // timestamp changed
+        [InlineData(PeppolWebhookTimestamp, PeppolWebhookBody, PeppolWebhookSignature, "OTHER_SECRET")]
+        [InlineData(PeppolWebhookTimestamp, PeppolWebhookBody, "f2471c8fe4e116a9fd43ac61a6b066a1ea1d3be227518bd6bd23549edbffd973", PeppolWebhookSecret)] // no "sha256=" prefix
+        [InlineData(PeppolWebhookTimestamp, PeppolWebhookBody, "sha256=f2471c8f", PeppolWebhookSecret)] // truncated
+        [InlineData(PeppolWebhookTimestamp, PeppolWebhookBody, null, PeppolWebhookSecret)] // unsigned request
+        [InlineData(null, PeppolWebhookBody, PeppolWebhookSignature, PeppolWebhookSecret)]
+        public void PeppolWebhookSignatureRejectsMismatch(string timestamp, string body, string signature, string secret)
+        {
+            Birko.SuperFaktura.PeppolWebhook.VerifySignature(timestamp, body, signature, secret).ShouldBeFalse();
+        }
+
+        [Fact]
+        public void PeppolWebhookSignatureRequiresSecret()
+        {
+            Should.Throw<System.ArgumentException>(() =>
+                Birko.SuperFaktura.PeppolWebhook.VerifySignature(PeppolWebhookTimestamp, PeppolWebhookBody, PeppolWebhookSignature, ""));
+        }
+
+        [Fact]
+        public void PeppolWebhookHeaderNamesMatchDocs()
+        {
+            Birko.SuperFaktura.PeppolWebhook.IdempotencyKeyHeader.ShouldBe("Idempotency-Key");
+            Birko.SuperFaktura.PeppolWebhook.WebhookIdHeader.ShouldBe("X-SuperFaktura-Webhook-Id");
+            Birko.SuperFaktura.PeppolWebhook.TimestampHeader.ShouldBe("X-SuperFaktura-Webhook-Timestamp");
+            Birko.SuperFaktura.PeppolWebhook.SignatureHeader.ShouldBe("X-SuperFaktura-Webhook-Signature");
+        }
+
+        [Fact]
         public void InvalidJsonResponseThrowsParseException()
         {
             Should.Throw<Birko.SuperFaktura.Exceptions.ParseException>(() =>

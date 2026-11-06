@@ -6,6 +6,12 @@
         public string ErrorMessage { get; set; }
         public string ResponseMessage { get; set; }
         public string URL { get; set; }
+        // String code of newer endpoints (e.g. "peppol.precheck_failed", see Request.ValueLists.PeppolErrorCode),
+        // which all answer "error": 1; null when the response has none.
+        public string ErrorCode { get; set; }
+        // The error response "data" (e.g. "issues" or "reason"); null when missing or empty.
+        // Named ErrorData because System.Exception.Data already exists.
+        public Newtonsoft.Json.Linq.JToken ErrorData { get; set; }
 
         public Exception(int? code, string message) : this(code, message, string.Empty, null,  null)
         { }
@@ -20,9 +26,15 @@
         public Exception(int? code, string message, string errorMessage, System.Exception inner) : this(code, message, errorMessage, inner, null)
         { }
         public Exception(int? code, string message, string errorMessage, System.Exception inner, string url)
-            : base(string.Format("\nCode: {0},\nMessage: {1}\nErrorMessage: {2}\nUrl: {3}", code, message, errorMessage, url), inner)
+            : this(code, message, errorMessage, inner, url, null, null)
+        { }
+        public Exception(int? code, string message, string errorMessage, System.Exception inner, string url, string errorCode, Newtonsoft.Json.Linq.JToken errorData)
+            : base(string.Format("\nCode: {0},{4}\nMessage: {1}\nErrorMessage: {2}\nUrl: {3}", code, message, errorMessage, url,
+                string.IsNullOrEmpty(errorCode) ? string.Empty : "\nErrorCode: " + errorCode), inner)
         {
             Error = code;
+            ErrorCode = errorCode;
+            ErrorData = errorData;
             ErrorMessage = errorMessage;
             ResponseMessage = message;
             URL = url;

@@ -43,7 +43,7 @@ It ensures that the delay between api calls is more than 1 second.
 * **ResponseByChecksum(string checksum)** - returns the original response of a request sent with given `checksum` (up to 3 months back), or `null` when no such request reached the server. See `checksum` parameter of `Invoices.Add`, `Expenses.Add` and `CashRegisters.AddItem`
 
 #### Errors
-API errors (also HTTP 4xx with an API error body) are thrown as `Birko.SuperFaktura.Exceptions.Exception` with `Error` (API error code), `ErrorMessage` and `ResponseMessage`. A response that is not JSON throws `Exceptions.ParseException`.
+API errors (also HTTP 4xx/5xx with an API error body) are thrown as `Birko.SuperFaktura.Exceptions.Exception` with `Error` (API error code), `ErrorMessage` and `ResponseMessage`. Newer endpoints (e.g. Peppol) always answer `"error": 1` and identify the error by a string `ErrorCode` (e.g. `peppol.precheck_failed`), with details in `ErrorData` (the response `data` as `JToken`, e.g. `ErrorData["issues"]`; `null` when empty). A response that is not JSON throws `Exceptions.ParseException`.
 
 #### Request models
 Request properties left `null` are not sent. `Edit` methods therefore change only the properties that were set and the server keeps the stored values.
@@ -124,6 +124,8 @@ Class that wrappes invoice API calls
 * **MarkAsSentViaMail(Request.Invoice.MarkEmail email)** - marks sended email with invoice
 * **SendPost(Post post)** - send invoice throw regular post
 * **MarkAsSent(int id)** - marks invoice as send
+* **SendPeppol(int id, string webhookUrl = null, string webhookSecret = null)** - queues sending of invoice with given `id` as eInvoice over the Peppol network (the company must have Peppol sending enabled). Returns `PeppolSendResult` with `OperationID` and `Status`; delivery is asynchronous. Optional `webhookUrl` (public HTTPS URL, redirects are not followed) receives the final outcome, signed when `webhookSecret` (1-512 chars) is set - see [Peppol webhook](#peppol-webhook). Errors carry `ErrorCode` from `PeppolErrorCode`
+* **GetPeppolStatus(int id)** - gets the latest Peppol sending status of invoice with given `id` (`PeppolSendStatus`: `Status`, `ProviderStatus`, `FailureCode`, ...). A failed send is `Status = "failed"`, not an exception. `ProviderStatus = "accepted"` is the final positive outcome
 * **DeleteItem(int id, int itemid)** - deletes item with `itemid` from invoice with given `id`
 * **DeleteItem(int id, int[] itemid)** - deletes items according given list of `itemid` from invoice with given `id`
 * **AddPayment(Request.Invoice.Payment payment)** - adds payment to invoice
@@ -131,6 +133,25 @@ Class that wrappes invoice API calls
 * **AddRelatedItem(Request.RelatedItem relatedItem)** - adds related item to expense
 * **DeleteRelatedItem(int id)** - deletes related item with given relation `id`
 * **DownloadReceipt(int id)** - downloads receipt according given invoice `id` as  byte array
+
+#### Peppol webhook
+`Birko.SuperFaktura.PeppolWebhook` helps the receiver of the `webhookUrl` passed to `SendPeppol`:
+* **VerifySignature(string timestamp, byte[] body, string signature, string secret)** (or `string body`) - checks the `X-SuperFaktura-Webhook-Signature` header against the `X-SuperFaktura-Webhook-Timestamp` header and the **raw** request body (re-serialized JSON does not match). Returns `false` for a missing or wrong signature
+* **Parse(string body)** - reads the body as `PeppolWebhookEvent` (`EventID`, `EventType`, `OccurredAt`, `Data` as `PeppolSendStatus`)
+* Header names are available as constants (`TimestampHeader`, `SignatureHeader`, `WebhookIdHeader`, `IdempotencyKeyHeader`)
+
+Delivery can be retried: deduplicate by `EventID` and answer HTTP 2xx also for a duplicate. A document can stay at provider status `sent` without a callback; use `GetPeppolStatus` when still waiting.
+
+```csharp
+var body = await ReadRawBodyAsync(request); // byte[]
+if (!PeppolWebhook.VerifySignature(request.Headers[PeppolWebhook.TimestampHeader], body,
+        request.Headers[PeppolWebhook.SignatureHeader], webhookSecret))
+{
+    return Unauthorized();
+}
+var webhook = PeppolWebhook.Parse(Encoding.UTF8.GetString(body));
+if (webhook.Data.ProviderStatus == PeppolProviderStatus.Accepted) { /* delivered */ }
+```
 
 ### Other
 Class that wrappes all other API calls
@@ -188,6 +209,9 @@ List are stored in `Birko.SuperFaktura.Request.ValueLists` namespace
 * **InvoiceStatus** - list of invoice statuses
 * **LanguageType** - list of supported languages
 * **PaymentType** - list of payment types
+* **PeppolErrorCode** - `ErrorCode` values of `SendPeppol` and `GetPeppolStatus`
+* **PeppolProviderStatus** - Peppol provider statuses (`PeppolSendStatus.ProviderStatus`)
+* **PeppolStatus** - statuses of the Peppol send operation (`PeppolSendResult.Status`)
 * **PeriodTypes** - list of period types
 * **RoundingType** - list of invoice or expense rounding types
 * **SequenceType** - keys of `ListSequences()` (document types of number sequences)

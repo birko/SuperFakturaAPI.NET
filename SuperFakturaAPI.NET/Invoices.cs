@@ -174,6 +174,22 @@ namespace Birko.SuperFaktura
             return superFaktura.DeserializeResult<Mark>(result);
         }
 
+        // invoice.md "Send invoice via Peppol": queues the send (HTTP 202); delivery is asynchronous,
+        // read the outcome with GetPeppolStatus or receive it on webhookUrl.
+        public async Task<PeppolSendResult> SendPeppol(int invoiceID, string webhookUrl = null, string webhookSecret = null)
+        {
+            var send = new PeppolSend { InvoiceID = invoiceID, WebhookUrl = webhookUrl, WebhookSecret = webhookSecret };
+            var result = await superFaktura.PostJson("invoices/sendPeppol", send).ConfigureAwait(false);
+            return superFaktura.DeserializeResult<Response<PeppolSendResult>>(result).Data;
+        }
+
+        // invoice.md "Get Peppol sending status": latest recorded status; a failed send is status "failed", not an error.
+        public async Task<PeppolSendStatus> GetPeppolStatus(int invoiceID)
+        {
+            var result = await superFaktura.Get(string.Format("invoices/getPeppolStatus/{0}", invoiceID)).ConfigureAwait(false);
+            return superFaktura.DeserializeResult<Response<PeppolSendStatus>>(result).Data;
+        }
+
         public async Task<DetailInvoice> DeleteItem(int invoiceID, int itemID)
         {
             return await DeleteItem(invoiceID, new int[] { itemID }).ConfigureAwait(false);

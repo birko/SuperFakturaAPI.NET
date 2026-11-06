@@ -71,5 +71,18 @@ namespace SuperFaktura.Tests
                 return null;
             }
         }
+
+        // Same for newer endpoints that answer "error": 1 with a string "error_code" (e.g. Peppol).
+        protected static async System.Threading.Tasks.Task<T> AllowSandboxLimit<T>(System.Func<System.Threading.Tasks.Task<T>> call, params string[] errorCodes) where T : class
+        {
+            try
+            {
+                return await call();
+            }
+            catch (Birko.SuperFaktura.Exceptions.Exception ex) when (ex.ErrorCode != null && System.Array.IndexOf(errorCodes, ex.ErrorCode) >= 0)
+            {
+                return null;
+            }
+        }
     }
 }

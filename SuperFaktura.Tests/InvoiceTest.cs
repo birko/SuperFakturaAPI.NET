@@ -753,6 +753,52 @@ namespace SuperFaktura.Tests
         }
 
         [Fact]
+        public async Task TestSendPeppol()
+        {
+            var detail = await CreateTestInvoice();
+            try
+            {
+                // Sandbox account has Peppol off: HTTP 409 {"error":1,"error_code":"peppol.sending_not_available",...}
+                var result = await AllowSandboxLimit(() => apiClient.Invoices.SendPeppol(detail.Invoice.ID.Value),
+                    Birko.SuperFaktura.Request.ValueLists.PeppolErrorCode.SendingNotAvailable);
+                result?.InvoiceID.ShouldBe(detail.Invoice.ID.Value);
+                result?.OperationID.ShouldNotBeNullOrEmpty();
+            }
+            finally
+            {
+                await DeleteTestInvoice(detail);
+            }
+        }
+
+        [Fact]
+        public async Task TestSendPeppolRejectsInvalidInvoiceId()
+        {
+            // HTTP 400 {"error":1,"error_code":"request.invalid_payload",...}
+            var ex = await Should.ThrowAsync<Birko.SuperFaktura.Exceptions.Exception>(() => apiClient.Invoices.SendPeppol(0));
+            ex.Error.ShouldBe(1);
+            ex.ErrorCode.ShouldBe(Birko.SuperFaktura.Request.ValueLists.PeppolErrorCode.InvalidPayload);
+            ex.ErrorMessage.ShouldNotBeNullOrEmpty();
+        }
+
+        [Fact]
+        public async Task TestGetPeppolStatus()
+        {
+            var detail = await CreateTestInvoice();
+            try
+            {
+                // Never sent: docs say HTTP 404 peppol.send_status_not_found, the sandbox answers HTTP 500 peppol.send_status_unavailable
+                var status = await AllowSandboxLimit(() => apiClient.Invoices.GetPeppolStatus(detail.Invoice.ID.Value),
+                    Birko.SuperFaktura.Request.ValueLists.PeppolErrorCode.SendStatusNotFound,
+                    Birko.SuperFaktura.Request.ValueLists.PeppolErrorCode.SendStatusUnavailable);
+                status?.InvoiceID.ShouldBe(detail.Invoice.ID.Value);
+            }
+            finally
+            {
+                await DeleteTestInvoice(detail);
+            }
+        }
+
+        [Fact]
         public async Task TestMarkAsSentViaMail()
         {
             var detail = await CreateTestInvoice();

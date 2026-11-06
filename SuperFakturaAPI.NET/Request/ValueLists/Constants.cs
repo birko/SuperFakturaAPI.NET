@@ -117,6 +117,56 @@ namespace Birko.SuperFaktura.Request.ValueLists
         public static int[] Statuses = new[] { Issued, PartiallyPaid, Paid, Overdue };
     }
 
+    // invoice.md "Get Peppol sending status": status of the SuperFaktura send operation.
+    public static class PeppolStatus
+    {
+        public const string Queued = "queued";
+        public const string Processing = "processing";
+        public const string Pending = "pending";
+        public const string Accepted = "accepted";
+        public const string Failed = "failed";
+
+        public static string[] Statuses = new[] { Queued, Processing, Pending, Accepted, Failed };
+    }
+
+    // invoice.md "Peppol status webhook": provider_status; null when the send failed without a provider outcome.
+    public static class PeppolProviderStatus
+    {
+        public const string Sent = "sent";
+        public const string Accepted = "accepted";
+        public const string Rejected = "rejected";
+        public const string FailedDelivery = "failed_delivery";
+
+        public static string[] Statuses = new[] { Sent, Accepted, Rejected, FailedDelivery };
+    }
+
+    // invoice.md "eInvoice": "error_code" of invoices/sendPeppol and invoices/getPeppolStatus (Exceptions.Exception.ErrorCode).
+    public static class PeppolErrorCode
+    {
+        public const string InvalidPayload = "request.invalid_payload";
+        public const string InvalidInvoiceId = "request.invalid_invoice_id";
+        public const string SendNotAllowed = "peppol.send_not_allowed";
+        public const string InvoiceNotFound = "peppol.invoice_not_found";
+        // ErrorData["reason"] when present.
+        public const string SendingNotAvailable = "peppol.sending_not_available";
+        public const string SendAlreadyPending = "peppol.send_already_pending";
+        public const string InvoiceAlreadySent = "peppol.invoice_already_sent";
+        // ErrorData["issues"] holds the validation results.
+        public const string PrecheckFailed = "peppol.precheck_failed";
+        public const string UnexpectedError = "peppol.unexpected_error";
+        public const string SendStatusNotFound = "peppol.send_status_not_found";
+        // Also returned by the sandbox for an invoice that was never sent (docs: SendStatusNotFound).
+        public const string SendStatusUnavailable = "peppol.send_status_unavailable";
+
+        public static string[] Codes = new[]
+        {
+            InvalidPayload, InvalidInvoiceId,
+            SendNotAllowed, InvoiceNotFound, SendingNotAvailable, SendAlreadyPending,
+            InvoiceAlreadySent, PrecheckFailed, UnexpectedError,
+            SendStatusNotFound, SendStatusUnavailable,
+        };
+    }
+
     public static class LanguageType
     {
         public const string Czech = "cze";
