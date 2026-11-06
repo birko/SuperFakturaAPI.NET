@@ -369,9 +369,6 @@ namespace Birko.SuperFaktura
             {
                 checkSum = CheckSum(dataData);
             }
-#if DEBUG
-            Console.WriteLine(JsonConvert.SerializeObject(data));
-#endif
             return await Post(uri, JsonConvert.SerializeObject(data), checkSum).ConfigureAwait(false);
         }
 
@@ -382,9 +379,6 @@ namespace Birko.SuperFaktura
             {
                 checkSum = CheckSum(dataData);
             }
-#if DEBUG
-            Console.WriteLine(JsonConvert.SerializeObject(data));
-#endif
             return await PostByte(uri, JsonConvert.SerializeObject(data), checkSum).ConfigureAwait(false);
         }
 
@@ -422,9 +416,6 @@ namespace Birko.SuperFaktura
             {
                 checkSum = CheckSum(dataData);
             }
-#if DEBUG
-            Console.WriteLine(JsonConvert.SerializeObject(data));
-#endif
             return await Patch(uri, JsonConvert.SerializeObject(data), checkSum).ConfigureAwait(false);
         }
 
