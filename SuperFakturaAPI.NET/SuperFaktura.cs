@@ -283,93 +283,114 @@ namespace Birko.SuperFaktura
                 : (DateTime?)null;
         }
 
-        internal async Task<string> Get(string uri)
+        // Fired after every API request (also failed ones), for debugging and monitoring. Never carries
+        // headers; the invoice token and webhook_secret are hidden. Exceptions thrown by handlers are
+        // ignored, so a failing logger never fails (and never makes the caller repeat) an API call.
+        public event EventHandler<RequestCompletedEventArgs> RequestCompleted;
+
+        // Adds request and response bodies to RequestCompleted. Off by default: bodies contain personal data.
+        public bool IncludeBodiesInEvents { get; set; } = false;
+
+        internal Task<string> Get(string uri)
+        {
+            return Send(new HttpRequestMessage(HttpMethod.Get, uri), null, ReadString);
+        }
+
+        internal Task<byte[]> GetByte(string uri)
+        {
+            return Send(new HttpRequestMessage(HttpMethod.Get, uri), null, ReadBytes);
+        }
+
+        internal Task<string> Post(string uri, string data, string checkSum = null)
+        {
+            LastCheckSum = checkSum;
+            return Send(new HttpRequestMessage(HttpMethod.Post, uri) { Content = FormData(data) }, data, ReadString);
+        }
+
+        internal Task<byte[]> PostByte(string uri, string data, string checkSum = null)
+        {
+            LastCheckSum = checkSum;
+            return Send(new HttpRequestMessage(HttpMethod.Post, uri) { Content = FormData(data) }, data, ReadBytes);
+        }
+
+        private static readonly Func<HttpContent, Task<string>> ReadString = content => content.ReadAsStringAsync();
+        private static readonly Func<HttpContent, Task<byte[]>> ReadBytes = content => content.ReadAsByteArrayAsync();
+
+        private static HttpContent FormData(string data)
+        {
+            return new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("data", data) });
+        }
+
+        // The single place every request goes through: throttling, rate-limit headers, errors, RequestCompleted.
+        private async Task<T> Send<T>(HttpRequestMessage request, string body, Func<HttpContent, Task<T>> read) where T : class
         {
             RequestDelay();
             var client = CreateClient();
+            var uri = request.RequestUri?.OriginalString;
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             HttpResponseMessage response = null;
+            T result = null;
+            Exceptions.Exception error = null;
             try
             {
                 IncreaseRequestCount(ProfileKey);
-                response = await client.GetAsync(uri).ConfigureAwait(false);
+                response = await client.SendAsync(request).ConfigureAwait(false);
                 ParseResponse(response);
                 if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
                 {
-                    return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    result = await read(response.Content).ConfigureAwait(false);
                 }
-                return await Task.FromResult<string>(null).ConfigureAwait(false);
+                return result;
             }
             catch (Exception ex)
             {
-                throw HandleRequestException(uri, response, ex);
+                error = HandleRequestException(uri, response, ex);
+                throw error;
+            }
+            finally
+            {
+                var handlers = RequestCompleted;
+                if (handlers != null)
+                {
+                    var args = await CreateRequestCompletedArgs(request.Method, uri, body, response, result, error, stopwatch.Elapsed, IncludeBodiesInEvents).ConfigureAwait(false);
+                    RaiseRequestCompleted(handlers, this, args);
+                }
             }
         }
 
-        internal async Task<byte[]> GetByte(string uri)
+        internal static async Task<RequestCompletedEventArgs> CreateRequestCompletedArgs(HttpMethod method, string uri, string body,
+            HttpResponseMessage response, object result, Exceptions.Exception error, TimeSpan duration, bool includeBodies)
         {
-            RequestDelay();
-            var client = CreateClient();
-            HttpResponseMessage response = null;
-            try
+            string responseBody = null;
+            long? responseLength = null;
+            if (result is byte[] bytes)
             {
-                IncreaseRequestCount(ProfileKey);
-                response = await client.GetAsync(uri).ConfigureAwait(false);
-                ParseResponse(response);
-                if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-                }
-                return await Task.FromResult<byte[]>(null).ConfigureAwait(false);
+                responseLength = bytes.Length;
             }
-            catch (Exception ex)
+            else if (response?.Content != null)
             {
-                throw HandleRequestException(uri, response, ex);
+                // The content is buffered (also for error responses), so it can be read again here.
+                responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                responseLength = responseBody.Length;
             }
+            return new RequestCompletedEventArgs(method.Method, HideSecrets(uri), (int?)response?.StatusCode, duration,
+                includeBodies ? HideSecretsInJson(body) : null,
+                includeBodies ? HideSecretsInJson(responseBody) : null,
+                responseLength, error);
         }
 
-        internal async Task<string> Post(string uri, string data, string checkSum = null)
+        internal static void RaiseRequestCompleted(EventHandler<RequestCompletedEventArgs> handlers, object sender, RequestCompletedEventArgs args)
         {
-            RequestDelay();
-            var client = CreateClient();
-            HttpResponseMessage response = null;
-            try
+            foreach (EventHandler<RequestCompletedEventArgs> handler in handlers.GetInvocationList())
             {
-                IncreaseRequestCount(ProfileKey);
-                this.LastCheckSum = checkSum;
-                response = await client.PostAsync(uri, new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("data", data) })).ConfigureAwait(false);
-                ParseResponse(response);
-                if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
+                try
                 {
-                    return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    handler(sender, args);
                 }
-                return await Task.FromResult<string>(null).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                throw HandleRequestException(uri, response, ex);
-            }
-        }
-
-        internal async Task<byte[]> PostByte(string uri, string data, string checkSum = null)
-        {
-            RequestDelay();
-            var client = CreateClient();
-            HttpResponseMessage response = null;
-            try
-            {
-                IncreaseRequestCount(ProfileKey);
-                this.LastCheckSum = checkSum;
-                response = await client.PostAsync(uri, new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("data", data) })).ConfigureAwait(false);
-                ParseResponse(response);
-                if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
+                catch (Exception)
                 {
-                    return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+                    // A failing handler must not change the result of the API call, nor stop other handlers.
                 }
-                return await Task.FromResult<byte[]>(null).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                throw HandleRequestException(uri, response, ex);
             }
         }
 
@@ -404,31 +425,14 @@ namespace Birko.SuperFaktura
             return SendJson(HttpMethod.Post, uri, JsonConvert.SerializeObject(data), null);
         }
 
-        private async Task<string> SendJson(HttpMethod method, string uri, string data, string checkSum)
+        private Task<string> SendJson(HttpMethod method, string uri, string data, string checkSum)
         {
-            RequestDelay();
-            var client = CreateClient();
-            HttpResponseMessage response = null;
-            try
+            LastCheckSum = checkSum;
+            var request = new HttpRequestMessage(method, uri)
             {
-                IncreaseRequestCount(ProfileKey);
-                this.LastCheckSum = checkSum;
-                HttpRequestMessage request = new HttpRequestMessage(method, uri)
-                {
-                    Content = new StringContent(data, Encoding.UTF8, "application/json")
-                };
-                response = await client.SendAsync(request).ConfigureAwait(false);
-                ParseResponse(response);
-                if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                }
-                return await Task.FromResult<string>(null).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                throw HandleRequestException(uri, response, ex);
-            }
+                Content = new StringContent(data, Encoding.UTF8, "application/json")
+            };
+            return Send(request, data, ReadString);
         }
 
         internal async Task<string> Patch(string uri, object data)
@@ -441,26 +445,9 @@ namespace Birko.SuperFaktura
             return await Patch(uri, JsonConvert.SerializeObject(data), checkSum).ConfigureAwait(false);
         }
 
-        internal async Task<string> Delete(string uri)
+        internal Task<string> Delete(string uri)
         {
-            RequestDelay();
-            var client = CreateClient();
-            HttpResponseMessage response = null;
-            try
-            {
-                IncreaseRequestCount(ProfileKey);
-                response = await client.DeleteAsync(uri).ConfigureAwait(false);
-                ParseResponse(response);
-                if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                }
-                return await Task.FromResult<string>(null).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                throw HandleRequestException(uri, response, ex);
-            }
+            return Send(new HttpRequestMessage(HttpMethod.Delete, uri), null, ReadString);
         }
 
         internal async Task<string> Delete(string uri, object data)
@@ -468,26 +455,9 @@ namespace Birko.SuperFaktura
             return await Delete(uri, JsonConvert.SerializeObject(data)).ConfigureAwait(false);
         }
 
-        internal async Task<string> Delete(string uri, string data)
+        internal Task<string> Delete(string uri, string data)
         {
-            RequestDelay();
-            var client = CreateClient();
-            HttpResponseMessage response = null;
-            try
-            {
-                IncreaseRequestCount(ProfileKey);
-                response = await client.SendAsync(CreateDeleteRequest(uri, data)).ConfigureAwait(false);
-                ParseResponse(response);
-                if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                }
-                return await Task.FromResult<string>(null).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                throw HandleRequestException(uri, response, ex);
-            }
+            return Send(CreateDeleteRequest(uri, data), data, ReadString);
         }
 
         // Relative URI is resolved against the client's BaseAddress; body is sent as "data=<json>" like POST.
@@ -497,7 +467,7 @@ namespace Birko.SuperFaktura
             {
                 Method = HttpMethod.Delete,
                 RequestUri = new Uri(uri, UriKind.Relative),
-                Content = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("data", data) })
+                Content = FormData(data)
             };
         }
 
@@ -582,6 +552,16 @@ namespace Birko.SuperFaktura
         internal static string HideSecrets(string uri)
         {
             return uri == null ? null : TokenInUrl.Replace(uri, "token:***");
+        }
+
+        // JSON string values of these names are secrets: the invoice token (public link to the PDF)
+        // and the Peppol webhook_secret.
+        private static readonly System.Text.RegularExpressions.Regex SecretInJson = new System.Text.RegularExpressions.Regex(
+            "(\"(?:token|webhook_secret)\"\\s*:\\s*)\"(?:[^\"\\\\]|\\\\.)*\"", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+        internal static string HideSecretsInJson(string json)
+        {
+            return json == null ? null : SecretInJson.Replace(json, "$1\"***\"");
         }
     }
 

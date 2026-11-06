@@ -26,6 +26,7 @@ It ensures that the delay between api calls is more than 1 second.
 
 #### Public Properties
 * **EnsureSuccessStatusCode** - boolean, default true. Switches the behaviour if System.Net.Http.HttpClient should raise exception for not succesfull response
+* **IncludeBodiesInEvents** - boolean, default false. Adds request and response bodies to [`RequestCompleted`](#request-events)
 * **BankAccounts** - instance of [`BankAccounts`](#bankaccounts) class, description bellow
 * **CashRegisters** - instance of [`CashRegisters`](#cashregisters) class, description bellow
 * **Clients** - instance of [`Clients`](#clients) class, description bellow
@@ -44,6 +45,22 @@ It ensures that the delay between api calls is more than 1 second.
 
 #### Errors
 API errors (also HTTP 4xx/5xx with an API error body) are thrown as `Birko.SuperFaktura.Exceptions.Exception` with `Error` (API error code), `ErrorMessage` and `ResponseMessage`. Newer endpoints (e.g. Peppol) always answer `"error": 1` and identify the error by a string `ErrorCode` (e.g. `peppol.precheck_failed`), with details in `ErrorData` (the response `data` as `JToken`, e.g. `ErrorData["issues"]`; `null` when empty). A response that is not JSON throws `Exceptions.ParseException`.
+
+#### Request events
+`RequestCompleted` fires after every API request, also a failed one, with `Method`, `Uri`, `StatusCode` (`null` without response), `Duration`, `ResponseLength` and `Exception`. `RequestBody` and `ResponseBody` are filled only with `IncludeBodiesInEvents = true`; binary responses (PDF) report only `ResponseLength`.
+* Headers are never included (the `Authorization` header holds the API key). The invoice `token` (in URLs and bodies) and `webhook_secret` are shown as `***`.
+* Bodies still contain **personal data** (clients, addresses, e-mails, IBAN): use them for debugging, do not send them to central logging in production.
+* Exceptions thrown by a handler are ignored, so a failing logger never fails an API call (e.g. after an invoice was already created).
+* The event belongs to the `SuperFaktura` instance, handlers can be called from any thread.
+
+The library always offers the event; decide in your application when to use it, e.g. only in its Debug build:
+```csharp
+var sf = new SuperFaktura(email, apiKey, companyId: 123);
+#if DEBUG
+sf.IncludeBodiesInEvents = true;
+sf.RequestCompleted += (s, e) => Debug.WriteLine($"{e.Method} {e.Uri} -> {e.StatusCode} ({e.Duration.TotalMilliseconds} ms)\n{e.RequestBody}\n{e.ResponseBody}");
+#endif
+```
 
 #### Request models
 Request properties left `null` are not sent. `Edit` methods therefore change only the properties that were set and the server keeps the stored values.

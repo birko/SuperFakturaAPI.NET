@@ -82,6 +82,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Invoices.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PeppolWebhook.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RateLimits.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RequestCompletedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Client\Client.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\ConctactPersons\ContactPresonData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request\Client\ClientData.cs" />

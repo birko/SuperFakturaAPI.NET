@@ -164,6 +164,65 @@ namespace SuperFaktura.Tests
             }
         }
 
+        private static Birko.SuperFaktura.RequestCompletedEventArgs CompletedArgs(object result, bool includeBodies,
+            string uri = "invoices/sendPeppol", string requestBody = "{\"invoice_id\":1,\"webhook_secret\":\"WEBHOOK_SECRET_VALUE\"}",
+            string responseBody = "{\"error\":0,\"data\":{\"Invoice\":{\"id\":1,\"token\":\"INVOICE_TOKEN_VALUE\"}}}")
+        {
+            var response = new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new System.Net.Http.StringContent(responseBody) };
+            return Birko.SuperFaktura.AbstractSuperFaktura.CreateRequestCompletedArgs(System.Net.Http.HttpMethod.Post, uri, requestBody,
+                response, result, null, System.TimeSpan.FromMilliseconds(120), includeBodies).Result;
+        }
+
+        [Fact]
+        public void RequestCompletedOmitsBodiesByDefault()
+        {
+            var args = CompletedArgs("{}", includeBodies: false);
+
+            args.Method.ShouldBe("POST");
+            args.Uri.ShouldBe("invoices/sendPeppol");
+            args.StatusCode.ShouldBe(200);
+            args.Duration.ShouldBe(System.TimeSpan.FromMilliseconds(120));
+            args.RequestBody.ShouldBeNull();
+            args.ResponseBody.ShouldBeNull();
+            args.Exception.ShouldBeNull();
+        }
+
+        [Fact]
+        public void RequestCompletedHidesSecretsInBodies()
+        {
+            var args = CompletedArgs("{}", includeBodies: true);
+
+            args.RequestBody.ShouldContain("\"invoice_id\":1");
+            args.RequestBody.ShouldNotContain("WEBHOOK_SECRET_VALUE");
+            args.RequestBody.ShouldContain("\"webhook_secret\":\"***\"");
+            args.ResponseBody.ShouldContain("\"id\":1");
+            args.ResponseBody.ShouldNotContain("INVOICE_TOKEN_VALUE");
+            args.ResponseBody.ShouldContain("\"token\":\"***\"");
+        }
+
+        [Fact]
+        public void RequestCompletedHidesTokenInUrl()
+        {
+            var args = CompletedArgs(new byte[] { 1, 2, 3 }, includeBodies: true, uri: "sk/invoices/pdf/1/token:abc123def", requestBody: null);
+
+            args.Uri.ShouldBe("sk/invoices/pdf/1/token:***");
+            // binary response (PDF): only its size
+            args.ResponseBody.ShouldBeNull();
+            args.ResponseLength.ShouldBe(3);
+        }
+
+        [Fact]
+        public void RequestCompletedHandlerErrorDoesNotBreakTheCall()
+        {
+            // A logger failing after e.g. a created invoice must not make the caller retry and create a duplicate.
+            var calls = 0;
+            System.EventHandler<Birko.SuperFaktura.RequestCompletedEventArgs> handlers = (s, e) => throw new System.InvalidOperationException("logger failed");
+            handlers += (s, e) => calls++;
+
+            Should.NotThrow(() => Birko.SuperFaktura.AbstractSuperFaktura.RaiseRequestCompleted(handlers, this, CompletedArgs("{}", includeBodies: false)));
+            calls.ShouldBe(1);
+        }
+
         [Fact]
         public void NetworkErrorWithoutResponseKeepsGenericException()
         {
