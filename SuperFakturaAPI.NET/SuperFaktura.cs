@@ -346,7 +346,7 @@ namespace Birko.SuperFaktura
             }
             catch (Exception ex)
             {
-                throw HandleRequestException(uri, response, ex, data);
+                throw HandleRequestException(uri, response, ex);
             }
         }
 
@@ -369,7 +369,7 @@ namespace Birko.SuperFaktura
             }
             catch (Exception ex)
             {
-                throw HandleRequestException(uri, response, ex, data);
+                throw HandleRequestException(uri, response, ex);
             }
         }
 
@@ -427,7 +427,7 @@ namespace Birko.SuperFaktura
             }
             catch (Exception ex)
             {
-                throw HandleRequestException(uri, response, ex, data);
+                throw HandleRequestException(uri, response, ex);
             }
         }
 
@@ -535,8 +535,11 @@ namespace Birko.SuperFaktura
             }
         }
 
-        internal static Exceptions.Exception HandleRequestException(string uri, HttpResponseMessage response, Exception ex, string data = null)
+        // Exception messages end up in logs: never include headers (response.RequestMessage carries the
+        // Authorization header with the API key) or the request body (personal data, webhook_secret).
+        internal static Exceptions.Exception HandleRequestException(string uri, HttpResponseMessage response, Exception ex)
         {
+            uri = HideSecrets(uri);
             string content = null;
             if (response != null)
             {
@@ -563,13 +566,22 @@ namespace Birko.SuperFaktura
                 }
             }
 
-            string message = string.Format("ReasonPhrase: {0}\nContent: {1}\nRequest: {2}\nData: {3}",
-                    response,
-                    content,
-                    response?.RequestMessage,
-                    data
+            string message = string.Format("Status: {0} {1}\nMethod: {2}\nContent: {3}",
+                    (int?)response?.StatusCode,
+                    response?.ReasonPhrase,
+                    response?.RequestMessage?.Method,
+                    content
                 );
             return new Exceptions.Exception(null, message, ex, uri);
+        }
+
+        // The invoice token in Invoices.Download's URL (token:...) works as a public link to the PDF.
+        private static readonly System.Text.RegularExpressions.Regex TokenInUrl =
+            new System.Text.RegularExpressions.Regex("token:[^/]+", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+        internal static string HideSecrets(string uri)
+        {
+            return uri == null ? null : TokenInUrl.Replace(uri, "token:***");
         }
     }
 

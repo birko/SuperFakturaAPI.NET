@@ -108,6 +108,62 @@ namespace SuperFaktura.Tests
             ex.InnerException.ShouldBe(inner);
         }
 
+        // HttpClient copies DefaultRequestHeaders (Authorization with the API key) into response.RequestMessage.
+        private static System.Net.Http.HttpResponseMessage NonJsonErrorWithSentRequest(string uri)
+        {
+            var request = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Post, "https://moja.superfaktura.sk/" + uri)
+            {
+                Content = new System.Net.Http.StringContent("{\"invoice_id\":1,\"webhook_secret\":\"WEBHOOK_SECRET_VALUE\"}"),
+            };
+            request.Headers.TryAddWithoutValidation("Authorization", "SFAPI email=api%40example.com&apikey=API_KEY_VALUE&company_id=1&module=API");
+            var response = new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.BadGateway)
+            {
+                Content = new System.Net.Http.StringContent("<html>Bad Gateway</html>"),
+                RequestMessage = request,
+            };
+            response.Headers.TryAddWithoutValidation("Set-Cookie", "SESSION=COOKIE_VALUE");
+            return response;
+        }
+
+        [Fact]
+        public void HttpErrorDoesNotLeakCredentialsOrRequestBody()
+        {
+            var ex = Birko.SuperFaktura.AbstractSuperFaktura.HandleRequestException("invoices/sendPeppol",
+                NonJsonErrorWithSentRequest("invoices/sendPeppol"), new System.Net.Http.HttpRequestException("502 (Bad Gateway)"));
+
+            var text = ex.ToString();
+            text.ShouldNotContain("API_KEY_VALUE");
+            text.ShouldNotContain("api%40example.com");
+            text.ShouldNotContain("WEBHOOK_SECRET_VALUE");
+            text.ShouldNotContain("COOKIE_VALUE");
+            // still enough to diagnose the failure
+            ex.ResponseMessage.ShouldContain("502");
+            ex.ResponseMessage.ShouldContain("POST");
+            ex.ResponseMessage.ShouldContain("<html>Bad Gateway</html>");
+            ex.URL.ShouldBe("invoices/sendPeppol");
+        }
+
+        [Theory]
+        [InlineData("sk/invoices/pdf/1/token:abc123def", "sk/invoices/pdf/1/token:***")]
+        [InlineData("sk/invoices/pdf/1/token:abc123def/signature:1", "sk/invoices/pdf/1/token:***/signature:1")]
+        [InlineData("invoices/view/1.json", "invoices/view/1.json")]
+        public void HttpErrorHidesInvoiceTokenInUrl(string uri, string expected)
+        {
+            // The invoice token in Download's URL works as a public link to the PDF.
+            var json = new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.NotFound)
+            {
+                Content = new System.Net.Http.StringContent("{\"error\":3,\"error_message\":\"Invoice not found\"}")
+            };
+            var apiError = Birko.SuperFaktura.AbstractSuperFaktura.HandleRequestException(uri, json, new System.Net.Http.HttpRequestException("404"));
+            var generic = Birko.SuperFaktura.AbstractSuperFaktura.HandleRequestException(uri, NonJsonErrorWithSentRequest(uri), new System.Net.Http.HttpRequestException("502"));
+
+            foreach (var ex in new[] { apiError, generic })
+            {
+                ex.URL.ShouldBe(expected);
+                ex.ToString().ShouldNotContain("abc123def");
+            }
+        }
+
         [Fact]
         public void NetworkErrorWithoutResponseKeepsGenericException()
         {
