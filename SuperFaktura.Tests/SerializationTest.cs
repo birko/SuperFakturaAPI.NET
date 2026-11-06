@@ -1447,6 +1447,23 @@ namespace SuperFaktura.Tests
         }
 
         [Fact]
+        public void ParseExceptionHidesInvoiceToken()
+        {
+            // invalid JSON (TestError)
+            var invalid = Should.Throw<Birko.SuperFaktura.Exceptions.ParseException>(() =>
+                Birko.SuperFaktura.AbstractSuperFaktura.TestError("{\"Invoice\":{\"id\":1,\"token\":\"INVOICE_TOKEN_VALUE\""));
+            invalid.ToString().ShouldNotContain("INVOICE_TOKEN_VALUE");
+            invalid.ErrorMessage.ShouldContain("\"token\":\"***\"");
+
+            // valid JSON that does not fit the model (DeserializeResult); no request is sent
+            var client = new Birko.SuperFaktura.SuperFakturaSandbox("api@example.com", "API_KEY_VALUE");
+            var mismatch = Should.Throw<Birko.SuperFaktura.Exceptions.ParseException>(() =>
+                client.DeserializeResult<int>("{\"Invoice\":{\"id\":1,\"token\":\"INVOICE_TOKEN_VALUE\"}}"));
+            mismatch.ToString().ShouldNotContain("INVOICE_TOKEN_VALUE");
+            mismatch.ErrorMessage.ShouldContain("\"id\":1");
+        }
+
+        [Fact]
         public void InvalidJsonResponseThrowsParseException()
         {
             Should.Throw<Birko.SuperFaktura.Exceptions.ParseException>(() =>

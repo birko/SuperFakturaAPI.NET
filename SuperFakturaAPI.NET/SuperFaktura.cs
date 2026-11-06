@@ -105,7 +105,7 @@ namespace Birko.SuperFaktura
             }
             catch (Exception ex)
             {
-                var exception = new Exceptions.ParseException(ex.Message, string.Format("Returned Response: {0}", result), ex);
+                var exception = new Exceptions.ParseException(ex.Message, string.Format("Returned Response: {0}", HideSecretsInJson(result)), ex);
                 throw (exception);
             }
         }
@@ -119,7 +119,7 @@ namespace Birko.SuperFaktura
             }
             catch (Exception ex)
             {
-                throw new Exceptions.ParseException(ex.Message, string.Format("Returned Response: {0}", result), ex);
+                throw new Exceptions.ParseException(ex.Message, string.Format("Returned Response: {0}", HideSecretsInJson(result)), ex);
             }
 
             var apiError = CreateApiError(token);
