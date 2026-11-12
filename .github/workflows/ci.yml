@@ -5,7 +5,7 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-  # Publishing a GitHub release with tag X.Y.Z (or vX.Y.Z) publishes version X.Y.Z to nuget.org.
+  # Publishing a GitHub release with tag X.Y.Z (or vX.Y.Z) publishes version X.Y.Z to nuget.org and GitHub Packages.
   release:
     types: [ published ]
   workflow_dispatch:
@@ -64,6 +64,7 @@ jobs:
     permissions:
       contents: write   # attach the .nupkg to the release
       id-token: write   # OIDC token for nuget.org
+      packages: write   # push to GitHub Packages with the workflow's own token
 
     steps:
       - name: Download package
@@ -91,3 +92,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.event.release.tag_name }}
         run: gh release upload "$TAG" out/*.nupkg --repo "$GITHUB_REPOSITORY" --clobber
+
+      # Last, so a GitHub Packages outage never blocks nuget.org or the release asset.
+      # Installing from it needs a GitHub token with read:packages, even for this public repository.
+      - name: Push package to GitHub Packages
+        run: dotnet nuget push "out/*.nupkg" --api-key "${{ github.token }}" --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" --skip-duplicate

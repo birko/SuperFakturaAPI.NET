@@ -4,6 +4,8 @@
 
 > You can also use [![NuGet version (SuperFaktura)](https://img.shields.io/nuget/v/SuperFaktura.svg?style=flat-square)](https://www.nuget.org/packages/SuperFaktura/)
 
+> Releases are also published to [GitHub Packages](https://github.com/birko/SuperFakturaAPI.NET/packages) (source `https://nuget.pkg.github.com/birko/index.json`; GitHub requires a token with `read:packages` to restore from it, even for public packages).
+
 Library uses System.Net.Http.HttpClient as communication layer and Newtonsoft.Json for serialization and deserialization
 
 Implementation used by [FinStat.sk](http://www.finstat.sk)
