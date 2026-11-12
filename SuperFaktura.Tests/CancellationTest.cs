@@ -14,6 +14,9 @@ namespace SuperFaktura.Tests
     // Offline: a local TCP server that accepts the connection, reads the request and never answers.
     public class CancellationTest
     {
+        // A regression (token not passed on) would otherwise wait out TimeoutSeconds; this fails it fast with TimeoutException.
+        private static readonly TimeSpan FailFast = TimeSpan.FromSeconds(5);
+
         private sealed class LocalSuperFaktura : Birko.SuperFaktura.SuperFaktura
         {
             // A unique API key per client, so the static 1-second spacing never links two tests.
@@ -93,7 +96,7 @@ namespace SuperFaktura.Tests
             using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(300));
             var stopwatch = Stopwatch.StartNew();
 
-            await Should.ThrowAsync<OperationCanceledException>(() => client.ValueLists.ListCountries(cts.Token));
+            await Should.ThrowAsync<OperationCanceledException>(() => client.ValueLists.ListCountries(cts.Token).WaitAsync(FailFast));
 
             stopwatch.Elapsed.ShouldBeLessThan(TimeSpan.FromSeconds(5));
             var connection = await server.Accepted.WaitAsync(TimeSpan.FromSeconds(5));
@@ -107,7 +110,7 @@ namespace SuperFaktura.Tests
             var client = new LocalSuperFaktura(server.Port);
             using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(200));
 
-            var ex = await Should.ThrowAsync<Exception>(() => client.Invoices.View(1, cts.Token));
+            var ex = await Should.ThrowAsync<Exception>(() => client.Invoices.View(1, cts.Token).WaitAsync(FailFast));
 
             ex.ShouldBeAssignableTo<OperationCanceledException>();
             ex.ShouldNotBeAssignableTo<Birko.SuperFaktura.Exceptions.Exception>();
@@ -122,7 +125,7 @@ namespace SuperFaktura.Tests
             client.RequestCompleted += (sender, e) => events.Add(e);
             using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(200));
 
-            await Should.ThrowAsync<OperationCanceledException>(() => client.Invoices.SendPeppol(1, cancellationToken: cts.Token));
+            await Should.ThrowAsync<OperationCanceledException>(() => client.Invoices.SendPeppol(1, cancellationToken: cts.Token).WaitAsync(FailFast));
 
             events.Count.ShouldBe(1);
             events[0].Method.ShouldBe("POST");
@@ -156,7 +159,7 @@ namespace SuperFaktura.Tests
             using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(100));
             var stopwatch = Stopwatch.StartNew();
 
-            await Should.ThrowAsync<OperationCanceledException>(() => client.Tags.List(cts.Token));
+            await Should.ThrowAsync<OperationCanceledException>(() => client.Tags.List(cts.Token).WaitAsync(FailFast));
 
             stopwatch.Elapsed.ShouldBeLessThan(TimeSpan.FromMilliseconds(800));
             server.Accepted.IsCompleted.ShouldBeFalse();
