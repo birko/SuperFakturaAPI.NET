@@ -5,6 +5,7 @@ using Birko.SuperFaktura.Response.Stock;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Birko.SuperFaktura
@@ -18,9 +19,9 @@ namespace Birko.SuperFaktura
             this.superFaktura = superFaktura;
         }
 
-        public async Task<PagedResponse<ListItem>> List(Filter filter, bool listInfo = true)
+        public async Task<PagedResponse<ListItem>> List(Filter filter, bool listInfo = true, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Get(string.Format("stock_items/index.json{0}", filter.ToParameters(listInfo))).ConfigureAwait(false);
+            var result = await superFaktura.Get(string.Format("stock_items/index.json{0}", filter.ToParameters(listInfo)), cancellationToken).ConfigureAwait(false);
             if (listInfo)
             {
                 return superFaktura.DeserializeResult<PagedResponse<ListItem>>(result);
@@ -31,53 +32,53 @@ namespace Birko.SuperFaktura
             }
         }
 
-        public async Task<Response.Stock.Item> View(int ID)
+        public async Task<Response.Stock.Item> View(int ID, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Get($"stock_items/view/{ID}").ConfigureAwait(false);
+            var result = await superFaktura.Get($"stock_items/view/{ID}", cancellationToken).ConfigureAwait(false);
             var data = superFaktura.DeserializeResult<Detail>(result);
             return data.StockItem;
         }
 
-        public async Task<Detail> Add(Request.Stock.Item item)
+        public async Task<Detail> Add(Request.Stock.Item item, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Post("stock_items/add", new StockItemData () { StockItem = item }).ConfigureAwait(false);
+            var result = await superFaktura.Post("stock_items/add", new StockItemData () { StockItem = item }, cancellationToken).ConfigureAwait(false);
             var data = superFaktura.DeserializeResult<Response<Detail>>(result);
             return data.Data;
         }
 
-        public async Task<Detail> Edit(int id, Request.Stock.Item item)
+        public async Task<Detail> Edit(int id, Request.Stock.Item item, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Patch($"stock_items/edit/{id}", new StockItemData() { StockItem = item }).ConfigureAwait(false);
+            var result = await superFaktura.Patch($"stock_items/edit/{id}", new StockItemData() { StockItem = item }, cancellationToken).ConfigureAwait(false);
             var data = superFaktura.DeserializeResult<Response<Detail>>(result);
             return data.Data;
         }
 
-        public async Task<Detail> Delete(int ID)
+        public async Task<Detail> Delete(int ID, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Delete(string.Format("stock_items/delete/{0}", ID)).ConfigureAwait(false);
+            var result = await superFaktura.Delete(string.Format("stock_items/delete/{0}", ID), cancellationToken).ConfigureAwait(false);
             var data = superFaktura.DeserializeResult<Response<Detail>>(result);
             return data.Data;
         }
 
-        public async Task<IEnumerable<Response.Stock.Log>> AddStockMovement(IEnumerable<Request.Stock.Log> items)
+        public async Task<IEnumerable<Response.Stock.Log>> AddStockMovement(IEnumerable<Request.Stock.Log> items, CancellationToken cancellationToken = default)
         {
             if (!(items?.Any() ?? false))
             {
                 return null;
             }
-            var result = await superFaktura.Post("stock_items/addstockmovement", new StockLogsData { StockLog = items.ToArray() }).ConfigureAwait(false);
+            var result = await superFaktura.Post("stock_items/addstockmovement", new StockLogsData { StockLog = items.ToArray() }, cancellationToken).ConfigureAwait(false);
             var data = superFaktura.DeserializeResult<Response<LogResponse>>(result);
             return data.Data.StockLog;
         }
 
-        public async Task<IEnumerable<Response.Stock.Log>> AddStockMovement(Request.Stock.Log item)
+        public async Task<IEnumerable<Response.Stock.Log>> AddStockMovement(Request.Stock.Log item, CancellationToken cancellationToken = default)
         {
-            return await AddStockMovement(new[] { item }).ConfigureAwait(false);
+            return await AddStockMovement(new[] { item }, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<PagedResponse<LogItem>> ListStockMovements(int id, PagedParameters filter, bool listInfo = true)
+        public async Task<PagedResponse<LogItem>> ListStockMovements(int id, PagedParameters filter, bool listInfo = true, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Get($"stock_items/movements/{id}{filter.ToParameters(listInfo)}").ConfigureAwait(false);
+            var result = await superFaktura.Get($"stock_items/movements/{id}{filter.ToParameters(listInfo)}", cancellationToken).ConfigureAwait(false);
             if (listInfo)
             {
                 return superFaktura.DeserializeResult<PagedResponse<LogItem>>(result);

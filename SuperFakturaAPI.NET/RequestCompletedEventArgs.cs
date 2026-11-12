@@ -18,11 +18,12 @@ namespace Birko.SuperFaktura
         // Only with IncludeBodiesInEvents; null for binary responses (PDF), see ResponseLength.
         public string ResponseBody { get; }
         public long? ResponseLength { get; }
-        // The exception the call throws, or null when it succeeded.
-        public Exceptions.Exception Exception { get; }
+        // The exception the call throws, or null when it succeeded: Exceptions.Exception for API and
+        // HTTP errors, OperationCanceledException when the caller's CancellationToken cancelled it.
+        public System.Exception Exception { get; }
 
         public RequestCompletedEventArgs(string method, string uri, int? statusCode, TimeSpan duration,
-            string requestBody, string responseBody, long? responseLength, Exceptions.Exception exception)
+            string requestBody, string responseBody, long? responseLength, System.Exception exception)
         {
             Method = method;
             Uri = uri;

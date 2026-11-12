@@ -2,6 +2,7 @@
 using Birko.SuperFaktura.Response;
 using Birko.SuperFaktura.Response.Client;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Birko.SuperFaktura
@@ -15,9 +16,9 @@ namespace Birko.SuperFaktura
             this.superFaktura = superFaktura;
         }
 
-        public async Task<PagedResponse<Item>> List(Filter filter, bool listInfo = true)
+        public async Task<PagedResponse<Item>> List(Filter filter, bool listInfo = true, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Get(string.Format("clients/index.json{0}", filter.ToParameters(listInfo))).ConfigureAwait(false);
+            var result = await superFaktura.Get(string.Format("clients/index.json{0}", filter.ToParameters(listInfo)), cancellationToken).ConfigureAwait(false);
             if (listInfo)
             {
                 return superFaktura.DeserializeResult<PagedResponse<Item>>(result);
@@ -28,28 +29,28 @@ namespace Birko.SuperFaktura
             }
         }
 
-        public async Task<Response.Client.Client> Add(Request.Client.Client client, IEnumerable<int> tags = null)
+        public async Task<Response.Client.Client> Add(Request.Client.Client client, IEnumerable<int> tags = null, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Post("clients/create", new ClientData { Client = client, Tag = tags }).ConfigureAwait(false);
+            var result = await superFaktura.Post("clients/create", new ClientData { Client = client, Tag = tags }, cancellationToken).ConfigureAwait(false);
             var data = superFaktura.DeserializeResult<Response<ResponseClient>>(result);
             return data.Data.Client;
         }
 
-        public async Task<StringMessageResponse> Edit(int id, Request.Client.Client client, IEnumerable<int> tags = null)
+        public async Task<StringMessageResponse> Edit(int id, Request.Client.Client client, IEnumerable<int> tags = null, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Patch($"clients/edit/{id}", new ClientData { Client = client, Tag = tags }).ConfigureAwait(false);
+            var result = await superFaktura.Patch($"clients/edit/{id}", new ClientData { Client = client, Tag = tags }, cancellationToken).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<ResponseClient>>(result);
         }
 
-        public async Task<DetailClient> View(int id)
+        public async Task<DetailClient> View(int id, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Get($"clients/view/{id}").ConfigureAwait(false);
+            var result = await superFaktura.Get($"clients/view/{id}", cancellationToken).ConfigureAwait(false);
             return superFaktura.DeserializeResult<DetailClient>(result);
         }
 
-        public async Task<RedirectResponse> Delete(int id)
+        public async Task<RedirectResponse> Delete(int id, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Delete($"clients/delete/{id}").ConfigureAwait(false);
+            var result = await superFaktura.Delete($"clients/delete/{id}", cancellationToken).ConfigureAwait(false);
             return superFaktura.DeserializeResult<RedirectResponse>(result);
         }
     }

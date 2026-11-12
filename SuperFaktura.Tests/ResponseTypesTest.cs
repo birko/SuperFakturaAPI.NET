@@ -49,7 +49,7 @@ namespace SuperFaktura.Tests
         [MemberData(nameof(Lists))]
         public async Task TestListValuesFitModelTypes(string url, Type type)
         {
-            var json = await client.Get(url);
+            var json = await client.Get(url, System.Threading.CancellationToken.None);
             var result = ModelCoverage.Compare(JToken.Parse(json), type);
             output.WriteLine(client.APIURL + url);
             output.WriteLine(result.ToString());

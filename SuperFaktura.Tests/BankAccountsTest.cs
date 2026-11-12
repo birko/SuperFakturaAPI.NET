@@ -90,7 +90,7 @@ namespace SuperFaktura.Tests
             var added = await AddTestAccount();
             try
             {
-                var raw = JObject.Parse(await apiClient.Get("bank_accounts/index"));
+                var raw = JObject.Parse(await apiClient.Get("bank_accounts/index", System.Threading.CancellationToken.None));
                 var account = (JObject)raw["BankAccounts"]
                     .Select(x => x["BankAccount"])
                     .Single(x => x["id"].Value<string>() == added.ID.ToString());
@@ -117,7 +117,7 @@ namespace SuperFaktura.Tests
             try
             {
                 invoice = await CreateTestInvoice();
-                var raw = JObject.Parse(await apiClient.Get(string.Format("invoices/view/{0}.json", invoice.Invoice.ID)));
+                var raw = JObject.Parse(await apiClient.Get(string.Format("invoices/view/{0}.json", invoice.Invoice.ID), System.Threading.CancellationToken.None));
                 output.WriteLine(raw["MyData"]["BankAccount"].ToString());
                 output.WriteLine(raw["Invoice"]["my_data"].ToString());
 

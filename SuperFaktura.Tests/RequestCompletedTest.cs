@@ -37,7 +37,7 @@ namespace SuperFaktura.Tests
             events[1].StatusCode.ShouldBe(400);
             events[1].RequestBody.ShouldBe("{\"invoice_id\":0}");
             events[1].ResponseBody.ShouldContain(Birko.SuperFaktura.Request.ValueLists.PeppolErrorCode.InvalidPayload);
-            events[1].Exception.ErrorCode.ShouldBe(Birko.SuperFaktura.Request.ValueLists.PeppolErrorCode.InvalidPayload);
+            events[1].Exception.ShouldBeOfType<Birko.SuperFaktura.Exceptions.Exception>().ErrorCode.ShouldBe(Birko.SuperFaktura.Request.ValueLists.PeppolErrorCode.InvalidPayload);
 
             foreach (var e in events)
             {

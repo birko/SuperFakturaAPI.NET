@@ -1,6 +1,7 @@
 ﻿using Birko.SuperFaktura.Request.Tags;
 using Birko.SuperFaktura.Response;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Birko.SuperFaktura
@@ -14,9 +15,9 @@ namespace Birko.SuperFaktura
             this.superFaktura = superFaktura;
         }
 
-        public async Task<Dictionary<int, string>> List()
+        public async Task<Dictionary<int, string>> List(CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Get("tags/index.json").ConfigureAwait(false);
+            var result = await superFaktura.Get("tags/index.json", cancellationToken).ConfigureAwait(false);
             try
             {
                 return superFaktura.DeserializeResult<Dictionary<int, string>>(result);
@@ -42,21 +43,21 @@ namespace Birko.SuperFaktura
             }
         }
 
-        public async Task<Response.Tag.Tag> Add(Tag tag)
+        public async Task<Response.Tag.Tag> Add(Tag tag, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Post("tags/add", tag).ConfigureAwait(false);
+            var result = await superFaktura.Post("tags/add", tag, cancellationToken).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response.Tag.Tag>(result);
         }
 
-        public async Task<Response.Tag.Tag> Edit(int id, Tag tag)
+        public async Task<Response.Tag.Tag> Edit(int id, Tag tag, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Post($"tags/edit/{id}", tag).ConfigureAwait(false);
+            var result = await superFaktura.Post($"tags/edit/{id}", tag, cancellationToken).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response.Tag.Tag>(result);
         }
 
-        public async Task<StringMessageResponse> Delete(int id)
+        public async Task<StringMessageResponse> Delete(int id, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Get($"tags/delete/{id}").ConfigureAwait(false);
+            var result = await superFaktura.Get($"tags/delete/{id}", cancellationToken).ConfigureAwait(false);
             return superFaktura.DeserializeResult<StringMessageResponse>(result);
         }
     }

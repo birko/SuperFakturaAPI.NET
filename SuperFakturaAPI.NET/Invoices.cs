@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Birko.SuperFaktura
@@ -20,9 +21,9 @@ namespace Birko.SuperFaktura
             this.superFaktura = superFaktura;
         }
 
-        public async Task<PagedResponse> List(Request.Invoice.Filter filter, bool listInfo = true)
+        public async Task<PagedResponse> List(Request.Invoice.Filter filter, bool listInfo = true, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Get(string.Format("invoices/index.json{0}", filter.ToParameters(listInfo))).ConfigureAwait(false);
+            var result = await superFaktura.Get(string.Format("invoices/index.json{0}", filter.ToParameters(listInfo)), cancellationToken).ConfigureAwait(false);
             if (listInfo)
             {
                 return superFaktura.DeserializeResult<PagedResponse>(result);
@@ -35,7 +36,7 @@ namespace Birko.SuperFaktura
 
         /// <param name="checksum">Your own unique identifier of this request (e.g. order number, max 32 chars).
         /// If no response arrives, call ResponseByChecksum with it to find out whether the invoice was created.</param>
-        public async Task<Detail> Add(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, InvoiceSettings setting = null, Extra extra = null, Request.Invoice.MyData myData = null, string checksum = null)
+        public async Task<Detail> Add(Request.Invoice.Invoice invoice, Client client, Request.Invoice.Item[] items, int[] tags = null, InvoiceSettings setting = null, Extra extra = null, Request.Invoice.MyData myData = null, string checksum = null, CancellationToken cancellationToken = default)
         {
             var data = new InvoiceData
             {
@@ -49,27 +50,27 @@ namespace Birko.SuperFaktura
                 MyData = myData
             };
 
-            var result = await superFaktura.Post("invoices/create", data).ConfigureAwait(false);
+            var result = await superFaktura.Post("invoices/create", data, cancellationToken).ConfigureAwait(false);
             var response = superFaktura.DeserializeResult<StatusResponse<Detail>>(result);
             return response.Data;
         }
 
-        public async Task<Detail> View(int ID)
+        public async Task<Detail> View(int ID, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Get(string.Format("invoices/view/{0}.json", ID)).ConfigureAwait(false);
+            var result = await superFaktura.Get(string.Format("invoices/view/{0}.json", ID), cancellationToken).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Detail>(result);
         }
 
-        public async Task<Dictionary<int, Detail>> ListDetails(IEnumerable<int> IDS)
+        public async Task<Dictionary<int, Detail>> ListDetails(IEnumerable<int> IDS, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Get(string.Format("invoices/getInvoiceDetails/{0}", string.Join(",", IDS))).ConfigureAwait(false);
+            var result = await superFaktura.Get(string.Format("invoices/getInvoiceDetails/{0}", string.Join(",", IDS)), cancellationToken).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Dictionary<int, Detail>>(result);
         }
 
         // Only fields that are set are changed; invoice.ID is required. Returns the full invoice detail.
         // Items with an ID are updated, items without one are added; items left out are NOT deleted
         // (API behaviour) - remove them with DeleteItem.
-        public async Task<Detail> Edit(Request.Invoice.Invoice invoice, Client client = null, Request.Invoice.Item[] items = null, int[] tags = null, InvoiceSettings setting = null, Extra extra = null, Request.Invoice.MyData myData = null)
+        public async Task<Detail> Edit(Request.Invoice.Invoice invoice, Client client = null, Request.Invoice.Item[] items = null, int[] tags = null, InvoiceSettings setting = null, Extra extra = null, Request.Invoice.MyData myData = null, CancellationToken cancellationToken = default)
         {
             var data = new InvoiceData
             {
@@ -82,23 +83,23 @@ namespace Birko.SuperFaktura
                 MyData = myData
             };
 
-            var result = await superFaktura.Post("invoices/edit", data).ConfigureAwait(false);
+            var result = await superFaktura.Post("invoices/edit", data, cancellationToken).ConfigureAwait(false);
             var response = superFaktura.DeserializeResult<Response<Detail>>(result);
             return response.Data;
         }
 
-        public async Task<StringMessageResponse> SetInvoiceLanguage(int ID, string language = Request.ValueLists.LanguageType.Slovak)
+        public async Task<StringMessageResponse> SetInvoiceLanguage(int ID, string language = Request.ValueLists.LanguageType.Slovak, CancellationToken cancellationToken = default)
         {
             if (!Request.ValueLists.LanguageType.Languages.Contains(language))
             {
                 language = Request.ValueLists.LanguageType.Slovak;
             }
             // error response fix
-            var result = await superFaktura.Get(string.Format("invoices/setinvoicelanguage/{0}/lang:{1}", ID, language)).ConfigureAwait(false);
+            var result = await superFaktura.Get(string.Format("invoices/setinvoicelanguage/{0}/lang:{1}", ID, language), cancellationToken).ConfigureAwait(false);
             return superFaktura.DeserializeResult<StringMessageResponse>(result);
         }
 
-        public async Task<byte[]> Download(int invoiceId, string token, string language = Request.ValueLists.LanguageType.Slovak, bool? signature = null, bool? bySquare = null, bool? paypal = null)
+        public async Task<byte[]> Download(int invoiceId, string token, string language = Request.ValueLists.LanguageType.Slovak, bool? signature = null, bool? bySquare = null, bool? paypal = null, CancellationToken cancellationToken = default)
         {
             if (!Request.ValueLists.LanguageType.Languages.Contains(language))
             {
@@ -117,7 +118,7 @@ namespace Birko.SuperFaktura
             {
                 url += $"/paypal:{(paypal.Value ? 1 : 0)}";
             }
-            var result = await superFaktura.GetByte(url).ConfigureAwait(false);
+            var result = await superFaktura.GetByte(url, cancellationToken).ConfigureAwait(false);
             //Code below tests if response is a SuperFaktura error response or PDF File
             try
             {
@@ -135,105 +136,105 @@ namespace Birko.SuperFaktura
             return result;
         }
 
-        public async Task<StringMessageResponse> Delete(int id)
+        public async Task<StringMessageResponse> Delete(int id, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Get(string.Format("invoices/delete/{0}", id)).ConfigureAwait(false);
+            var result = await superFaktura.Get(string.Format("invoices/delete/{0}", id), cancellationToken).ConfigureAwait(false);
             return superFaktura.DeserializeResult<StringMessageResponse>(result);
         }
 
-        public async Task<DetailBasic> WillNotBePaid(int id)
+        public async Task<DetailBasic> WillNotBePaid(int id, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Get(string.Format("invoices/will_not_be_paid/{0}", id)).ConfigureAwait(false);
+            var result = await superFaktura.Get(string.Format("invoices/will_not_be_paid/{0}", id), cancellationToken).ConfigureAwait(false);
             var detail = superFaktura.DeserializeResult<Response<DetailBasic>>(result);
             return detail.Data;
         }
 
-        public async Task<ResponseEmailInvoice> SendEmail(Request.Invoice.Email email)
+        public async Task<ResponseEmailInvoice> SendEmail(Request.Invoice.Email email, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Post("invoices/send", new EmailData { Email = email }).ConfigureAwait(false);
+            var result = await superFaktura.Post("invoices/send", new EmailData { Email = email }, cancellationToken).ConfigureAwait(false);
             var data = superFaktura.DeserializeResult<Response<ResponseEmail>>(result);
             return data.Data.Invoice;
         }
 
-        public async Task<ErrorMessageResponse> MarkAsSentViaMail(MarkEmail email)
+        public async Task<ErrorMessageResponse> MarkAsSentViaMail(MarkEmail email, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Post("invoices/mark_as_sent", new MarkEmailData { InvoiceEmail = email }).ConfigureAwait(false);
+            var result = await superFaktura.Post("invoices/mark_as_sent", new MarkEmailData { InvoiceEmail = email }, cancellationToken).ConfigureAwait(false);
             return superFaktura.DeserializeResult<ErrorMessageResponse>(result);
         }
 
-        public async Task<DetailBasic> SendPost(Post post)
+        public async Task<DetailBasic> SendPost(Post post, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Post("invoices/post", new PostData { Post = post }).ConfigureAwait(false);
+            var result = await superFaktura.Post("invoices/post", new PostData { Post = post }, cancellationToken).ConfigureAwait(false);
             var data = superFaktura.DeserializeResult<Response<DetailBasic>>(result);
             return data.Data;
         }
 
-        public async Task<Mark> MarkAsSent(int invoiceID)
+        public async Task<Mark> MarkAsSent(int invoiceID, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Get(string.Format("invoices/mark_sent/{0}", invoiceID)).ConfigureAwait(false);
+            var result = await superFaktura.Get(string.Format("invoices/mark_sent/{0}", invoiceID), cancellationToken).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Mark>(result);
         }
 
         // invoice.md "Send invoice via Peppol": queues the send (HTTP 202); delivery is asynchronous,
         // read the outcome with GetPeppolStatus or receive it on webhookUrl.
-        public async Task<PeppolSendResult> SendPeppol(int invoiceID, string webhookUrl = null, string webhookSecret = null)
+        public async Task<PeppolSendResult> SendPeppol(int invoiceID, string webhookUrl = null, string webhookSecret = null, CancellationToken cancellationToken = default)
         {
             var send = new PeppolSend { InvoiceID = invoiceID, WebhookUrl = webhookUrl, WebhookSecret = webhookSecret };
-            var result = await superFaktura.PostJson("invoices/sendPeppol", send).ConfigureAwait(false);
+            var result = await superFaktura.PostJson("invoices/sendPeppol", send, cancellationToken).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<PeppolSendResult>>(result).Data;
         }
 
         // invoice.md "Get Peppol sending status": latest recorded status; a failed send is status "failed", not an error.
-        public async Task<PeppolSendStatus> GetPeppolStatus(int invoiceID)
+        public async Task<PeppolSendStatus> GetPeppolStatus(int invoiceID, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Get(string.Format("invoices/getPeppolStatus/{0}", invoiceID)).ConfigureAwait(false);
+            var result = await superFaktura.Get(string.Format("invoices/getPeppolStatus/{0}", invoiceID), cancellationToken).ConfigureAwait(false);
             return superFaktura.DeserializeResult<Response<PeppolSendStatus>>(result).Data;
         }
 
-        public async Task<DetailInvoice> DeleteItem(int invoiceID, int itemID)
+        public async Task<DetailInvoice> DeleteItem(int invoiceID, int itemID, CancellationToken cancellationToken = default)
         {
-            return await DeleteItem(invoiceID, new int[] { itemID }).ConfigureAwait(false);
+            return await DeleteItem(invoiceID, new int[] { itemID }, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<DetailInvoice> DeleteItem(int invoiceID, int[] itemID)
+        public async Task<DetailInvoice> DeleteItem(int invoiceID, int[] itemID, CancellationToken cancellationToken = default)
         {
             if (!(itemID?.Any() ?? false))
             {
                 return null;
             }
-            var result = await superFaktura.Get(string.Format("invoice_items/delete/{1}/invoice_id:{0}", invoiceID, string.Join(",", itemID))).ConfigureAwait(false);
+            var result = await superFaktura.Get(string.Format("invoice_items/delete/{1}/invoice_id:{0}", invoiceID, string.Join(",", itemID)), cancellationToken).ConfigureAwait(false);
             var data = superFaktura.DeserializeResult<Response<DetailInvoice>>(result);
             return data.Data;
         }
 
-        public async Task<ResponsePayment> AddPayment(Request.Invoice.Payment payment)
+        public async Task<ResponsePayment> AddPayment(Request.Invoice.Payment payment, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Post("invoice_payments/add/ajax:1/api:1", new InvoicePaymentData { InvoicePayment = payment }).ConfigureAwait(false);
+            var result = await superFaktura.Post("invoice_payments/add/ajax:1/api:1", new InvoicePaymentData { InvoicePayment = payment }, cancellationToken).ConfigureAwait(false);
             return superFaktura.DeserializeResult<ResponsePayment>(result);
         }
 
-        public async Task<DeletePayment> DeletePayment(int invoicePaymentID)
+        public async Task<DeletePayment> DeletePayment(int invoicePaymentID, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Get(string.Format("invoice_payments/delete/{0}", invoicePaymentID)).ConfigureAwait(false);
+            var result = await superFaktura.Get(string.Format("invoice_payments/delete/{0}", invoicePaymentID), cancellationToken).ConfigureAwait(false);
             return superFaktura.DeserializeResult<DeletePayment>(result);
         }
 
-        public async Task<RelatedItemResponse> AddRelatedItem(Request.RelatedItem related)
+        public async Task<RelatedItemResponse> AddRelatedItem(Request.RelatedItem related, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Post("invoices/addRelatedItem", related).ConfigureAwait(false);
+            var result = await superFaktura.Post("invoices/addRelatedItem", related, cancellationToken).ConfigureAwait(false);
             var data = superFaktura.DeserializeResult<Response<RelatedItemResponse>>(result);
             return data.Data;
         }
 
-        public async Task<StringMessageResponse> DeleteRelatedItem(int relationID)
+        public async Task<StringMessageResponse> DeleteRelatedItem(int relationID, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Get(string.Format("invoices/deleteRelatedItem/{0}", relationID)).ConfigureAwait(false);
+            var result = await superFaktura.Get(string.Format("invoices/deleteRelatedItem/{0}", relationID), cancellationToken).ConfigureAwait(false);
             return superFaktura.DeserializeResult<StringMessageResponse>(result);
         }
 
-        public async Task<byte[]> DownloadReceipt(int invoiceID)
+        public async Task<byte[]> DownloadReceipt(int invoiceID, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.GetByte(string.Format("invoices/receipt/{0}", invoiceID)).ConfigureAwait(false);
+            var result = await superFaktura.GetByte(string.Format("invoices/receipt/{0}", invoiceID), cancellationToken).ConfigureAwait(false);
             try
             {
                 string testResult = Encoding.UTF8.GetString(result);
@@ -252,19 +253,19 @@ namespace Birko.SuperFaktura
 
         // Not in the API docs, used by the official PHP client (createRegularFromProforma): GET returns the
         // regular invoice prefilled from the proforma, which is then created as is.
-        public async Task<Detail> CreateFromProforma(int proformaID)
+        public async Task<Detail> CreateFromProforma(int proformaID, CancellationToken cancellationToken = default)
         {
-            var proforma = await superFaktura.Get(string.Format("invoices/regular/{0}.json", proformaID)).ConfigureAwait(false);
+            var proforma = await superFaktura.Get(string.Format("invoices/regular/{0}.json", proformaID), cancellationToken).ConfigureAwait(false);
             var data =  superFaktura.DeserializeResult<ExpandoObject>(proforma);
-            var result = await superFaktura.Post("invoices/create", data).ConfigureAwait(false);
+            var result = await superFaktura.Post("invoices/create", data, cancellationToken).ConfigureAwait(false);
             var resultdata = superFaktura.DeserializeResult<Response<Detail>>(result);
             return resultdata.Data;
         }
 
         [Obsolete("Not found in API documentation")]
-        public async Task<ExpandoObject> SetEstimateStatus(int estimateID, int status)
+        public async Task<ExpandoObject> SetEstimateStatus(int estimateID, int status, CancellationToken cancellationToken = default)
         {
-            var result = await superFaktura.Get(string.Format("invoices/set_estimate_status/{0}/{1}/ajax:1", estimateID, status)).ConfigureAwait(false);
+            var result = await superFaktura.Get(string.Format("invoices/set_estimate_status/{0}/{1}/ajax:1", estimateID, status), cancellationToken).ConfigureAwait(false);
             var data = superFaktura.DeserializeResult<Response<ExpandoObject>>(result);
             return data.Data;
         }

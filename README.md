@@ -46,8 +46,20 @@ It ensures that the delay between api calls is more than 1 second.
 #### Errors
 API errors (also HTTP 4xx/5xx with an API error body) are thrown as `Birko.SuperFaktura.Exceptions.Exception` with `Error` (API error code), `ErrorMessage` and `ResponseMessage`. Newer endpoints (e.g. Peppol) always answer `"error": 1` and identify the error by a string `ErrorCode` (e.g. `peppol.precheck_failed`), with details in `ErrorData` (the response `data` as `JToken`, e.g. `ErrorData["issues"]`; `null` when empty). A response that is not JSON throws `Exceptions.ParseException`.
 
+#### Cancellation
+Every public async method takes an optional last parameter `CancellationToken cancellationToken = default` (omitted in the method lists below).
+* Cancelling the token aborts the HTTP request (the connection is closed, not just abandoned), including the download of the response body (e.g. a PDF).
+* It also cuts short the 1-second spacing the client keeps between requests; a token already cancelled sends nothing.
+* A cancelled call throws `OperationCanceledException` (usually `TaskCanceledException`), never `Exceptions.Exception`, so your own deadline is distinguishable from an API refusal. An `HttpClient` timeout (`TimeoutSeconds`) is still thrown as `Exceptions.Exception`.
+* A request cancelled after it was sent may still have been processed by the API: for creating calls, use `checksum` and `ResponseByChecksum` to find out.
+
+```csharp
+using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+var pdf = await sf.Invoices.Download(invoiceId, token, cancellationToken: cts.Token);
+```
+
 #### Request events
-`RequestCompleted` fires after every API request, also a failed one, with `Method`, `Uri`, `StatusCode` (`null` without response), `Duration`, `ResponseLength` and `Exception`. `RequestBody` and `ResponseBody` are filled only with `IncludeBodiesInEvents = true`; binary responses (PDF) report only `ResponseLength`.
+`RequestCompleted` fires after every API request, also a failed or cancelled one, with `Method`, `Uri`, `StatusCode` (`null` without response), `Duration`, `ResponseLength` and `Exception` (`Exceptions.Exception`, or `OperationCanceledException` for a cancelled request). `RequestBody` and `ResponseBody` are filled only with `IncludeBodiesInEvents = true`; binary responses (PDF) report only `ResponseLength`.
 * Headers are never included (the `Authorization` header holds the API key). The invoice `token` (in URLs and bodies) and `webhook_secret` are shown as `***`.
 * Bodies still contain **personal data** (clients, addresses, e-mails, IBAN): use them for debugging, do not send them to central logging in production.
 * Exceptions thrown by a handler are ignored, so a failing logger never fails an API call (e.g. after an invoice was already created).

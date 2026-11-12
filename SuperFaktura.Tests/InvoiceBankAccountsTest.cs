@@ -80,7 +80,7 @@ namespace SuperFaktura.Tests
                     Client = new Birko.SuperFaktura.Request.Client.Client { Name = UniqueName("sf-test-invoice-client") },
                     InvoiceItem = new[] { new Birko.SuperFaktura.Request.Invoice.Item { Name = "test item", Quantity = 1, UnitPrice = 10, Tax = 20 } },
                 };
-                var created = JObject.Parse(await apiClient.Post("invoices/create", data));
+                var created = JObject.Parse(await apiClient.Post("invoices/create", data, System.Threading.CancellationToken.None));
                 created["error"].Value<int>().ShouldBe(0, created.ToString());
                 invoiceID = created["data"]["Invoice"]["id"].Value<int>();
                 clientID = created["data"]["Invoice"]["client_id"].Value<int>();
@@ -88,7 +88,7 @@ namespace SuperFaktura.Tests
                 output.WriteLine($"invoice {invoiceID} currency={invoiceCurrency} sent bank_accounts={sentAccounts}");
                 Dump("create MyData.BankAccount:", created["data"]["MyData"]["BankAccount"]);
 
-                var view = JObject.Parse(await apiClient.Get(string.Format("invoices/view/{0}.json", invoiceID)));
+                var view = JObject.Parse(await apiClient.Get(string.Format("invoices/view/{0}.json", invoiceID), System.Threading.CancellationToken.None));
                 Dump("view MyData.BankAccount:", view["MyData"]["BankAccount"]);
                 Dump("view Invoice.my_data BankAccount:", JObject.Parse(view["Invoice"]["my_data"].Value<string>())["MyData"]["BankAccount"]);
 

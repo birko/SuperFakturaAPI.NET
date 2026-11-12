@@ -10,6 +10,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Birko.SuperFaktura
@@ -163,18 +164,18 @@ namespace Birko.SuperFaktura
             return token.Type == JTokenType.String ? token.Value<string>() : token.ToString(Formatting.None);
         }
 
-        private void RequestDelay()
+        private async Task RequestDelay(CancellationToken cancellationToken)
         {
             DateTime now = DateTime.Now;
             var key = ProfileKey;
             //request throttling
             if (RequestCount(key, now) >= 1000)
             {
-                Task.Delay(TimeSpan.FromSeconds(5)).Wait();
+                await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken).ConfigureAwait(false);
             }
             else if (_lastRequest.TryGetValue(key, out DateTime last) && (now - last).TotalSeconds <= 1)
             {
-                Task.Delay(TimeSpan.FromSeconds(1)).Wait();
+                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
             }
             now = DateTime.Now;
             _lastRequest[key] = now;
@@ -291,26 +292,27 @@ namespace Birko.SuperFaktura
         // Adds request and response bodies to RequestCompleted. Off by default: bodies contain personal data.
         public bool IncludeBodiesInEvents { get; set; } = false;
 
-        internal Task<string> Get(string uri)
+        // The CancellationToken is required on every internal method, so no public method can forget to pass it on.
+        internal Task<string> Get(string uri, CancellationToken cancellationToken)
         {
-            return Send(new HttpRequestMessage(HttpMethod.Get, uri), null, ReadString);
+            return Send(new HttpRequestMessage(HttpMethod.Get, uri), null, ReadString, cancellationToken);
         }
 
-        internal Task<byte[]> GetByte(string uri)
+        internal Task<byte[]> GetByte(string uri, CancellationToken cancellationToken)
         {
-            return Send(new HttpRequestMessage(HttpMethod.Get, uri), null, ReadBytes);
+            return Send(new HttpRequestMessage(HttpMethod.Get, uri), null, ReadBytes, cancellationToken);
         }
 
-        internal Task<string> Post(string uri, string data, string checkSum = null)
+        internal Task<string> Post(string uri, string data, string checkSum, CancellationToken cancellationToken)
         {
             LastCheckSum = checkSum;
-            return Send(new HttpRequestMessage(HttpMethod.Post, uri) { Content = FormData(data) }, data, ReadString);
+            return Send(new HttpRequestMessage(HttpMethod.Post, uri) { Content = FormData(data) }, data, ReadString, cancellationToken);
         }
 
-        internal Task<byte[]> PostByte(string uri, string data, string checkSum = null)
+        internal Task<byte[]> PostByte(string uri, string data, string checkSum, CancellationToken cancellationToken)
         {
             LastCheckSum = checkSum;
-            return Send(new HttpRequestMessage(HttpMethod.Post, uri) { Content = FormData(data) }, data, ReadBytes);
+            return Send(new HttpRequestMessage(HttpMethod.Post, uri) { Content = FormData(data) }, data, ReadBytes, cancellationToken);
         }
 
         private static readonly Func<HttpContent, Task<string>> ReadString = content => content.ReadAsStringAsync();
@@ -322,19 +324,25 @@ namespace Birko.SuperFaktura
         }
 
         // The single place every request goes through: throttling, rate-limit headers, errors, RequestCompleted.
-        private async Task<T> Send<T>(HttpRequestMessage request, string body, Func<HttpContent, Task<T>> read) where T : class
+        // A cancelled token throws OperationCanceledException as is (never wrapped as Exceptions.Exception);
+        // an HttpClient timeout (TimeoutSeconds) is still reported as Exceptions.Exception.
+        private async Task<T> Send<T>(HttpRequestMessage request, string body, Func<HttpContent, Task<T>> read, CancellationToken cancellationToken) where T : class
         {
-            RequestDelay();
+            await RequestDelay(cancellationToken).ConfigureAwait(false);
+            // Cancelled before anything was sent: no request is counted and RequestCompleted is not raised.
+            cancellationToken.ThrowIfCancellationRequested();
             var client = CreateClient();
             var uri = request.RequestUri?.OriginalString;
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             HttpResponseMessage response = null;
             T result = null;
-            Exceptions.Exception error = null;
+            Exception error = null;
             try
             {
                 IncreaseRequestCount(ProfileKey);
-                response = await client.SendAsync(request).ConfigureAwait(false);
+                // The default HttpCompletionOption.ResponseContentRead buffers the whole body inside
+                // SendAsync, so the token also covers downloading it; read() below only reads memory.
+                response = await client.SendAsync(request, cancellationToken).ConfigureAwait(false);
                 ParseResponse(response);
                 if (response.IsSuccessStatusCode || !EnsureSuccessStatusCode)
                 {
@@ -342,10 +350,16 @@ namespace Birko.SuperFaktura
                 }
                 return result;
             }
+            catch (OperationCanceledException ex) when (cancellationToken.IsCancellationRequested)
+            {
+                error = ex;
+                throw;
+            }
             catch (Exception ex)
             {
-                error = HandleRequestException(uri, response, ex);
-                throw error;
+                var apiError = HandleRequestException(uri, response, ex);
+                error = apiError;
+                throw apiError;
             }
             finally
             {
@@ -359,7 +373,7 @@ namespace Birko.SuperFaktura
         }
 
         internal static async Task<RequestCompletedEventArgs> CreateRequestCompletedArgs(HttpMethod method, string uri, string body,
-            HttpResponseMessage response, object result, Exceptions.Exception error, TimeSpan duration, bool includeBodies)
+            HttpResponseMessage response, object result, Exception error, TimeSpan duration, bool includeBodies)
         {
             string responseBody = null;
             long? responseLength = null;
@@ -394,70 +408,70 @@ namespace Birko.SuperFaktura
             }
         }
 
-        internal async Task<string> Post(string uri, object data)
+        internal async Task<string> Post(string uri, object data, CancellationToken cancellationToken)
         {
             string checkSum = null;
             if (data is Data dataData)
             {
                 checkSum = CheckSum(dataData);
             }
-            return await Post(uri, JsonConvert.SerializeObject(data), checkSum).ConfigureAwait(false);
+            return await Post(uri, JsonConvert.SerializeObject(data), checkSum, cancellationToken).ConfigureAwait(false);
         }
 
-        internal async Task<byte[]> PostByte(string uri, object data)
+        internal async Task<byte[]> PostByte(string uri, object data, CancellationToken cancellationToken)
         {
             string checkSum = null;
             if (data is Data dataData)
             {
                 checkSum = CheckSum(dataData);
             }
-            return await PostByte(uri, JsonConvert.SerializeObject(data), checkSum).ConfigureAwait(false);
+            return await PostByte(uri, JsonConvert.SerializeObject(data), checkSum, cancellationToken).ConfigureAwait(false);
         }
 
-        internal Task<string> Patch(string uri, string data, string checkSum = null)
+        internal Task<string> Patch(string uri, string data, string checkSum, CancellationToken cancellationToken)
         {
-            return SendJson(new HttpMethod("PATCH"), uri, data, checkSum);
+            return SendJson(new HttpMethod("PATCH"), uri, data, checkSum, cancellationToken);
         }
 
         // Raw JSON body instead of the "data=" form field, for endpoints documented with Content-Type: application/json.
-        internal Task<string> PostJson(string uri, object data)
+        internal Task<string> PostJson(string uri, object data, CancellationToken cancellationToken)
         {
-            return SendJson(HttpMethod.Post, uri, JsonConvert.SerializeObject(data), null);
+            return SendJson(HttpMethod.Post, uri, JsonConvert.SerializeObject(data), null, cancellationToken);
         }
 
-        private Task<string> SendJson(HttpMethod method, string uri, string data, string checkSum)
+        private Task<string> SendJson(HttpMethod method, string uri, string data, string checkSum, CancellationToken cancellationToken)
         {
             LastCheckSum = checkSum;
             var request = new HttpRequestMessage(method, uri)
             {
                 Content = new StringContent(data, Encoding.UTF8, "application/json")
             };
-            return Send(request, data, ReadString);
+            return Send(request, data, ReadString, cancellationToken);
         }
 
-        internal async Task<string> Patch(string uri, object data)
+        internal async Task<string> Patch(string uri, object data, CancellationToken cancellationToken)
         {
             string checkSum = null;
             if (data is Data dataData)
             {
                 checkSum = CheckSum(dataData);
             }
-            return await Patch(uri, JsonConvert.SerializeObject(data), checkSum).ConfigureAwait(false);
+            return await Patch(uri, JsonConvert.SerializeObject(data), checkSum, cancellationToken).ConfigureAwait(false);
         }
 
-        internal Task<string> Delete(string uri)
+        internal Task<string> Delete(string uri, CancellationToken cancellationToken)
         {
-            return Send(new HttpRequestMessage(HttpMethod.Delete, uri), null, ReadString);
+            return Send(new HttpRequestMessage(HttpMethod.Delete, uri), null, ReadString, cancellationToken);
         }
 
-        internal async Task<string> Delete(string uri, object data)
+        internal async Task<string> Delete(string uri, object data, CancellationToken cancellationToken)
         {
-            return await Delete(uri, JsonConvert.SerializeObject(data)).ConfigureAwait(false);
+            return await Delete(uri, JsonConvert.SerializeObject(data), cancellationToken).ConfigureAwait(false);
         }
 
-        internal Task<string> Delete(string uri, string data)
+        internal Task<string> Delete(string uri, string data, CancellationToken cancellationToken)
         {
-            return Send(CreateDeleteRequest(uri, data), data, ReadString);
+            return Send(CreateDeleteRequest(uri, data), data, ReadString, cancellationToken);
         }
 
         // Relative URI is resolved against the client's BaseAddress; body is sent as "data=<json>" like POST.
@@ -676,7 +690,7 @@ namespace Birko.SuperFaktura
         }
 
         [Obsolete("Not found in API documentation")]
-        public async Task<Response<Register>> Register(string email, bool sendEmail = true)
+        public async Task<Response<Register>> Register(string email, bool sendEmail = true, CancellationToken cancellationToken = default)
         {
             var result = await Post("users/create", new Request.UserData
             {
@@ -685,16 +699,16 @@ namespace Birko.SuperFaktura
                     Email = email,
                     SendEmail = sendEmail
                 }
-            }).ConfigureAwait(false);
+            }, cancellationToken).ConfigureAwait(false);
             return DeserializeResult<Response<Register>>(result);
         }
 
         [Obsolete("Not found in API documentation")]
-        public async Task<Response<ExpandoObject>> GetCourierData(string curierType, object data)
+        public async Task<Response<ExpandoObject>> GetCourierData(string curierType, object data, CancellationToken cancellationToken = default)
         {
             if (new[] { "slp", "csp" }.Contains(curierType))
             {
-                var result = await Post($"{curierType}_exports/export", new Request.DataData { Data = data }).ConfigureAwait(false);
+                var result = await Post($"{curierType}_exports/export", new Request.DataData { Data = data }, cancellationToken).ConfigureAwait(false);
                 return DeserializeResult<Response<ExpandoObject>>(result);
             }
             return null;
@@ -702,9 +716,9 @@ namespace Birko.SuperFaktura
 
         // Returns the original response of a request sent with this checksum (up to 3 months back),
         // or null when no request with this checksum reached the server.
-        public async Task<string> ResponseByChecksum(string checksum)
+        public async Task<string> ResponseByChecksum(string checksum, CancellationToken cancellationToken = default)
         {
-            var result = await Get($"api_logs/getResponseByChecksum/{Uri.EscapeDataString(checksum)}").ConfigureAwait(false);
+            var result = await Get($"api_logs/getResponseByChecksum/{Uri.EscapeDataString(checksum)}", cancellationToken).ConfigureAwait(false);
             return ParseResponseByChecksum(result);
         }
 
