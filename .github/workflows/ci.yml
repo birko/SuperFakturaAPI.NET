@@ -40,10 +40,10 @@ jobs:
       - name: Build
         run: dotnet build SuperFaktura.slnx --configuration Release --no-restore $VERSION_ARG
 
-      # Offline tests only: they check requests and responses without calling the API.
+      # Offline tests only: they check requests and responses without calling the API (CancellationTest uses a local TCP server).
       # Integration tests need sandbox credentials (SuperFaktura.Tests/Properties/launchSettings.json).
       - name: Test
-        run: dotnet test SuperFaktura.slnx --configuration Release --no-build --filter "FullyQualifiedName~SerializationTest"
+        run: dotnet test SuperFaktura.slnx --configuration Release --no-build --filter "FullyQualifiedName~SerializationTest|FullyQualifiedName~CancellationTest"
 
       - name: Pack
         run: dotnet pack SuperFaktura/SuperFaktura.csproj --configuration Release --no-build --output out $VERSION_ARG
